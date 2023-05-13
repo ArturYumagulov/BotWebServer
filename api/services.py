@@ -1,8 +1,12 @@
 import datetime
+import environ
 
 import requests
 import json
 from tasks.models import Worker, Basics  # noqa
+
+env = environ.Env()
+environ.Env.read_env()
 
 
 def send_message_bot(request):
@@ -16,7 +20,7 @@ def send_message_bot(request):
     Задача номер {str(request['number'])} от {date}\n\n"{request['name']}"\n\nАвтор: { author }\nОснование: {base.name}
     """
 
-    token = '5614919077:AAEaF1O3mJm-lNyP1fDD6-AXZnOYufB8FLw'
+    token = env.str("BOT_TOKEN")
 
     url = 'https://api.telegram.org/bot' + token + '/sendMessage'
 
@@ -33,7 +37,8 @@ def send_message_bot(request):
     return r.json()['ok']
 
 
-
-
+if __name__ == '__main__':
+    print(env("BOT_TOKEN"))
+    pass
 
 

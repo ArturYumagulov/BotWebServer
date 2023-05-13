@@ -56,7 +56,7 @@ class TaskViewSet(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            # send_message_bot(data)
+            send_message_bot(data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
