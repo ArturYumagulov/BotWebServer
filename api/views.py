@@ -90,7 +90,7 @@ class WorkerFilterViews(generics.ListAPIView):
     queryset = Worker.objects.all()
     serializer_class = WorkerSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['chat_id']
+    filterset_fields = ['chat_id', 'phone']
 
 
 

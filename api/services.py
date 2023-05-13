@@ -25,9 +25,9 @@ def send_message_bot(request):
     url = 'https://api.telegram.org/bot' + token + '/sendMessage'
 
     reply_markup = {"inline_keyboard": [
-                [{"text": "Выполнена", "callback_data": "done"}],
-                [{"text": "Не выполнена", "callback_data": "dont"}],
-                [{"text": "Переадресовать", "callback_data": "forward"}]
+                [{"text": "Выполнена ✅", "callback_data": f"done_{request['number']}"}],
+                [{"text": "Не выполнена ❌", "callback_data": f"dont_{request['number']}"}],
+                [{"text": "Переадресовать ↪️", "callback_data": f"forward_{request['number']}"}]
     ]}
 
     data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup)}

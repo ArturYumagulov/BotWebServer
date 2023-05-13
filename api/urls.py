@@ -27,10 +27,10 @@ router.register('worker_comment', WorkerCommentsViews)
 
 
 urlpatterns = [
-    path('token-auth/', views.obtain_auth_token, name="api_login"),
+    # path('token-auth/', views.obtain_auth_token, name="api_login"),
     path('', include(router.urls), name="api"),
     path('tasks_f/', TasksFilterViews.as_view(queryset=Task.objects.all(), serializer_class=TaskSerializer),
          name='tasks_list'),
     path('worker_f/', WorkerFilterViews.as_view(queryset=Worker.objects.all(), serializer_class=WorkerSerializer),
-         name='tasks_list')
+         name='workers_filter')
 ]

@@ -47,6 +47,7 @@ class WorkerSerializer(serializers.ModelSerializer):
         instance.code = validated_data.get('code', instance.code)
         instance.name = validated_data.get('name', instance.name)
         instance.chat_id = validated_data.get('chat_id', instance.chat_id)
+        instance.phone = validated_data.get('phone', instance.phone)
         instance.save()
 
         return instance
