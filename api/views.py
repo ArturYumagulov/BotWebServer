@@ -69,8 +69,8 @@ class TaskViewSet(ModelViewSet):
             serializer = self.serializer_class(data=data, instance=Task.objects.get(number=data['number']))
 
             if serializer.is_valid():
-
                 serializer.save()
+                send_message_bot(data)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Task.DoesNotExist:
@@ -91,9 +91,6 @@ class WorkerFilterViews(generics.ListAPIView):
     serializer_class = WorkerSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['chat_id', 'phone']
-
-
-
 
 
 class BaseViewSet(ModelViewSet):
@@ -277,9 +274,23 @@ class WorkerCommentsViews(ModelViewSet):
 
         data = request.data
         serializer = self.serializer_class(data=data,
-                                           instance=Basics.objects.get(number=data['number']))
+                                           instance=WorkerComments.objects.get(pk=data.pk))
 
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class WorkerForwardViewSet(ModelViewSet):
+    """Фильтр сотрудников при переадресовывании задачи
+        исключается number запросивщего и chat_id=null
+    """
+
+    serializer_class = WorkerSerializer
+    queryset = Worker.objects.all()
+
+    def list(self, request, code):  # noqa
+        queryset = self.queryset.filter(chat_id__isnull=False).exclude(code=code)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

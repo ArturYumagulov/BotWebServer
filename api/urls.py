@@ -1,4 +1,3 @@
-
 from django.urls import path, include
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
@@ -7,7 +6,7 @@ from .serializers import TaskSerializer, WorkerSerializer
 
 
 from .views import TaskViewSet, BaseViewSet, PartnersViewSet, WorkerViewSet, AuthorCommentsViews, \
-    WorkerCommentsViews, TasksFilterViews, WorkerFilterViews
+    WorkerCommentsViews, TasksFilterViews, WorkerFilterViews, WorkerForwardViewSet
 
 
 router = DefaultRouter()
@@ -16,14 +15,13 @@ router.register('base', BaseViewSet)
 router.register('base/(?P<number>[0-9]+)', BaseViewSet)
 router.register('tasks', TaskViewSet)
 router.register('tasks/(?P<number>[0-9]+)', TaskViewSet)
-# router.register('tasks_f/', TasksFilterViews.as_view(queryset=Task.objects.all(), serializer_class=TaskSerializer),
-#                 basename='tasks_list')
 router.register('partners', PartnersViewSet)
 router.register('partners/(?P<code>[0-9]+)', TaskViewSet)
 router.register('workers', WorkerViewSet)
 router.register('workers/(?P<code>[0-9]+)', TaskViewSet)
 router.register('author_comment', AuthorCommentsViews)
 router.register('worker_comment', WorkerCommentsViews)
+router.register('worker-forward/(?P<code>[0-9]+)', WorkerForwardViewSet)
 
 
 urlpatterns = [
