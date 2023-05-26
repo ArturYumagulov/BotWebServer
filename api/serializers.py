@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerComments  # noqa
+from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerComments, Result, PartnerWorker, \
+    ResultGroup, ResultData, Supervisor  # noqa
 
 
 class AuthorCommentsSerializer(serializers.ModelSerializer):
@@ -40,8 +41,15 @@ class WorkerSerializer(serializers.ModelSerializer):
         model = Worker
         fields = "__all__"
 
+
+class SupervisorSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Supervisor
+        fields = "__all__"
+
     def create(self, validated_data):
-        return Worker.objects.create(**validated_data)
+        return Supervisor.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.code = validated_data.get('code', instance.code)
@@ -71,6 +79,25 @@ class PartnerSerializer(serializers.ModelSerializer):
         return instance
 
 
+class PartnerWorkerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PartnerWorker
+        fields = "__all__"
+
+    def create(self, validated_data):
+        return PartnerWorker.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.partner = validated_data.get('partner', instance.partner)
+        instance.name = validated_data.get('name', instance.name)
+        instance.positions = validated_data.get('positions', instance.positions)
+
+        instance.save()
+
+        return instance
+
+
 class BasicSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -89,6 +116,27 @@ class BasicSerializer(serializers.ModelSerializer):
         return instance
 
 
+class ResultGroupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ResultGroup
+        fields = "__all__"
+
+
+class ResultDataSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ResultData
+        fields = "__all__"
+
+
+class ResultSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Result
+        fields = "__all__"
+
+
 class TaskSerializer(serializers.ModelSerializer):
 
     base_tasks = BasicSerializer(read_only=True)
@@ -104,19 +152,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
 
-        task = Task.objects.create(
-            number=validated_data.get('number'),
-            name=validated_data.get('name'),
-            date=validated_data.get('date'),
-            status=validated_data.get('status'),
-            deadline=validated_data.get('deadline'),
-            base=validated_data.get('base'),
-            partner=validated_data.get('partner'),
-            author_comment=validated_data.get('author_comment'),
-            author=validated_data.get('author'),
-            worker=validated_data.get('worker'),
-            worker_comment=validated_data.get('worker_comment')
-            )
+        task = Task.objects.create(**validated_data)
 
         return task
 
@@ -131,7 +167,40 @@ class TaskSerializer(serializers.ModelSerializer):
         instance.author_comment = validated_data.get('author_comment', instance.author_comment)
         instance.worker_comment = validated_data.get('worker_comment', instance.worker_comment)
         instance.edited = validated_data.get('edited', instance.edited)
+        instance.worker = validated_data.get('worker', instance.worker)
+        instance.author = validated_data.get('author', instance.author)
+        instance.result = validated_data.get('result', instance.result)
 
         instance.save()
 
         return instance
+
+
+class TaskListSerializer(serializers.ModelSerializer):
+
+    base = BasicSerializer()
+    partner = PartnerSerializer()
+    worker = WorkerSerializer()
+    author = WorkerSerializer()
+    worker_comment = WorkerCommentsSerializer()
+    author_comment = AuthorCommentsSerializer()
+    result = ResultSerializer()
+
+    class Meta:
+        model = Task
+        fields = '__all__'
+
+
+class AllTaskListSerializer(serializers.ModelSerializer):
+
+    # base = BasicSerializer()
+    # partner = PartnerSerializer()
+    # worker = WorkerSerializer()
+    # author = WorkerSerializer()
+    worker_comment = WorkerCommentsSerializer()
+    # author_comment = AuthorCommentsSerializer()
+    result = ResultSerializer()
+
+    class Meta:
+        model = Task
+        fields = '__all__'
