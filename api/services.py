@@ -34,7 +34,7 @@ def send_message_bot(request):
 
         message = f"""
 
-           {task_header['text']} номер {str(request['number'])} от {date}\n\n"{request['name']}"\n\nОснование: {base.name}\n\nАвтор: {author}\n\nКомментарий автора: {author_comment.comment}\n"""
+           {task_header['text']} от {date}\n\n"{request['name']}"\n\nОснование: {base.name}\n\nАвтор: {author}\n\nКомментарий автора: {author_comment.comment}\n"""
 
         if worker_comment.id != 1:
             message += sub_text
@@ -51,7 +51,7 @@ def send_message_bot(request):
 
         message = f"""
 
-           {task_header['text']} номер {str(request['number'])} от {date}\n\n"{request['name']}"\n\nОснование: {base.name}\n\nАвтор: {author}\n\nКомментарий автора: {author_comment.comment}\n"""
+           {task_header['text']} от {date}\n\n"{request['name']}"\n\nОснование: {base.name}\n\nАвтор: {author}\n\nКомментарий автора: {author_comment.comment}\n"""
 
         if worker_comment.id != 1:
             message += sub_text
@@ -67,7 +67,7 @@ def send_message_bot(request):
         task_header = {'text': "Отклонена задача"}
         message = f"""
 
-                   {task_header['text']} номер {str(request['number'])} от {date}\n\n"{request['name']}"\n\nОснование: {base.name}\n\nАвтор: {author}\n\nКомментарий автора: {author_comment.comment}\n"""
+                   {task_header['text']} от {date}\n\n"{request['name']}"\n\nОснование: {base.name}\n\nАвтор: {author}\n\nКомментарий автора: {author_comment.comment}\n"""
 
         if worker_comment.id != 1:
             message += sub_text
