@@ -199,8 +199,14 @@ class AllTaskListSerializer(serializers.ModelSerializer):
     # author = WorkerSerializer()
     worker_comment = WorkerCommentsSerializer()
     # author_comment = AuthorCommentsSerializer()
-    result = ResultSerializer()
+    result = ResultSerializer(read_only=True)
 
     class Meta:
         model = Task
         fields = '__all__'
+
+    def update(self, instance, validated_data):
+
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+        return instance

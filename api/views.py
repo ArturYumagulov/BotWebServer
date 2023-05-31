@@ -531,7 +531,7 @@ class AllTasksFilterView(ModelViewSet):
 
         data = request.data
         serializer = self.serializer_class(data=data,
-                                           instance=self.queryset.get(pk=data.pk))
+                                           instance=self.queryset.get(number=data['number']))
 
         if serializer.is_valid():
             serializer.save()
