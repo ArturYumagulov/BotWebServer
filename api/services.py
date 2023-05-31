@@ -62,9 +62,9 @@ def send_message_bot(request):
 
         return r.json()['ok']
 
-    elif request['status'] == "Не выполнено":
+    elif request['status'] == "Отклонена":
 
-        task_header = {'text': "Не выполнена задача"}
+        task_header = {'text': "Отклонена задача"}
         message = f"""
 
                    {task_header['text']} номер {str(request['number'])} от {date}\n\n"{request['name']}"\n\nОснование: {base.name}\n\nАвтор: {author}\n\nКомментарий автора: {author_comment.comment}\n"""
