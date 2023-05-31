@@ -22,7 +22,7 @@ def send_message_bot(request):
 
     reply_markup = {"inline_keyboard": [
                 [{"text": "Выполнена ✅", "callback_data": f"ok_{request['number']}"}],
-                [{"text": "Не выполнена ❌", "callback_data": f"dont_{request['number']}"}],
+                [{"text": "Отклонить ❌", "callback_data": f"dont_{request['number']}"}],
                 [{"text": "Переадресовать ↪️", "callback_data": f"first_forward_{request['number']}"}]
     ]}
 
