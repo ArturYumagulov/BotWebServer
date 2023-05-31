@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -10,6 +11,8 @@ from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerCo
 from .serializers import TaskSerializer, BasicSerializer, PartnerSerializer, WorkerSerializer, \
     AuthorCommentsSerializer, WorkerCommentsSerializer, TaskListSerializer, PartnerWorkerSerializer, ResultSerializer, \
     ResultGroupSerializer, ResultDataSerializer, SupervisorSerializer, AllTaskListSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class TaskViewSet(ModelViewSet):
@@ -47,7 +50,7 @@ class TaskViewSet(ModelViewSet):
 
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-
+        logger.info("Get response")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):  # noqa
@@ -512,3 +515,28 @@ class AllTasksFilterView(ModelViewSet):
     queryset = Task.objects.filter(edited=True).exclude(status="Загружено")
     serializer_class = AllTaskListSerializer
     # filter_backends = [DjangoFilterBackend]
+
+    def create(self, request):  # noqa
+
+        data = request.data
+
+        serializer = self.serializer_class(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):
+
+        data = request.data
+        serializer = self.serializer_class(data=data,
+                                           instance=self.queryset.get(pk=data.pk))
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#  TODO Добавить кеширование
+#  TODO Добаввить логгирование
