@@ -151,7 +151,7 @@ class WorkerComments(models.Model):
 
 class Task(models.Model):
     name = models.CharField(max_length=1000, verbose_name="Имя")
-    number = models.CharField(max_length=11, verbose_name="Номер", primary_key=True)
+    number = models.CharField(max_length=36, verbose_name="Номер", primary_key=True)
     date = models.DateTimeField(verbose_name="Дата")
     status = models.CharField(max_length=100, verbose_name="Статус", default="Новая")
     deadline = models.DateTimeField(verbose_name="Исполнить до")

@@ -163,17 +163,23 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'console'
         },
-        'file': {
-            'level': 'DEBUG',
+        'info_file': {
+            'level': 'INFO',
             'class': 'logging.FileHandler',
             'formatter': 'file',
-            'filename': 'debug.log'
+            'filename': 'logs/info.log'
+        },
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'formatter': 'file',
+            'filename': 'logs/error.log'
         }
     },
     'loggers': {
         '': {
             'level': 'DEBUG',
-            'handlers': ['console', 'file']
+            'handlers': ['console', 'info_file', 'error_file']
         }
     }
 }
