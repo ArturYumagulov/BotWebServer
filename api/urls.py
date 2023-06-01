@@ -7,7 +7,7 @@ from .serializers import WorkerSerializer, TaskListSerializer, PartnerWorkerSeri
 from .views import TaskViewSet, BaseViewSet, PartnersViewSet, WorkerViewSet, AuthorCommentsViews, \
     WorkerCommentsViews, TasksFilterViews, WorkerFilterViews, WorkerForwardViewSet, TaskViewListSet, \
     PartnersWorkerViewSet, PartnerWorkerFilterViews, ResultListView, ResultDataFilterViews, ResultGroupListView, \
-    ResultDataListView, SupervisorViewSet, AllTasksFilterView
+    ResultDataListView, SupervisorViewSet, AllTasksUpdateView
 
 
 router = DefaultRouter()
@@ -16,7 +16,7 @@ router.get_api_root_view().cls.__doc__ = "API для бота по задача�
 router.register('base', BaseViewSet)
 router.register('tasks', TaskViewSet, basename='tasks')
 router.register('all-tasks', TaskViewListSet, basename="all_tasks")
-router.register('all-tasks-update', AllTasksFilterView, basename="all_tasks_update")
+router.register('all-tasks-update', AllTasksUpdateView, basename="all_tasks_update")
 router.register('partners', PartnersViewSet, basename='partners')
 router.register('partners-worker', PartnersWorkerViewSet, basename="partners_worker_list")
 router.register('workers', WorkerViewSet)

@@ -41,8 +41,8 @@ class TaskViewSet(ModelViewSet):
     \n
     """
 
+    model = Task
     serializer_class = TaskSerializer
-    basic_serializer = BasicSerializer
     queryset = Task.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -50,7 +50,7 @@ class TaskViewSet(ModelViewSet):
 
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info("Get response")
+        logger.info(f"{request.method} - {request.path} - {request.META['REMOTE_ADDR']} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):  # noqa
@@ -62,59 +62,65 @@ class TaskViewSet(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            send_message_bot(data)
+            logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - saving data - "
+                        f"{status.HTTP_201_CREATED}")
+            if send_message_bot(data):
+                logger.info(f"Сообщение {data} отправлено")
+            else:
+                logger.error(f"Сообщение {data} не отправлено")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        logger.error(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - не сохранено - "
+                     f"serializer_error:{serializer.errors} {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
+        return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def put(self, request):  # noqa
         """Изменение существующего поста"""
 
         data = request.data
-        try:
-            serializer = self.serializer_class(data=data, instance=Task.objects.get(number=data['number']))
 
+        try:
+            serializer = self.serializer_class(data=data, instance=self.queryset.get(number=data['number']))
+            logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - data_have - "
+                        f"{status.HTTP_200_OK}")
             if serializer.is_valid():
                 serializer.save()
-                send_message_bot(data)
+                logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - saving data - "
+                            f"{status.HTTP_201_CREATED}")
+                if send_message_bot(data):
+                    logger.info(f"Сообщение {data} отправлено")
+                else:
+                    logger.error(f"Сообщение {data} не отправлено")
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Task.DoesNotExist:
-            return Response({'detail': 'Данная задача не существует'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ResultDataFilterViews(generics.ListAPIView):
-
-    serializer_class = ResultDataSerializer
-
-    def get_queryset(self):
-        queryset = ResultData.objects.all()
-        group_name = self.request.query_params.get('group')
-        group = get_object_or_404(ResultGroup, pk=group_name)
-        if group_name is not None:
-            queryset = queryset.filter(group=group)
-        return queryset
+            logger.error(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - не сохранено - "
+                         f"serializer_error:{serializer.errors} - {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
+            return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        except self.model.DoesNotExist:
+            logger.error(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} "
+                         f"serializer_error:{'Данная задача не существует'} - {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
+            return Response({'detail': 'Данная задача не существует'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class BaseViewSet(ModelViewSet):
     """
-    Основание
+    Выгрузка и загрузка оснований
     <hr>
-    <b>GET</b> - получение списка задач \n
-    <b>POST</b> - создание задачи \n
-    <b>PUT</b> - обновление задачи \n
+    <b>GET</b> - получение\n
+    <b>POST</b> - создание\n
+    <b>PUT</b> - обновление\n
     <hr>
     <b><em>number</em></b> - Код 1С\n
     <b><em>name</em></b> - Название \n
     <b><em>date</em></b> - Дата \n
     """
 
+    model = Basics
     serializer_class = BasicSerializer
     queryset = Basics.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
+        logger.info(f"{request.method} - {request.path} - {request.META['REMOTE_ADDR']} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request): # noqa
@@ -125,29 +131,38 @@ class BaseViewSet(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
+            logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - saving data - "
+                        f"{status.HTTP_201_CREATED}")
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        logger.error(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - не сохранено - "
+                     f"serializer_error:{serializer.errors} {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
+        return Response(data=serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def put(self, request, *args, **kwargs):
 
         data = request.data
+
         serializer = self.serializer_class(data=data,
-                                           instance=Basics.objects.get(number=data['number']), many=True)
+                                           instance=self.queryset.get(number=data['number']), many=True)
 
         if serializer.is_valid():
             serializer.save()
+            logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - saving data - "
+                        f"{status.HTTP_201_CREATED}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        logger.error(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - не сохранено - "
+                     f"serializer_error:{serializer.errors} {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
+        return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
 
 class PartnersViewSet(ModelViewSet):
     """
-    Контрагент
+    Выгрузка и загрузка контрагентов - множественная
 
     <hr>
-    <b>GET</b> - получение списка задач \n
-    <b>POST</b> - создание задачи \n
-    <b>PUT</b> - обновление задачи \n
+    <b>GET</b> - получение\n
+    <b>POST</b> - создание\n
+    <b>PUT</b> - обновление\n
     <hr>
     <b><em>code</em></b> - Код 1С\n
     <b><em>name</em></b> - Имя \n
@@ -159,24 +174,23 @@ class PartnersViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
+        logger.info(f"{request.method} - {request.path} - {request.META['REMOTE_ADDR']} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request): # noqa
 
         data = request.data
-
         serializer = self.serializer_class(data=data, many=True)
-
         if serializer.is_valid():
             serializer.save()
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, *args, **kwargs):
 
         data = request.data
         serializer = self.serializer_class(data=data,
-                                           instance=Basics.objects.get(number=data['number']))
+                                           instance=self.queryset.get(code=data['code']))
 
         if serializer.is_valid():
             serializer.save()
@@ -487,34 +501,10 @@ class ResultDataListView(ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# FILTERS
-
-class TasksFilterViews(generics.ListAPIView):
-    queryset = Task.objects.all()
-    serializer_class = TaskListSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['worker', 'edited', 'status']
-
-
-class WorkerFilterViews(generics.ListAPIView):
-    queryset = Worker.objects.all()
-    serializer_class = WorkerSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['chat_id', 'phone', 'controller', 'code']
-
-
-class PartnerWorkerFilterViews(generics.ListAPIView):
-    queryset = PartnerWorker.objects.all()
-    serializer_class = PartnerWorkerSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['partner', 'id']
-
-
-class AllTasksFilterView(ModelViewSet):
+class AllTasksUpdateView(ModelViewSet):
     """Вывод только измененных задач"""
     queryset = Task.objects.filter(edited=True).exclude(status="Загружено")
     serializer_class = AllTaskListSerializer
-    # filter_backends = [DjangoFilterBackend]
 
     def create(self, request):  # noqa
 
@@ -537,6 +527,42 @@ class AllTasksFilterView(ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# FILTERS
+
+class TasksFilterViews(generics.ListAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskListSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['worker', 'edited', 'status']
+
+
+class WorkerFilterViews(generics.ListAPIView):
+    queryset = Worker.objects.all()
+    serializer_class = WorkerSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['chat_id', 'phone', 'controller', 'code']
+
+
+class PartnerWorkerFilterViews(generics.ListAPIView):
+    queryset = PartnerWorker.objects.all()
+    serializer_class = PartnerWorkerSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['partner', 'id', 'code']
+
+
+class ResultDataFilterViews(generics.ListAPIView):
+
+    serializer_class = ResultDataSerializer
+
+    def get_queryset(self):
+        queryset = ResultData.objects.all()
+        group_name = self.request.query_params.get('group')
+        group = get_object_or_404(ResultGroup, pk=group_name)
+        if group_name is not None:
+            queryset = queryset.filter(group=group)
+        return queryset
 
 #  TODO Добавить кеширование
 #  TODO Добаввить логгирование

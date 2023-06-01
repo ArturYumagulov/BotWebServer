@@ -83,6 +83,7 @@ class PartnerWorker(models.Model):
     partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name="partner_workers")
     name = models.CharField(max_length=1000)
     positions = models.CharField(max_length=1000)
+    code = models.CharField(max_length=11, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}"

@@ -65,15 +65,14 @@ class PartnerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Partner
-        fields = "__all__"
+        fields = ('code', 'name',)
 
     def create(self, validated_data):
         return Partner.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.number = validated_data.get('number', instance.number)
+        instance.code = validated_data.get('code', instance.code)
         instance.name = validated_data.get('name', instance.name)
-        instance.date = validated_data.get('date', instance.date)
         instance.save()
 
         return instance
@@ -92,6 +91,7 @@ class PartnerWorkerSerializer(serializers.ModelSerializer):
         instance.partner = validated_data.get('partner', instance.partner)
         instance.name = validated_data.get('name', instance.name)
         instance.positions = validated_data.get('positions', instance.positions)
+        instance.code = validated_data.get('code', instance.code)
 
         instance.save()
 
@@ -193,12 +193,7 @@ class TaskListSerializer(serializers.ModelSerializer):
 
 class AllTaskListSerializer(serializers.ModelSerializer):
 
-    # base = BasicSerializer()
-    # partner = PartnerSerializer()
-    # worker = WorkerSerializer()
-    # author = WorkerSerializer()
     worker_comment = WorkerCommentsSerializer()
-    # author_comment = AuthorCommentsSerializer()
     result = ResultSerializer(read_only=True)
 
     class Meta:

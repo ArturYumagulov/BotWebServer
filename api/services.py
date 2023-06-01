@@ -43,7 +43,7 @@ def send_message_bot(request):
 
         r = requests.post(url, data=data)
 
-        return r.json()['ok']
+        return True
 
     if request['status'] == 'Переадресована':
 
@@ -60,7 +60,7 @@ def send_message_bot(request):
 
         r = requests.post(url, data=data)
 
-        return r.json()['ok']
+        return True
 
     elif request['status'] == "Отклонена":
 
@@ -76,7 +76,10 @@ def send_message_bot(request):
 
         r = requests.post(url, data=data)
 
-        return r.json()['ok']
+        return True
+
+    else:
+        return False
 
 
 if __name__ == '__main__':
