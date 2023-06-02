@@ -5,7 +5,7 @@ from tasks.models import Task, Worker, PartnerWorker, Result, ResultGroup  # noq
 from .serializers import WorkerSerializer, TaskListSerializer, PartnerWorkerSerializer
 
 from .views import TaskViewSet, BaseViewSet, PartnersViewSet, WorkerViewSet, AuthorCommentsViews, \
-    WorkerCommentsViews, TasksFilterViews, WorkerFilterViews, WorkerForwardViewSet, TaskViewListSet, \
+    WorkerCommentsViews, TasksFilterViews, WorkerFilterViews, TaskViewListSet, \
     PartnersWorkerViewSet, PartnerWorkerFilterViews, ResultListView, ResultDataFilterViews, ResultGroupListView, \
     ResultDataListView, SupervisorViewSet, AllTasksUpdateView
 

@@ -193,7 +193,7 @@ class TaskListSerializer(serializers.ModelSerializer):
 
 class AllTaskListSerializer(serializers.ModelSerializer):
 
-    worker_comment = WorkerCommentsSerializer()
+    author_comment = AuthorCommentsSerializer()
     result = ResultSerializer(read_only=True)
 
     class Meta:
