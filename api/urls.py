@@ -13,7 +13,7 @@ from .views import TaskViewSet, BaseViewSet, PartnersViewSet, WorkerViewSet, Aut
 router = DefaultRouter()
 router.get_api_root_view().cls.__doc__ = "API для бота по задачам из 1С"
 
-router.register('base', BaseViewSet)
+router.register('base', BaseViewSet, basename="base")
 router.register('tasks', TaskViewSet, basename='tasks')
 router.register('all-tasks', TaskViewListSet, basename="all_tasks")
 router.register('all-tasks-update', AllTasksUpdateView, basename="all_tasks_update")

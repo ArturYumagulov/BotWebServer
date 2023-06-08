@@ -97,7 +97,7 @@ class PartnerWorker(models.Model):
 class Worker(models.Model):
     name = models.CharField(verbose_name="Имя", max_length=1000)
     code = models.CharField(verbose_name="Код 1С", primary_key=True, max_length=11)
-    chat_id = models.IntegerField(unique=True, blank=True, null=True)
+    chat_id = models.PositiveBigIntegerField(unique=True, blank=True, null=True)
     phone = models.CharField(verbose_name="Телефон", max_length=15, null=True, blank=True)
     supervisor = models.ForeignKey('Supervisor', on_delete=models.PROTECT, null=True, blank=True)
     controller = models.BooleanField(default=False)

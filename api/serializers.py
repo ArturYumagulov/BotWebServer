@@ -12,12 +12,6 @@ class AuthorCommentsSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return AuthorComments.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('comment', instance.name)
-        instance.number = validated_data.get('author', instance.author)
-        instance.save()
-        return instance
-
 
 class WorkerCommentsSerializer(serializers.ModelSerializer):
 
@@ -27,12 +21,6 @@ class WorkerCommentsSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return self.Meta.model.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('comment', instance.name)
-        instance.number = validated_data.get('worker', instance.worker)
-        instance.save()
-        return instance
 
 
 class WorkerSerializer(serializers.ModelSerializer):
@@ -86,16 +74,6 @@ class PartnerWorkerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return PartnerWorker.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.partner = validated_data.get('partner', instance.partner)
-        instance.name = validated_data.get('name', instance.name)
-        instance.positions = validated_data.get('positions', instance.positions)
-        instance.code = validated_data.get('code', instance.code)
-
-        instance.save()
-
-        return instance
 
 
 class BasicSerializer(serializers.ModelSerializer):
