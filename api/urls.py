@@ -30,7 +30,7 @@ router.register('result-data', ResultDataListView, basename='result_data_list')
 
 # Фильтры
 urlpatterns = [
-    # path('token-auth/', views.obtain_auth_token, name="api_login"),
+    path('token-auth/', views.obtain_auth_token, name="api_login"),
     path('', include(router.urls), name="api"),
     path('tasks_f/', TasksFilterViews.as_view(queryset=Task.objects.all(), serializer_class=TaskListSerializer),
          name='tasks_list'),
@@ -41,3 +41,6 @@ urlpatterns = [
          name='partner-worker_filter'),
     path('result-data_f/', ResultDataFilterViews.as_view(), name='result_filter'),
 ]
+
+
+#  TODO добавить авторизацию

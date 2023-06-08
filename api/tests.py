@@ -1,7 +1,11 @@
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import get_user_model
+
 from tasks import models
-from api.urls import router
+
+User = get_user_model()
 
 ROUTES = {
     'base': '/api/v1/base/',
@@ -11,6 +15,8 @@ ROUTES = {
     'workers': '/api/v1/workers/',
     'author_comment': '/api/v1/author_comment/',
     'worker_comment': '/api/v1/worker_comment/',
+    'auth': '/api/v1/token-auth/',
+    'auth_data': {'username': "test_user", 'password': "test12345"}
 }
 
 
@@ -50,6 +56,15 @@ class BaseTests(APITestCase):
             "name": "Изменено",
             "date": "2023-06-05T16:37:47Z"
         }
+
+    def setUp(self):
+        self.client = APIClient()
+        self.is_authenticated = User.objects.create_user(
+            username=ROUTES['auth_data']['username'],
+            password=ROUTES['auth_data']['password'])
+        self.response = self.client.post(ROUTES['auth'], data=ROUTES['auth_data'])
+        self.token = Token.objects.get(user__username=ROUTES['auth_data']['username'])
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
     def test_create_and_update_basic(self):
         create_response = self.client.post(self.base_url, self.create_data, format='json')
@@ -113,6 +128,15 @@ class PartnersTests(APITestCase):
         }
 
     ]
+
+    def setUp(self):
+        self.client = APIClient()
+        self.is_authenticated = User.objects.create_user(
+            username=ROUTES['auth_data']['username'],
+            password=ROUTES['auth_data']['password'])
+        self.response = self.client.post(ROUTES['auth'], data=ROUTES['auth_data'])
+        self.token = Token.objects.get(user__username=ROUTES['auth_data']['username'])
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
     def test_create_and_update_partners(self):
         create_response = self.client.post(self.base_url, self.create_data, format='json')
@@ -194,6 +218,15 @@ class SupervisorsWorkerTests(APITestCase):
 
     ]
 
+    def setUp(self):
+        self.client = APIClient()
+        self.is_authenticated = User.objects.create_user(
+            username=ROUTES['auth_data']['username'],
+            password=ROUTES['auth_data']['password'])
+        self.response = self.client.post(ROUTES['auth'], data=ROUTES['auth_data'])
+        self.token = Token.objects.get(user__username=ROUTES['auth_data']['username'])
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
     def test_create_and_update_supervisors_workers(self):
         create_response = self.client.post(self.supervisor_url, self.create_data, format='json')
 
@@ -253,6 +286,15 @@ class AutorCommentTests(APITestCase):
         'author': create_worker_data[0]['code']
     }
 
+    def setUp(self):
+        self.client = APIClient()
+        self.is_authenticated = User.objects.create_user(
+            username=ROUTES['auth_data']['username'],
+            password=ROUTES['auth_data']['password'])
+        self.response = self.client.post(ROUTES['auth'], data=ROUTES['auth_data'])
+        self.token = Token.objects.get(user__username=ROUTES['auth_data']['username'])
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
     def test_create_author_comments(self):
 
         #  Создаю супервизора
@@ -273,6 +315,7 @@ class AutorCommentTests(APITestCase):
                                                           format='json')
 
         self.assertEqual(create_author_comment_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.author_comment_model.objects.get().id, create_author_comment_response.data['id'])
         self.assertEqual(self.author_comment_model.objects.count(), 1)
         self.assertEqual(self.author_comment_model.objects.get().comment, self.author_comment_data['comment'])
 
@@ -309,6 +352,15 @@ class WorkerCommentTests(APITestCase):
         'worker': create_worker_data[0]['code']
     }
 
+    def setUp(self):
+        self.client = APIClient()
+        self.is_authenticated = User.objects.create_user(
+            username=ROUTES['auth_data']['username'],
+            password=ROUTES['auth_data']['password'])
+        self.response = self.client.post(ROUTES['auth'], data=ROUTES['auth_data'])
+        self.token = Token.objects.get(user__username=ROUTES['auth_data']['username'])
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
     def test_create_worker_comments(self):
 
         #  Создаю супервизора
@@ -319,7 +371,6 @@ class WorkerCommentTests(APITestCase):
 
         #  Создаю торгового
         create_worker_response = self.client.post(self.worker_url, self.create_worker_data, format='json')
-
         self.assertEqual(create_worker_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(self.worker_model.objects.count(), 1)
         self.assertEqual(self.worker_model.objects.get().name, self.create_worker_data[0]['name'])
@@ -327,10 +378,7 @@ class WorkerCommentTests(APITestCase):
         #  Создаю комментарий
         create_worker_comment_response = self.client.post(self.worker_comment_url, data=self.worker_comment_data,
                                                           format='json')
-
         self.assertEqual(create_worker_comment_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.worker_comment_model.objects.get().id, create_worker_comment_response.data['id'])
         self.assertEqual(self.worker_comment_model.objects.count(), 1)
         self.assertEqual(self.worker_comment_model.objects.get().comment, self.worker_comment_data['comment'])
-
-#  TODO написать тесты
-
