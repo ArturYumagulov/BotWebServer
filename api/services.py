@@ -55,30 +55,30 @@ def send_message_bot(request):
 
         return True
 
-    if request['status'] == 'Переадресована':
-        task_header = {'text': "Вам переадресована задача"}
-        message = f"{task_header['text']} от " \
-                  f"{date}\n\n" \
-                  f"'{request['name']}'\n\n" \
-                  f"Исполнить до:\n" \
-                  f"{deadline}\n\n" \
-                  f"Автор:\n" \
-                  f"{author}\n\n" \
-                  f"Контрагент:\n" \
-                  f"{partner.name}\n\n" \
-                  f"Основание:\n" \
-                  f"{base.name}\n\n" \
-                  f"Комментарий автора:\n" \
-                  f"{author_comment.comment}\n"
-
-        if worker_comment.id != 1:
-            message += sub_text
-
-        data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup)}
-
-        r = requests.post(url, data=data)
-
-        return True
+    # if request['status'] == 'Переадресована':
+    #     task_header = {'text': "Вам переадресована задача"}
+    #     message = f"{task_header['text']} от " \
+    #               f"{date}\n\n" \
+    #               f"'{request['name']}'\n\n" \
+    #               f"Исполнить до:\n" \
+    #               f"{deadline}\n\n" \
+    #               f"Автор:\n" \
+    #               f"{author}\n\n" \
+    #               f"Контрагент:\n" \
+    #               f"{partner.name}\n\n" \
+    #               f"Основание:\n" \
+    #               f"{base.name}\n\n" \
+    #               f"Комментарий автора:\n" \
+    #               f"{author_comment.comment}\n"
+    #
+    #     if worker_comment.id != 1:
+    #         message += sub_text
+    #
+    #     data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup)}
+    #
+    #     r = requests.post(url, data=data)
+    #
+    #     return True
 
     elif request['status'] == "Отклонена":
         task_header = {'text': "Отклонена задача"}
