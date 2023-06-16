@@ -28,7 +28,8 @@ def send_message_bot(request):
                 [{"text": "Переадресовать ↪️", "callback_data": f"first_forward_{request['number']}"}]
     ]}
 
-    sub_text = f"Комментарий исполнителя: \n {worker_comment.comment}"
+    sub_text = f"<b>Комментарий исполнителя:</b> \n" \
+               f"{worker_comment.comment}"
 
     if request['status'] == 'Новая':
         task_header = {'text': "Задача"}
