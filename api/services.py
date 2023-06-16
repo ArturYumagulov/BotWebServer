@@ -35,21 +35,22 @@ def send_message_bot(request):
         message = f"{task_header['text']} от " \
                   f"{date}\n\n" \
                   f"'{request['name']}'\n\n" \
-                  f"Исполнить до:\n" \
-                  f"{deadline}\n\n" \
-                  f"Автор:\n" \
-                  f"{author}\n\n" \
-                  f"Контрагент:\n" \
-                  f"{partner.name}\n\n" \
-                  f"Основание:\n" \
+                  f"<b>Исполнить до:</b>\n" \
+                  f"{deadline}\n" \
+                  f"<b>Автор:</b>\n" \
+                  f"{author}\n" \
+                  f"<b>Контрагент:</b>\n" \
+                  f"{partner.name}\n" \
+                  f"<b>Основание:</b>\n" \
                   f"{base.name}\n\n" \
-                  f"Комментарий автора:\n" \
+                  f"<b>Комментарий автора:</b>\n" \
                   f"{author_comment.comment}\n"
 
         if worker_comment.id != 1:
             message += sub_text
 
-        data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup)}
+        data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup),
+                'parse_mode': "HTML"}
 
         r = requests.post(url, data=data)
 
@@ -85,21 +86,21 @@ def send_message_bot(request):
         message = f"{task_header['text']} от " \
                   f"{date}\n\n" \
                   f"'{request['name']}'\n\n" \
-                  f"Исполнить до:\n" \
-                  f"{deadline}\n\n" \
-                  f"Автор:\n" \
-                  f"{author}\n\n" \
-                  f"Контрагент:\n" \
-                  f"{partner.name}\n\n" \
-                  f"Основание:\n" \
+                  f"<b>Исполнить до:</b>\n" \
+                  f"{deadline}\n" \
+                  f"<b>Автор:</b>\n" \
+                  f"{author}\n" \
+                  f"<b>Контрагент:</b>\n" \
+                  f"{partner.name}\n" \
+                  f"<b>Основание:</b>\n" \
                   f"{base.name}\n\n" \
-                  f"Комментарий автора:\n" \
+                  f"<b>Комментарий автора:</b>\n" \
                   f"{author_comment.comment}\n"
 
         if worker_comment.id != 1:
             message += sub_text
 
-        data = {'chat_id': author.chat_id, 'text': message}
+        data = {'chat_id': author.chat_id, 'text': message, 'parse_mode': "HTML"}
 
         r = requests.post(url, data=data)
 
