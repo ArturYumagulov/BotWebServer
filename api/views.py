@@ -617,9 +617,9 @@ class ResultDataFilterViews(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = ResultData.objects.all()
-        group_name = self.request.query_params.get('group')
-        group = get_object_or_404(ResultGroup, pk=group_name)
-        if group_name is not None:
+        group_code = self.request.query_params.get('group')
+        group = get_object_or_404(ResultGroup, code=group_code)
+        if group is not None:
             queryset = queryset.filter(group=group)
         return queryset
 
