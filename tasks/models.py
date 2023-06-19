@@ -2,6 +2,7 @@ from django.db import models
 
 
 class ResultGroup(models.Model):
+    code = models.CharField(verbose_name="Код 1С", max_length=11, primary_key=True)
     name = models.CharField(max_length=1000)
 
     def __str__(self):
@@ -16,6 +17,7 @@ class ResultData(models.Model):
     group = models.ForeignKey(ResultGroup, on_delete=models.CASCADE, related_name="result_dates")
     name = models.CharField(max_length=1000)
     control_data = models.BooleanField(default=False)
+    code = models.CharField(verbose_name="Код 1С", max_length=11, primary_key=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -37,7 +39,6 @@ class Result(models.Model):
 
     base = models.ForeignKey('Basics', verbose_name="Основание", on_delete=models.CASCADE, related_name='result_bases')
     type = models.CharField(choices=TYPES, max_length=1000, default='other')
-    group = models.ForeignKey('ResultGroup', on_delete=models.CASCADE, related_name="result_groups")
     result = models.CharField(max_length=1000)
     task_number = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='result_task')
     contact_person = models.CharField(max_length=500)
@@ -56,6 +57,7 @@ class Basics(models.Model):
     name = models.CharField(verbose_name="Название", max_length=1000)
     date = models.DateTimeField(verbose_name="Дата основания")
     number = models.CharField(verbose_name="Номер", max_length=11, primary_key=True)
+    group = models.ForeignKey('ResultGroup', on_delete=models.CASCADE, related_name="basics_groups")
 
     def __str__(self):
         return f"{self.name} {self.number} {self.date}"
@@ -101,6 +103,7 @@ class Worker(models.Model):
     phone = models.CharField(verbose_name="Телефон", max_length=15, null=True, blank=True)
     supervisor = models.ForeignKey('Supervisor', on_delete=models.PROTECT, null=True, blank=True)
     controller = models.BooleanField(default=False)
+    partner = models.CharField(max_length=11, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}"

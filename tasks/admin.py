@@ -24,11 +24,7 @@ class TaskAdmin(admin.ModelAdmin):
 
 
 class BaseAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'date',
-        'number',
-    )
+    # list_display = ('')
     search_fields = [
         'name',
         'number'
