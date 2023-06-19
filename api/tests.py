@@ -15,6 +15,7 @@ ROUTES = {
     'workers': '/api/v1/workers/',
     'author_comment': '/api/v1/author_comment/',
     'worker_comment': '/api/v1/worker_comment/',
+    'result_group': '/api/v1/result-group/',
     'auth': '/api/v1/token-auth/',
     'auth_data': {'username': "test_user", 'password': "test12345"}
 }
@@ -24,23 +25,32 @@ class BaseTests(APITestCase):
     """Тестирование оснований"""
 
     base_url = ROUTES['base']
+    group_url = ROUTES['result_group']
     model = models.Basics
+
+    group_data = {
+        "code": "000000002",
+        "name": "Pазработка Контрагента"
+    }
 
     create_data = [
         {
             "number": "00000142871",
             "name": "Событие 00000142871 от 05.06.2023 16:37:47",
-            "date": "2023-06-05T16:37:47Z"
+            "date": "2023-06-05T16:37:47Z",
+            "group": "000000002"
         },
         {
             "number": "00000142866",
             "name": "Событие 00000142866 от 02.06.2023 16:59:07",
-            "date": "2023-06-02T16:59:07Z"
+            "date": "2023-06-02T16:59:07Z",
+            "group": "000000002"
         },
         {
             "number": "00000142865",
             "name": "Событие 00000142865 от 02.06.2023 15:34:20",
-            "date": "2023-06-02T15:34:20Z"
+            "date": "2023-06-02T15:34:20Z",
+            "group": "000000002"
         }
     ]
 
@@ -48,13 +58,15 @@ class BaseTests(APITestCase):
         {
             "number": "00000142871",
             "name": "Изменено",
-            "date": "2023-06-05T16:37:47Z"
+            "date": "2023-06-05T16:37:47Z",
+            "group": "000000002"
         }
     ]
     error_data = {
             "number": "00000142871",
             "name": "Изменено",
-            "date": "2023-06-05T16:37:47Z"
+            "date": "2023-06-05T16:37:47Z",
+            "group": "000000002"
         }
 
     def setUp(self):
@@ -67,6 +79,8 @@ class BaseTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
     def test_create_and_update_basic(self):
+        create_group = self.client.post(self.group_url, self.group_data)
+        self.assertEqual(create_group.status_code, status.HTTP_201_CREATED)
         create_response = self.client.post(self.base_url, self.create_data, format='json')
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(self.model.objects.count(), 3)
