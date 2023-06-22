@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+
+{% load static %}
+
+{% block title %}Tranzit Task API Admin Panel{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+:root {
+  --primary: #2e353d;
+  --secondary: #2C2C2C;
+  --link-fg: #48484c;
+  {#--link-selected-fg: #8f5bb2;#}
+}
+</style>
+{% endblock %}
+
+{% block branding %}
+        <div id="branding">
+        <h1 id="site-name">
+            <a href="/admin/">
+
+                <span style="padding: 15px">Tranzit Admin Panel</span>
+            </a>
+
+        </h1>
+
+    </div>
+{% endblock %}
+
+{% block usertools %}
+        {% if has_permission %}
+        <div id="user-tools">
+            {% block welcome-msg %}
+                <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+            {% endblock %}
+            {% block userlinks %}
+                {% if site_url %}
+                    <a href="/api/v1">Перейти на сайт</a> /
+                {% endif %}
+                {% if user.is_active and user.is_staff %}
+                    {% url 'django-admindocs-docroot' as docsroot %}
+                    {% if docsroot %}
+                        <a href="{{ docsroot }}">Документация</a> /
+                    {% endif %}
+                {% endif %}
+                {% if user.has_usable_password %}
+                <a href="{% url 'admin:password_change' %}">Сменить пароль</a> /
+                {% endif %}
+                <a href="{% url 'admin:logout' %}">Выйти</a>
+            {% endblock %}
+                </div>
+        {% endif %}
+        {% endblock %}
+
+
