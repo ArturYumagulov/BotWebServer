@@ -159,7 +159,7 @@ class Task(models.Model):
     date = models.DateTimeField(verbose_name="Дата")
     status = models.CharField(max_length=100, verbose_name="Статус", default="Новая")
     deadline = models.DateTimeField(verbose_name="Исполнить до")
-    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+    edit_date = models.DateTimeField(verbose_name="Дата изменения", auto_now=True)
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name="Исполнитель",
                                related_name="task_worker", default="Удален")
     partner = models.ForeignKey(Partner, verbose_name="Контрагент", max_length=1000, on_delete=models.CASCADE,
