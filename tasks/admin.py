@@ -54,7 +54,27 @@ class PartnerWorkersAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(models.Worker)
+class WorkersAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'code',
+        'chat_id',
+        'phone',
+        'supervisor',
+        'controller',
+        'partner'
+    )
+    search_fields = [
+        'name',
+        'phone'
+    ]
+    list_filter = [
+        'controller',
+        'supervisor'
+    ]
+
+
+admin.site.register(models.Worker, WorkersAdmin)
 admin.site.register(models.Task, TaskAdmin)
 admin.site.register(models.Basics, BaseAdmin)
 admin.site.register(models.AuthorComments)
