@@ -186,4 +186,4 @@ class Task(models.Model):
     class Meta:
         verbose_name = "01. Задача"
         verbose_name_plural = "01. Задачи"
-        ordering = ['-deadline']
+        ordering = ['-date']
