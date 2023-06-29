@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
+
 from . import models
 
 # Register your models here.
@@ -6,15 +8,16 @@ from . import models
 
 class TaskAdmin(admin.ModelAdmin):
     list_display = (
-        'number',
+        'status',
+        # 'number',
         'date',
         'edit_date',
         'edited',
-        'status',
         'deadline',
         'author',
         'worker',
-        'return_base_number_to_admin'
+        'return_base_number_to_admin',
+        'return_result'
     )
     search_fields = [
         'author__name',
@@ -24,6 +27,17 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = [
         'status'
     ]
+
+    def return_base_number_to_admin(self, object):
+        return mark_safe(f'<a href="/admin/tasks/basics/{object.base.number}/change/">{object.base.number}</a>')
+
+    def return_result(self, object):
+        result = object.result_task.all()
+        for i in result:
+            return mark_safe(f'<a href=/admin/tasks/result/{i.pk}/change/>{i.result}</a>')
+
+    return_base_number_to_admin.short_description = 'Основание'
+    return_result.short_description = "Результат"
 
 
 class BaseAdmin(admin.ModelAdmin):
