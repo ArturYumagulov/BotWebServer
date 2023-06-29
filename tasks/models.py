@@ -183,6 +183,11 @@ class Task(models.Model):
     def __str__(self):
         return f"{self.name} {self.number} {self.deadline}"
 
+    def return_base_number_to_admin(self):
+        return self.base.number
+
+    return_base_number_to_admin.short_description = 'Основание'
+
     class Meta:
         verbose_name = "01. Задача"
         verbose_name_plural = "01. Задачи"
