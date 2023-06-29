@@ -13,10 +13,12 @@ class TaskAdmin(admin.ModelAdmin):
         'deadline',
         'author',
         'worker',
+        'base'
     )
     search_fields = [
         'author__name',
-        'number'
+        'number',
+        'base__number',
     ]
     list_filter = [
         'status'
