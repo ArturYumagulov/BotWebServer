@@ -176,7 +176,7 @@ class Task(models.Model):
                                        related_name='worker_comments')
 
     base = models.ForeignKey(Basics, verbose_name="Основание", on_delete=models.CASCADE, related_name='base_tasks')
-    edited = models.BooleanField(verbose_name="изменен", default=False)
+    edited = models.BooleanField(verbose_name="Изменено", default=False)
     result = models.ForeignKey(Result, on_delete=models.CASCADE, related_name="task_results", blank=True, null=True,
                                default=None)
 

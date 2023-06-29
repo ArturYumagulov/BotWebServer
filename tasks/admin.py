@@ -8,6 +8,7 @@ class TaskAdmin(admin.ModelAdmin):
     list_display = (
         'number',
         'date',
+        'edit_date',
         'edited',
         'status',
         'deadline',
