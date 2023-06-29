@@ -13,7 +13,6 @@ class TaskAdmin(admin.ModelAdmin):
         'deadline',
         'author',
         'worker',
-        'base'
     )
     search_fields = [
         'author__name',
