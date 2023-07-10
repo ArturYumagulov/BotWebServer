@@ -93,14 +93,29 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 #     }
 # }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": env('database'),
+#         'USER': env('user'),
+#         'HOST': env('host'),
+#         'PORT': env('port'),
+#         'PASSWORD': env('password'),
+#         "OPTIONS": {
+#             'charset': 'utf8',
+#             # 'use_unicode': True,
+#             }
+#         }
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": env('database'),
-        'USER': env('user'),
-        'HOST': env('host'),
-        'PORT': env('port'),
-        'PASSWORD': env('password'),
+        "NAME": 'seotrah3_test_db',
+        'USER': 'seotrah3_test_db',
+        'HOST': 'seotrah3.beget.tech',
+        'PORT': 3306,
+        'PASSWORD': 'Uwz%zc5X',
         "OPTIONS": {
             'charset': 'utf8',
             # 'use_unicode': True,
@@ -161,7 +176,8 @@ REST_FRAMEWORK = {
     # 'DEFAULT_AUTHENTICATION_CLASSES': [
     #     'rest_framework.authentication.TokenAuthentication',
     # ],
-    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'UNICODE_JSON': True
 }
 
 
