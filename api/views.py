@@ -1,6 +1,9 @@
 import logging
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from urllib.parse import quote
+from django.utils.encoding import uri_to_iri
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework import status
 from rest_framework import generics
@@ -317,6 +320,14 @@ class WorkerViewSet(ModelViewSet):
                      "{'detail': 'ожидался массив данных'} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+
+class WorkerDetailView(APIView):
+
+    def get(self, request, code):
+        clean_code = uri_to_iri(code)
+        worker = Worker.objects.filter(code=clean_code)
+        return Response(worker.values()[0])
 
 
 class SupervisorViewSet(ModelViewSet):
@@ -667,5 +678,4 @@ class ResultDataFilterViews(generics.ListAPIView):
             queryset = queryset.filter(group=group)
         return queryset
 
-#  TODO Добаввить логгирование
-#  TODO Добавить функцию удаления задачи при выгрузке измененных задач
+

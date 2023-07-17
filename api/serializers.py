@@ -29,6 +29,9 @@ class WorkerSerializer(serializers.ModelSerializer):
         model = Worker
         fields = "__all__"
 
+    def get(self, validated_data):
+        print(**validated_data)
+
 
 class SupervisorSerializer(serializers.ModelSerializer):
 
