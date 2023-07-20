@@ -2,8 +2,7 @@ import logging
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from urllib.parse import quote
-from django.utils.encoding import uri_to_iri
+from urllib.parse import quote, urlencode, unquote
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework import status
 from rest_framework import generics
@@ -324,10 +323,13 @@ class WorkerViewSet(ModelViewSet):
 
 class WorkerDetailView(APIView):
 
-    def get(self, request, code):
-        clean_code = uri_to_iri(code)
-        worker = Worker.objects.filter(code=clean_code)
-        return Response(worker.values()[0])
+    def get(self, request, code: str):
+        url_encode = urlencode({'url_encode': code})
+        unquote_code = unquote(code)
+        print(url_encode, unquote_code)
+        data = {'url_encode': url_encode, 'unquote_code': unquote_code}
+        worker = Worker.objects.filter(code=unquote_code)
+        return Response(worker)
 
 
 class SupervisorViewSet(ModelViewSet):
