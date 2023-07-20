@@ -7,7 +7,7 @@ from .serializers import WorkerSerializer, TaskListSerializer, PartnerWorkerSeri
 from .views import TaskViewSet, BaseViewSet, PartnersViewSet, WorkerViewSet, AuthorCommentsViews, \
     WorkerCommentsViews, TasksFilterViews, WorkerFilterViews, TaskViewListSet, \
     PartnersWorkerViewSet, PartnerWorkerFilterViews, ResultListView, ResultDataFilterViews, ResultGroupListView, \
-    ResultDataListView, SupervisorViewSet, AllTasksUpdateView, WorkerDetailView
+    ResultDataListView, SupervisorViewSet, AllTasksUpdateView, WorkerDetailView, SupervisorDetailView
 
 
 router = DefaultRouter()
@@ -42,6 +42,7 @@ urlpatterns = [
          name='partner-worker_filter'),
     path('result-data_f/', ResultDataFilterViews.as_view(), name='result_filter'),
     path('worker_detail/<str:code>/', WorkerDetailView.as_view(), name='worker_detail'),
+    path('supervisor_detail/<str:code>/', SupervisorDetailView.as_view(), name='worker_detail'),
 ]
 
 

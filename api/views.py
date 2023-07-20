@@ -1,4 +1,8 @@
+import json
 import logging
+from django.core import serializers as django_serializer
+
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -324,12 +328,20 @@ class WorkerViewSet(ModelViewSet):
 class WorkerDetailView(APIView):
 
     def get(self, request, code: str):
-        url_encode = urlencode({'url_encode': code})
         unquote_code = unquote(code)
-        print(url_encode, unquote_code)
-        data = {'url_encode': url_encode, 'unquote_code': unquote_code}
         worker = Worker.objects.filter(code=unquote_code)
-        return Response(worker)
+        data = list(worker.values())
+        return JsonResponse(data, safe=False)
+
+
+class SupervisorDetailView(APIView):
+
+    def get(self, request, code: str):
+        unquote_code = unquote(code)
+        supervisor = Supervisor.objects.filter(code=unquote_code)
+        data = list(supervisor.values())
+        return JsonResponse(data, safe=False)
+
 
 
 class SupervisorViewSet(ModelViewSet):
