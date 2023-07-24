@@ -328,21 +328,21 @@ class WorkerViewSet(ModelViewSet):
 class WorkerDetailView(APIView):
 
     def get(self, request, code: str):
-        unquote_code = unquote(code)
-        url_encode = urlencode({'code': code})
-        # worker = Worker.objects.filter(code=unquote_code)
-        # data = list(worker.values())
-        return JsonResponse(url_encode, safe=False)
+        url_decode = unquote(unquote(unquote(code)))
+        clean_code = unquote(unquote(url_decode))
+        worker = Worker.objects.filter(code=clean_code)
+        data = list(worker.values())
+        return JsonResponse(data, safe=False)
 
 
 class SupervisorDetailView(APIView):
 
     def get(self, request, code: str):
-        unquote_code = unquote(code)
-        url_encode = urlencode({'code': code})
-        # supervisor = Supervisor.objects.filter(code=unquote_code)
-        # data = list(supervisor.values())
-        return JsonResponse(url_encode, safe=False)
+        url_decode = unquote(unquote(unquote(code)))
+        clean_code = unquote(unquote(url_decode))
+        supervisor = Supervisor.objects.filter(code=clean_code)
+        data = list(supervisor.values())
+        return JsonResponse(data, safe=False)
 
 
 
