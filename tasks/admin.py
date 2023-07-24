@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from urllib.parse import unquote
 
 from . import models
 
@@ -78,7 +79,7 @@ class PartnerWorkersAdmin(admin.ModelAdmin):
 class WorkersAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'code',
+        'get_worker_urlencode',
         'chat_id',
         'phone',
         'supervisor',
@@ -94,6 +95,13 @@ class WorkersAdmin(admin.ModelAdmin):
         'supervisor'
     ]
     list_per_page = 20
+
+    def get_worker_urlencode(self, object):
+        url_decode = unquote(unquote(unquote(object.pk)))
+        clean_code = unquote(unquote(url_decode))
+        return mark_safe(f'<a href="/admin/tasks/worker/{clean_code}/change/">{clean_code}</a>')
+
+    get_worker_urlencode.short_description = 'Агент'
 
 
 admin.site.register(models.Worker, WorkersAdmin)
