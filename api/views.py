@@ -4,6 +4,7 @@ from django.core import serializers as django_serializer
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from urllib.parse import quote, urlencode, unquote
@@ -19,6 +20,10 @@ from .serializers import TaskSerializer, BasicSerializer, PartnerSerializer, Wor
     ResultGroupSerializer, ResultDataSerializer, SupervisorSerializer, AllTaskListSerializer
 
 logger = logging.getLogger(__name__)
+
+
+# class DefaultLimitPagination(PageNumberPagination):
+#     default_limit = 100
 
 
 class TaskViewSet(ModelViewSet):
@@ -50,6 +55,7 @@ class TaskViewSet(ModelViewSet):
     model = Task
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
+    pagination_class = PageNumberPagination
 
     def list(self, request, *args, **kwargs):
         """Вывод всех задач"""
@@ -330,9 +336,11 @@ class WorkerDetailView(APIView):
     def get(self, request, code: str):
         url_decode = unquote(unquote(unquote(code)))
         clean_code = unquote(unquote(url_decode))
-        worker = Worker.objects.filter(code=clean_code)
-        data = list(worker.values())
-        return JsonResponse(data, safe=False)
+        try:
+            worker = Worker.objects.get(code=clean_code)
+            return JsonResponse({'name': worker.name, 'code': worker.code}, safe=False, status=status.HTTP_200_OK)
+        except Worker.DoesNotExist:
+            return JsonResponse({'detail': "Not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class SupervisorDetailView(APIView):
@@ -340,10 +348,22 @@ class SupervisorDetailView(APIView):
     def get(self, request, code: str):
         url_decode = unquote(unquote(unquote(code)))
         clean_code = unquote(unquote(url_decode))
-        supervisor = Supervisor.objects.filter(code=clean_code)
-        data = list(supervisor.values())
-        return JsonResponse(data, safe=False)
+        try:
+            supervisor = Supervisor.objects.get(code=clean_code)
+            return JsonResponse({'name': supervisor.name, 'code': supervisor.code}, safe=False, status=status.HTTP_200_OK)
+        except Supervisor.DoesNotExist:
+            return JsonResponse({'detail': "Not found"}, status=status.HTTP_404_NOT_FOUND)
 
+
+class PartnerDetailView(APIView):
+    def get(self, request, code: str):
+        url_decode = unquote(unquote(unquote(code)))
+        clean_code = unquote(unquote(url_decode))
+        try:
+            partner = Partner.objects.get(code=clean_code)
+            return JsonResponse({'name': partner.name, 'code': partner.code}, safe=False, status=status.HTTP_200_OK)
+        except Partner.DoesNotExist:
+            return JsonResponse({'detail': "Not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class SupervisorViewSet(ModelViewSet):
@@ -694,4 +714,4 @@ class ResultDataFilterViews(generics.ListAPIView):
             queryset = queryset.filter(group=group)
         return queryset
 
-
+# TODO установить django import-export

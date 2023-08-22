@@ -15,8 +15,8 @@ class TaskAdmin(admin.ModelAdmin):
         'edit_date',
         'edited',
         'deadline',
-        'author',
-        'worker',
+        'return_author_num',
+        'return_worker_num',
         'return_base_number_to_admin',
         'return_result'
     )
@@ -38,8 +38,18 @@ class TaskAdmin(admin.ModelAdmin):
         for i in result:
             return mark_safe(f'<a href=/admin/tasks/result/{i.pk}/change/>{i.result}</a>')
 
+    def return_worker_num(self, object):
+        worker = object.worker
+        return mark_safe(f'<a href="/admin/tasks/worker/{worker.code}/change/">{worker.name}</a>')
+
+    def return_author_num(self, object):
+        author = object.author
+        return mark_safe(f'<a href="/admin/tasks/worker/{author.code}/change/">{author.name}</a>')
+
     return_base_number_to_admin.short_description = 'Основание'
     return_result.short_description = "Результат"
+    return_worker_num.short_description = "Исполнитель"
+    return_author_num.short_description = "Автор"
 
 
 class BaseAdmin(admin.ModelAdmin):
@@ -88,7 +98,8 @@ class WorkersAdmin(admin.ModelAdmin):
     )
     search_fields = [
         'name',
-        'phone'
+        'phone',
+        'chat_id'
     ]
     list_filter = [
         'controller',
@@ -115,7 +126,3 @@ admin.site.register(models.ResultData)
 admin.site.register(models.ResultGroup)
 admin.site.register(models.PartnerWorker, PartnerWorkersAdmin)
 admin.site.register(models.Supervisor)
-
-
-
-

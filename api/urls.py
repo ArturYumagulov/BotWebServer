@@ -7,7 +7,7 @@ from .serializers import WorkerSerializer, TaskListSerializer, PartnerWorkerSeri
 from .views import TaskViewSet, BaseViewSet, PartnersViewSet, WorkerViewSet, AuthorCommentsViews, \
     WorkerCommentsViews, TasksFilterViews, WorkerFilterViews, TaskViewListSet, \
     PartnersWorkerViewSet, PartnerWorkerFilterViews, ResultListView, ResultDataFilterViews, ResultGroupListView, \
-    ResultDataListView, SupervisorViewSet, AllTasksUpdateView, WorkerDetailView, SupervisorDetailView
+    ResultDataListView, SupervisorViewSet, AllTasksUpdateView, WorkerDetailView, SupervisorDetailView, PartnerDetailView
 
 
 router = DefaultRouter()
@@ -43,7 +43,8 @@ urlpatterns = [
     path('result-data_f/', ResultDataFilterViews.as_view(), name='result_filter'),
     path('worker_detail/<str:code>/', WorkerDetailView.as_view(), name='worker_detail'),
     path('supervisor_detail/<str:code>/', SupervisorDetailView.as_view(), name='worker_detail'),
+    path('partner_detail/<str:code>/', PartnerDetailView.as_view(), name='partner_detail'),
 ]
 
 
-#  TODO добавить авторизацию
+

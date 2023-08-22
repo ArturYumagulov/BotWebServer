@@ -5,7 +5,7 @@ import json
 from tasks.models import Worker, Basics, AuthorComments, WorkerComments, Partner  # noqa
 
 env = environ.Env()
-environ.Env.read_env()
+environ.Env.read_env('BotWebServer/.env')
 
 
 def send_message_bot(request):
@@ -47,7 +47,7 @@ def send_message_bot(request):
                   f"<b>Комментарий автора:</b>\n" \
                   f"{author_comment.comment}\n"
 
-        if worker_comment.id != 1:
+        if worker_comment.id != 5:
             message += sub_text
 
         data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup),
@@ -113,5 +113,3 @@ def send_message_bot(request):
 
 if __name__ == '__main__':
     pass
-
-

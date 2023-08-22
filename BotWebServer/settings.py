@@ -86,12 +86,12 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
 
 # DATABASES = {
 #     "default": {
@@ -108,20 +108,20 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 #         }
 # }
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": 'seotrah3_test_db',
-        'USER': 'seotrah3_test_db',
-        'HOST': 'seotrah3.beget.tech',
-        'PORT': 3306,
-        'PASSWORD': 'Uwz%zc5X',
-        "OPTIONS": {
-            'charset': 'utf8',
-            # 'use_unicode': True,
-            }
-        }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": 'seotrah3_test_db',
+#         'USER': 'seotrah3_test_db',
+#         'HOST': 'seotrah3.beget.tech',
+#         'PORT': 3306,
+#         'PASSWORD': 'Uwz%zc5X',
+#         "OPTIONS": {
+#             'charset': 'utf8',
+#             # 'use_unicode': True,
+#             }
+#         }
+# }
 
 
 # Password validation
@@ -170,14 +170,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 REST_FRAMEWORK = {
+
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.IsAuthenticated',
     # ],
     # 'DEFAULT_AUTHENTICATION_CLASSES': [
     #     'rest_framework.authentication.TokenAuthentication',
     # ],
+
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'UNICODE_JSON': True
+
 }
 
 

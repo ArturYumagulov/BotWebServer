@@ -10,7 +10,7 @@
   --primary: #2e353d;
   --secondary: #2C2C2C;
   --link-fg: #48484c;
-  {#--link-selected-fg: #8f5bb2;#}
+  --link-selected-fg: #8f5bb2;
 }
 </style>
 {% endblock %}
@@ -48,6 +48,7 @@
                 <a href="{% url 'admin:password_change' %}">Сменить пароль</a> /
                 {% endif %}
                 <a href="{% url 'admin:logout' %}">Выйти</a>
+                {% include "admin/color_theme.html" %}
             {% endblock %}
                 </div>
         {% endif %}
