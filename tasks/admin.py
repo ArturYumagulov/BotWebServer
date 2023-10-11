@@ -26,7 +26,8 @@ class TaskAdmin(admin.ModelAdmin):
         'base__number',
     ]
     list_filter = [
-        'status'
+        'status',
+        'worker'
     ]
     list_per_page = 20
 
@@ -115,6 +116,12 @@ class WorkersAdmin(admin.ModelAdmin):
     get_worker_urlencode.short_description = 'Агент'
 
 
+@admin.register(models.ResultData)
+class ResultDataAdmin(admin.ModelAdmin):
+    list_display = ('code', 'name', 'control_data', 'group',)
+    list_filter = ('group',)
+
+
 admin.site.register(models.Worker, WorkersAdmin)
 admin.site.register(models.Task, TaskAdmin)
 admin.site.register(models.Basics, BaseAdmin)
@@ -122,7 +129,7 @@ admin.site.register(models.AuthorComments)
 admin.site.register(models.WorkerComments)
 admin.site.register(models.Partner, PartnerAdmin)
 admin.site.register(models.Result)
-admin.site.register(models.ResultData)
+# admin.site.register(models.ResultData)
 admin.site.register(models.ResultGroup)
 admin.site.register(models.PartnerWorker, PartnerWorkersAdmin)
 admin.site.register(models.Supervisor)

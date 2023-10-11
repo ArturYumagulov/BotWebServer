@@ -12,12 +12,14 @@ from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework import status
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
+
+from census.models import Census
 from .services import send_message_bot
 from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerComments, PartnerWorker, Result, \
     ResultGroup, ResultData, Supervisor  # noqa
 from .serializers import TaskSerializer, BasicSerializer, PartnerSerializer, WorkerSerializer, \
     AuthorCommentsSerializer, WorkerCommentsSerializer, TaskListSerializer, PartnerWorkerSerializer, ResultSerializer, \
-    ResultGroupSerializer, ResultDataSerializer, SupervisorSerializer, AllTaskListSerializer
+    ResultGroupSerializer, ResultDataSerializer, SupervisorSerializer, AllTaskListSerializer, CensusSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -329,41 +331,6 @@ class WorkerViewSet(ModelViewSet):
                      "{'detail': 'ожидался массив данных'} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-
-class WorkerDetailView(APIView):
-
-    def get(self, request, code: str):
-        url_decode = unquote(unquote(unquote(code)))
-        clean_code = unquote(unquote(url_decode))
-        try:
-            worker = Worker.objects.get(code=clean_code)
-            return JsonResponse({'name': worker.name, 'code': worker.code}, safe=False, status=status.HTTP_200_OK)
-        except Worker.DoesNotExist:
-            return JsonResponse({'detail': "Not found"}, status=status.HTTP_404_NOT_FOUND)
-
-
-class SupervisorDetailView(APIView):
-
-    def get(self, request, code: str):
-        url_decode = unquote(unquote(unquote(code)))
-        clean_code = unquote(unquote(url_decode))
-        try:
-            supervisor = Supervisor.objects.get(code=clean_code)
-            return JsonResponse({'name': supervisor.name, 'code': supervisor.code}, safe=False, status=status.HTTP_200_OK)
-        except Supervisor.DoesNotExist:
-            return JsonResponse({'detail': "Not found"}, status=status.HTTP_404_NOT_FOUND)
-
-
-class PartnerDetailView(APIView):
-    def get(self, request, code: str):
-        url_decode = unquote(unquote(unquote(code)))
-        clean_code = unquote(unquote(url_decode))
-        try:
-            partner = Partner.objects.get(code=clean_code)
-            return JsonResponse({'name': partner.name, 'code': partner.code}, safe=False, status=status.HTTP_200_OK)
-        except Partner.DoesNotExist:
-            return JsonResponse({'detail': "Not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class SupervisorViewSet(ModelViewSet):
@@ -713,5 +680,24 @@ class ResultDataFilterViews(generics.ListAPIView):
         if group is not None:
             queryset = queryset.filter(group=group)
         return queryset
+
+
+class CensusView(ModelViewSet):
+
+    serializer_class = CensusSerializer
+    queryset = Census.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        serializer = self.serializer_class(self.queryset, many=True)
+        logger.info(f"{request.method} - {request.path} - {request.META['REMOTE_ADDR']} - {status.HTTP_200_OK}")
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CensusFilterViews(generics.ListAPIView):
+    queryset = Census.objects.all()
+    serializer_class = CensusSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['task']
+
 
 # TODO установить django import-export

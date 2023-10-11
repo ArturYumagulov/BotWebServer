@@ -21,21 +21,42 @@ def send_message_bot(request):
 
     token = env.str("BOT_TOKEN")
     url = 'https://api.telegram.org/bot' + token + '/sendMessage'
-
-    reply_markup = {"inline_keyboard": [
-                [{"text": "Выполнена ✅", "callback_data": f"ok_{request['number']}"}],
-                # [{"text": "Отклонить ❌", "callback_data": f"dont_{request['number']}"}],
-                [{"text": "Переадресовать ↪️", "callback_data": f"first_forward_{request['number']}"}]
-    ]}
-
+    group_name = base.group.name
+    task_header = {'text': "Задача"}
     sub_text = f"<b>Комментарий исполнителя:</b> \n" \
                f"{worker_comment.comment}"
 
-    if request['status'] == 'Новая':
-        task_header = {'text': "Задача"}
+    if base.group.code == '000000001':  # Если "Разработка контрагента"
+
+        author_comment_clean = author_comment.comment.split('_')[0]
+        link_url = author_comment.comment.split('_')[1]
+
         message = f"{task_header['text']} от " \
                   f"{date}\n\n" \
-                  f"'{request['name']}'\n\n" \
+                  f"'{group_name}'\n\n" \
+                  f"<b>Исполнить до:</b>\n" \
+                  f"{deadline}\n" \
+                  f"<b>Автор:</b>\n" \
+                  f"{author}\n" \
+                  f"<b>Контрагент:</b>\n" \
+                  f"{partner.name}\n" \
+                  f"<b>Основание:</b>\n" \
+                  f"{base.name}\n\n" \
+                  f"<b>Комментарий автора:</b>\n" \
+                  f"{author_comment_clean}\n"
+
+        if worker_comment.id != 5:
+            message += sub_text
+
+        reply_markup = {"inline_keyboard": [
+                    [{"text": "Сенсус", "url": link_url}],
+                    [{"text": "Переадресовать ↪️", "callback_data": f"first_forward_{request['number']}"}]
+        ]}
+
+    else:
+        message = f"{task_header['text']} от " \
+                  f"{date}\n\n" \
+                  f"'{group_name}'\n\n" \
                   f"<b>Исполнить до:</b>\n" \
                   f"{deadline}\n" \
                   f"<b>Автор:</b>\n" \
@@ -50,65 +71,17 @@ def send_message_bot(request):
         if worker_comment.id != 5:
             message += sub_text
 
-        data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup),
-                'parse_mode': "HTML"}
+        reply_markup = {"inline_keyboard": [
+            [{"text": "Выполнена ✅", "callback_data": f"ok_{request['number']}"}],
+            [{"text": "Переадресовать ↪️", "callback_data": f"first_forward_{request['number']}"}]
+        ]}
 
-        r = requests.post(url, data=data)
+    data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup),
+            'parse_mode': "HTML"}
 
-        return True
+    r = requests.post(url, data=data)
 
-    # if request['status'] == 'Переадресована':
-    #     task_header = {'text': "Вам переадресована задача"}
-    #     message = f"{task_header['text']} от " \
-    #               f"{date}\n\n" \
-    #               f"'{request['name']}'\n\n" \
-    #               f"Исполнить до:\n" \
-    #               f"{deadline}\n\n" \
-    #               f"Автор:\n" \
-    #               f"{author}\n\n" \
-    #               f"Контрагент:\n" \
-    #               f"{partner.name}\n\n" \
-    #               f"Основание:\n" \
-    #               f"{base.name}\n\n" \
-    #               f"Комментарий автора:\n" \
-    #               f"{author_comment.comment}\n"
-    #
-    #     if worker_comment.id != 1:
-    #         message += sub_text
-    #
-    #     data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup)}
-    #
-    #     r = requests.post(url, data=data)
-    #
-    #     return True
-
-    elif request['status'] == "Отклонена":
-        task_header = {'text': "Отклонена задача"}
-        message = f"{task_header['text']} от " \
-                  f"{date}\n\n" \
-                  f"'{request['name']}'\n\n" \
-                  f"<b>Исполнить до:</b>\n" \
-                  f"{deadline}\n" \
-                  f"<b>Автор:</b>\n" \
-                  f"{author}\n" \
-                  f"<b>Контрагент:</b>\n" \
-                  f"{partner.name}\n" \
-                  f"<b>Основание:</b>\n" \
-                  f"{base.name}\n\n" \
-                  f"<b>Комментарий автора:</b>\n" \
-                  f"{author_comment.comment}\n"
-
-        if worker_comment.id != 1:
-            message += sub_text
-
-        data = {'chat_id': author.chat_id, 'text': message, 'parse_mode': "HTML"}
-
-        r = requests.post(url, data=data)
-
-        return True
-
-    else:
-        return False
+    return True
 
 
 if __name__ == '__main__':

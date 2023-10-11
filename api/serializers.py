@@ -1,4 +1,7 @@
 from rest_framework import serializers
+
+from census.models import Census, CarsList, OilList, ProviderList, FilterList, AccessoriesCategoryItem, \
+    AccessoriesCategory, PointTypes, PointVectors, STOTypeList, PointCategory
 from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerComments, Result, PartnerWorker, \
     ResultGroup, ResultData, Supervisor  # noqa
 
@@ -28,9 +31,6 @@ class WorkerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Worker
         fields = "__all__"
-
-    def get(self, validated_data):
-        print(**validated_data)
 
 
 class SupervisorSerializer(serializers.ModelSerializer):
@@ -176,6 +176,7 @@ class AllTaskListSerializer(serializers.ModelSerializer):
 
     author_comment = AuthorCommentsSerializer()
     worker_comment = WorkerCommentsSerializer()
+    base = BasicSerializer()
     result = ResultSerializer(read_only=True)
 
     class Meta:
@@ -187,3 +188,91 @@ class AllTaskListSerializer(serializers.ModelSerializer):
         instance.status = validated_data.get('status', instance.status)
         instance.save()
         return instance
+
+
+class CarsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CarsList
+        fields = ("name", )
+
+
+class OilsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OilList
+        fields = ('name',)
+
+
+class ProviderSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProviderList
+        fields = ('name',)
+
+
+class FilterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = FilterList
+        fields = ('name',)
+
+
+class AccessoriesCategoryItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AccessoriesCategoryItem
+        fields = ('name',)
+
+
+class AccessoriesCategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AccessoriesCategory
+        fields = ('name',)
+
+
+class PointTypesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PointTypes
+        fields = ('name',)
+
+
+class PointVectorsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PointVectors
+        fields = ('name',)
+
+
+class STOTypeListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = STOTypeList
+        fields = ('name',)
+
+
+class PointCategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PointCategory
+        fields = ('name',)
+
+
+class CensusSerializer(serializers.ModelSerializer):
+    result = ResultSerializer()
+    cars = CarsSerializer(many=True)
+    oils = OilsSerializer(many=True)
+    providers = ProviderSerializer(many=True)
+    filters = FilterSerializer(many=True)
+    accessories_brands = AccessoriesCategoryItemSerializer(many=True)
+    point_type = PointTypesSerializer()
+    vector = PointVectorsSerializer()
+    sto_type = STOTypeListSerializer()
+    category = PointCategorySerializer()
+    accessories_category = AccessoriesCategorySerializer()
+
+    class Meta:
+        model = Census
+        fields = '__all__'

@@ -32,7 +32,7 @@ DEBUG = True
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['192.168.80.65', 'localhost']
+    ALLOWED_HOSTS = ['192.168.80.224', 'localhost']
 
 # Application definition
 
@@ -47,13 +47,16 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
+    'corsheaders',
     'tasks',
-    'api'
+    'api',
+    'census'
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -86,43 +89,23 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env('database'),
+        'USER': env('user'),
+        'HOST': env('host'),
+        'PORT': env('port'),
+        'PASSWORD': env('password'),
+        }
 }
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": env('database'),
-#         'USER': env('user'),
-#         'HOST': env('host'),
-#         'PORT': env('port'),
-#         'PASSWORD': env('password'),
-#         "OPTIONS": {
-#             'charset': 'utf8',
-#             # 'use_unicode': True,
-#             }
-#         }
-# }
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": 'seotrah3_test_db',
-#         'USER': 'seotrah3_test_db',
-#         'HOST': 'seotrah3.beget.tech',
-#         'PORT': 3306,
-#         'PASSWORD': 'Uwz%zc5X',
-#         "OPTIONS": {
-#             'charset': 'utf8',
-#             # 'use_unicode': True,
-#             }
-#         }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -158,10 +141,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+   os.path.join(BASE_DIR, "static"),
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -220,3 +209,5 @@ LOGGING = {
         }
     }
 }
+
+CORS_ORIGIN_ALLOW_ALL = True

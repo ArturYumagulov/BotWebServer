@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Title</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <!-- Or for RTL support -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
+    <!---Datepicker-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
+    <!---Datepicker-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    {% load static %}
+    <script src="{% static 'js/app.js' %}"></script>
+    <script>
+        let csrf="{{ csrf_token }}";
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            CreateApp(document.getElementById('todo-app'));
+        });
+    </script>
+
+
+</head>
+<body>
+<div class="container" id="todo-app" data-search="{% url 'partners' %}" data-address_id="{{ address_id }}">
+    <h2 class="text-center m-4">Сенсус торговой точки</h2>
+    <p class="text-center mb-3"><span class="fw-bold">Адрес: </span>{{ city }}, {{ street }}, {{ house }}</p>
+    <form class="m-3" action="/census/load/" method="post">
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="workCheckbox">
+            <label class="form-check-label" for="workCheckbox">Уже работаем с точкой?</label>
+        </div>
+        <input class="form-control mb-3" name="working" list="contragentsListOptions" placeholder="Контрагент в 1С" id="searchClient"
+               style="display: none;">
+        <ul class="list-group mb-3" id="contragentsListOptions" style="display: none;"></ul>
+{#        Вывеска -----------------------#}
+        <div class="form-floating mb-3" id="boardId">
+            <input class="form-control" name="point_name" id="signboardId" type="text" placeholder="Вывеска" aria-describedby="signboardIdFeedback" required>
+            <label for="signboardId">Вывеска</label>
+            <div id="signboardIdFeedback" class="invalid-feedback">
+                Укажите вывеску торговой точки
+            </div>
+        </div>
+{#        Точка является сетью? -----------------------#}
+        <div class="mb-3">
+            <label for="typeId" class="form-label">Точка является сетью?</label>
+            <select class="form-select mb-3" name="nets" id="typeId" aria-describedby="typeIdFeedback" required>
+                <option selected disabled value="">Выберите вид...</option>
+                <option value="1">Да</option>
+                <option value="0">Нет</option>
+            </select>
+            <div id="typeIdFeedback" class="invalid-feedback">
+                Выберите корректный вид торговой точки.
+            </div>
+        </div>
+{#        Категория точки? -----------------------#}
+        <div class="mb-3">
+        <label for="shopCategoryId" class="form-label">Категория точки?</label>
+            <select class="form-select mb-3" name="category" id="shopCategoryId" data-url="{% url 'point_category' %}"
+                    aria-describedby="pointCategoryIDFeedback" required>
+                <option selected disabled value="">Выберите категорию...</option>
+            </select>
+            <div id="pointCategoryIDFeedback" class="invalid-feedback">
+                Выберите нужную категорию торговой точки
+            </div>
+        </div>
+{#        Тип торговой точки? -----------------------#}
+        <div class="mb-3">
+            <label for="pointTypeID" class="form-label">Тип торговой точки?</label>
+            <select class="form-select mb-3" name="point_type" selected="" id="pointTypeID" data-url="{% url 'point_names' %}"
+                    aria-describedby="pointTypeIDFeedback" required>>
+                <option selected disabled value="">Выберите тип...</option>
+            </select>
+            <div id="pointTypeIDFeedback" class="invalid-feedback">Выберите тип торговой точки</div>
+        </div>
+{#        Тип СТО? -----------------------#}
+        <div class="mb-3" id="stoTypeDiv" style="display: none;">
+            <label for="stoTypeId" class="form-label">Тип СТО?</label>
+            <select class="form-select mb-3" name="sto_type" selected="" id="stoTypeId"
+                    aria-describedby="stoTypeIdFeedback" data-url="{% url 'sto_types' %}">
+                <option selected disabled value="">Выберите тип СТО...</option>
+            </select>
+            <div id="stoTypeIdFeedback" class="invalid-feedback">Выберите тип СТО</div>
+        </div>
+    {#        Направление? -----------------------#}
+        <div class="mb-3 multi_res was-validated" id="vectorMultiDiv">
+            <select class="form-select multiple mb-3" id="vectorMulti" required data-placeholder="Направления точки?" multiple data-url="{% url 'point_vectors' %}">
+            </select>
+        </div>
+{#        Направление? -----------------------#}
+        <div class="form-floating mb-3" id="otherVectorId" style="display: none;">
+            <input class="form-control" name="other_vector" id="otherVectorInputId" type="text"
+                   placeholder="Направление" aria-describedby="otherVectorFeedback">
+            <label for="otherVectorInputId">Какое направление?</label>
+            <div id="otherVectorFeedback" class="invalid-feedback">Выберите направление торговой точки</div>
+        </div>
+{#    Количество подъемников#}
+        <div class="form-floating mb-3" id="elevatorId" style="display: none;">
+            <input class="form-control" id="elevatorCountId" name="elevators_count" type="text" placeholder="Количество подъемников"
+            aria-describedby="elevatorCountIdFeedback">
+            <label for="elevatorCountId">Количество подъемников</label>
+            <div type="number" id="elevatorCountIdFeedback" class="invalid-feedback">Укажите количество подъемников</div>
+        </div>
+{#    Общий пролив масла в месяц, л#}
+        <div class="form-floating mb-3" id="debitId" style="display: none;">
+            <input class="form-control" name="oil_debit" id="iolDebitId" type="text" placeholder="Общий пролив масла в месяц, л"
+            aria-describedby="iolDebitId">
+            <label for="iolDebitId">Общий пролив масла в месяц, л</label>
+            <div id="iolDebitIdFeedback" class="invalid-feedback">
+                Укажите общий пролив масла в месяц в литрах
+            </div>
+        </div>
+{#    Пролив Лукойл в месяц, л#}
+        <div class="form-floating mb-3" id="lukDebitId" style="display: none;">
+            <input class="form-control" name="lukoil_debit" id="lukoilDebitId" type="text" placeholder="Пролив Лукойл в месяц, л"
+            aria-describedby="lukoilDebitIdFeedback">
+            <label for="lukoilDebitId">Пролив Лукойл в месяц, л</label>
+            <div id="lukoilDebitIdFeedback" class="invalid-feedback">
+                Укажите пролив Лукойл в месяц в литрах
+            </div>
+        </div>
+{#    Пролив Rowe в месяц, л#}
+        <div class="form-floating mb-3" id="RowDebitId" style="display: none;">
+            <input class="form-control" id="RoweDebitId" name="rowe_debit" type="text" placeholder="Пролив Rowe в месяц, л"
+            aria-describedby="RoweDebitIdFeedback">
+            <label for="RoweDebitId">Пролив Rowe в месяц, л</label>
+            <div id="RoweDebitIdFeedback" class="invalid-feedback">
+                Укажите пролив Rowe в месяц в литрах
+            </div>
+        </div>
+{#    Пролив Motul в месяц#}
+        <div class="form-floating mb-3" id="motDebitId" style="display: none;">
+            <input class="form-control" id="motulDebitId" name="motul_debit" type="text" placeholder="Пролив Motul в месяц, л"
+            aria-describedby="motulDebitIdFeedback">
+            <label for="motulDebitId">Пролив Motul в месяц, л</label>
+            <div id="motulDebitIdFeedback" class="invalid-feedback">
+                Укажите пролив Motul в месяц в литрах
+            </div>
+        </div>
+{#    Есть лицо принимающее решение?#}
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="decisionCheckboxId">
+            <label class="form-check-label" for="decisionCheckboxId">Есть лицо принимающее решение?</label>
+        </div>
+{#    ФИО#}
+        <div class="form-floating mb-3" id="fioId" style="display: none;">
+            <input class="form-control" name="decision_fio" id="decisionMakerId" type="text" placeholder="Лицо принимающее решение"
+                   aria-describedby="fioIdFeedback">
+            <label for="decisionMakerId">ФИО</label>
+            <div id="fioIdFeedback" class="invalid-feedback">
+                Укажите ФИО лица принимающего решение
+            </div>
+        </div>
+{#    Email#}
+        <div class="form-floating mb-3" id="emailId" style="display: none;">
+            <input class="form-control" name="decision_email" id="decisionMakerEmailId" type="email" placeholder="Email"
+            aria-describedby="decisionMakerEmailIdFeedback">
+            <label for="decisionMakerEmailId">Email</label>
+            <div id="decisionMakerEmailIdFeedback" class="invalid-feedback">
+                Укажите электронную почту лица принимающего решение
+            </div>
+        </div>
+{#    Телефон#}
+        <div class="form-floating mb-3" id="phoneId" style="display: none;">
+            <input class="form-control" name="decision_phone" id="decisionMakerPhoneId" type="phone" placeholder="Телефон"
+            aria-describedby="decisionMakerPhoneIdFeedback">
+            <label for="decisionMakerPhoneId">Телефон</label>
+            <div id="decisionMakerPhoneIdFeedback" class="invalid-feedback">
+                Укажите телефон лица принимающего решение
+            </div>
+        </div>
+{#      Какие авто обслуживают?#}
+        <div class="mb-3 multi" id="carsDiv">
+            <select class="form-select multiple mb-3" name="cars" id="cars" data-placeholder="Какие авто обслуживают?" multiple data-url="{% url 'cars_list' %}">
+            </select>
+        </div>
+{#    Какие масла используют?#}
+        <div class="mb-3 multi" id="oilsDiv">
+            <select class="form-select multiple multiple mb-3" name="oils" id="oils" data-placeholder="Какие масла используют?" multiple data-url="{% url 'oil_list' %}">
+            </select>
+        </div>
+{#    Какие фильтры используют?#}
+        <div class="mb-3 multi" id="filtersDiv">
+            <select class="form-select multiple mb-3" name="filters" id="filters" data-placeholder="Какие фильтры используют?" multiple data-url="{% url 'filter_list' %}">
+            </select>
+        </div>
+{#       Категория аксессуаров #}
+        <div class="mb-3" id="accessDiv" style="display: none">
+            <label for="accessId" class="form-label">Категория аксессуаров</label>
+            <select class="form-select mb-3" selected name="accessories_category" id="accessId"
+                    aria-describedby="accessIdFeedback" data-url="{% url 'access_category' %}">
+                <option selected disabled value="">Выберите категорию...</option>
+            </select>
+            <div id="accessIdFeedback" class="invalid-feedback">Выберите направление торговой точки</div>
+
+        </div>
+{# Бренды аксессуаров#}
+        {% for category in categories %}
+        <div class="mb-3 acc_div" id="category_{{ category.pk }}_div" style="display: block">
+            <select class="form-select multiple access" name='accessories_brands' data-placeholder="Какие бренды {{ category.name }} используют?"
+                    id="category_{{ category.pk }}" multiple data-url="{% url 'access_category' %}">
+            </select>
+        </div>
+        {% endfor %}
+
+{#        Какие бренды аксессуаров используют?#}
+        <div class="form-floating mb-3" id="otherDivId" style="display: none;">
+            <input class="form-control" id="otherId" type="text" name="other_brand" placeholder="Какие другие бренды аксессуаров используют?"
+            aria-describedby="otherIdFeedback">
+            <label for="otherId">Какие другие бренды аксессуаров используют?</label>
+            <div id="otherIdFeedback" class="invalid-feedback">Напишите бренды аксессуаров торговой точки</div>
+        </div>
+{#        Специализированная точка по АКБ?#}
+        <div class="mb-3" id="akbDiv" style="display: none">
+            <label for="akbId" class="form-label">Специализированная точка по АКБ?</label>
+            <select class="form-select mb-3" selected="" name="akb_specify" id="akbId" style="display: block;"
+                    aria-describedby="akbFeedback">
+                <option selected disabled value="">Выберите...</option>
+                <option value="1">Да</option>
+                <option value="0">Нет</option>
+            </select>
+            <div id="akbFeedback" class="invalid-feedback">Выберите специализацию торговой точки по АКБ</div>
+        </div>
+{#        Поставщик         #}
+        <div class="was-validated mb-3" id="providersDiv">
+            <select class="form-select multiple" name="providers" data-placeholder="Поставщик" id="providers"
+                    data-url="{% url 'providers' %}" multiple required>
+            </select>
+        </div>
+
+{#        Другой поставщик #}
+        <div class="form-floating mb-3" id="otherProvDivId" style="display: none;">
+            <input class="form-control" id="otherProvId" type="text" name="other_providers" placeholder="Какие другие поставщики?"
+            aria-describedby="otherProvIdFeedback">
+            <label for="otherId">Какие другие поставщики?</label>
+            <div id="otherProvIdFeedback" class="invalid-feedback">Напишите других поставщиков торговой точки</div>
+        </div>
+
+        <div class="mb-3" id="controlDiv" style="display: block">
+            <label for="controlId" class="form-label">Результат встречи</label>
+            <select class="form-select mb-3" selected id="controlId" name="result"
+                    aria-describedby="controlIdFeedbackk" data-url="{% url 'controls_list' %}" required>
+                <option selected disabled value="">Выберите результат...</option>
+            </select>
+            <div id="controlIdFeedback" class="invalid-feedback">Выберите результат встречи</div>
+        </div>
+        <div class="row" id="dateDiv" style="display: none">
+            <label for="date" class="col-form-label">Контрольная дата</label>
+            <div class="col-6">
+                <div class="input-group date" id="datepicker">
+                    <input type="text" name="control_date" class="form-control was-validated" id="date"/>
+                    <span class="input-group-append" style="cursor: pointer">
+                        <span class="input-group-text bg-light d-block">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2 mt-5">
+            <button class="btn btn-danger" type="submit">Отправить</button>
+        </div>
+        <input type="hidden" name="address_id" value="{{ address_id }}">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <input type="hidden" name="guid" value="{{ guid }}">
+    </form>
+</div>
+
+
+
+<script>
+    let selects = document.querySelectorAll('.form-select.multiple')
+    selects.forEach((item) => {
+        let id = item.getAttribute('id')
+        $( '#' + id ).select2( {
+            theme: "bootstrap-5",
+            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+            placeholder: $( this ).data( 'placeholder' ),
+            closeOnSelect: false,
+            dropdownParent: $( '#' + id ).parent(),
+        });
+    })
+
+    $(function(){
+      $('#datepicker').datepicker({
+          format:"dd-mm-yyyy"
+      });
+    });
+</script>
+</body>
+</html>
