@@ -15,6 +15,7 @@ class TaskAdmin(admin.ModelAdmin):
         'edit_date',
         'edited',
         'deadline',
+        'partner',
         'return_author_num',
         'return_worker_num',
         'return_base_number_to_admin',
@@ -26,8 +27,9 @@ class TaskAdmin(admin.ModelAdmin):
         'base__number',
     ]
     list_filter = [
+        'base__group__name',
         'status',
-        'worker'
+        'worker',
     ]
     list_per_page = 20
 

@@ -10,8 +10,13 @@ from .services import valid_data
 # Create your views here.
 
 
+def template_test(request):
+    return render(request, 'census/ready_census.html')
+
+
 def census(request, pk):
 
+    name = request.GET['name']
     city = request.GET['city']
     street = request.GET['street']
     house = request.GET['house']
@@ -20,11 +25,12 @@ def census(request, pk):
 
     try:
         models.Census.objects.get(address_id=pk)
-        return HttpResponse('Напиши шаблон на существующую задачу')
+        return render(request, 'census/exist_census.html')
 
     except models.Census.DoesNotExist:
 
         context = {
+            'name': name,
             'city': city,
             'street': street,
             'house': house,
@@ -38,7 +44,7 @@ def census(request, pk):
 def load_data(request):
     form = valid_data(request.POST)
     if form:
-        return HttpResponse("<h1>Все ОК<h1>")
+        return render(request, 'census/ready_census.html')
     else:
         return HttpResponse("<h1>Ошибка<h1>")
     # дописать валидацию и сохранение в БД

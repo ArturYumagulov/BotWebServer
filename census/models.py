@@ -158,17 +158,23 @@ class AccessoriesCategoryItem(models.Model):
 
 class Census(models.Model):
     address_id = models.PositiveBigIntegerField(verbose_name="ID адреса в 1С")
-    point_name = models.CharField(max_length=1000, verbose_name="Вывеска")
-    point_type = models.ForeignKey(PointTypes, on_delete=models.CASCADE, verbose_name="Тип")
-    vector = models.ForeignKey(PointVectors, on_delete=models.CASCADE, verbose_name="Направленность", blank=True, null=True)
+    address = models.CharField(verbose_name="Адрес", max_length=2000, blank=True, null=True)
+    name = models.CharField(verbose_name="Название", max_length=1000, blank=True, null=True)
+    point_name = models.CharField(max_length=1000, verbose_name="Вывеска", blank=True, null=True,
+                                  default=None)
+    point_type = models.ForeignKey(PointTypes, on_delete=models.CASCADE, verbose_name="Тип", blank=True, null=True,
+                                   default=None)
+    vector = models.ManyToManyField(PointVectors, verbose_name="Направленность", blank=True, default=None)
     other_vector = models.CharField(verbose_name="Другое направление", max_length=1000, blank=True, null=True,
                                     default=None)
     nets = models.BooleanField(verbose_name="Сетевой", default=False)
     sto_type = models.ForeignKey(STOTypeList, on_delete=models.CASCADE, verbose_name="Тип СТО", blank=True, null=True)
-    category = models.ForeignKey(PointCategory, on_delete=models.CASCADE, verbose_name="Категория")
+    category = models.ForeignKey(PointCategory, on_delete=models.CASCADE, verbose_name="Категория", blank=True, null=True,
+                                 default=None)
     cars = models.ManyToManyField(CarsList, verbose_name="Автомобили обслуживают", blank=True, default=None)
     oils = models.ManyToManyField(OilList, verbose_name="Масла используют", blank=True, default=None)
-    providers = models.ManyToManyField(ProviderList, verbose_name="Основные поставщики")
+    providers = models.ManyToManyField(ProviderList, verbose_name="Основные поставщики", blank=True, null=True,
+                                       default=None)
     filters = models.ManyToManyField(FilterList, verbose_name="Фильтры используют", blank=True, default=None)
     accessories_category = models.ForeignKey(AccessoriesCategory, verbose_name="Категории аксессуаров",
                                              on_delete=models.CASCADE, blank=True, default=None, null=True)
@@ -191,10 +197,14 @@ class Census(models.Model):
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edited = models.BooleanField(default=False)
     result = models.ForeignKey(Result, on_delete=models.CASCADE, verbose_name="Результат встречи", null=True,
-                               blank=True)
+                               blank=True, default=None)
     other_providers = models.CharField(max_length=1000, verbose_name="Другие поставщики", blank=True, null=True,
                                        default=None)
-    task = models.ForeignKey(Task, on_delete=models.PROTECT, verbose_name='Задача', blank=True, null=True)
+    task = models.ForeignKey(Task, on_delete=models.PROTECT, verbose_name='Задача', blank=True, null=True,
+                             default=None)
+    inn = models.CharField(verbose_name="ИНН", max_length=12, blank=True, null=True, default=None)
+    organizations_name = models.CharField(verbose_name="Название организации", max_length=2000, blank=True, null=True)
+    closing = models.BooleanField(verbose_name="Точка закрыта", default=False)
 
     class Meta:
         verbose_name = "Сенсус"
@@ -202,4 +212,4 @@ class Census(models.Model):
         ordering = ['-created_date']
 
     def __str__(self):
-        return self.point_name
+        return f"{self.address_id}"

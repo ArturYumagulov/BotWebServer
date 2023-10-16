@@ -3,7 +3,7 @@ from django.db import models
 
 class ResultGroup(models.Model):
     code = models.CharField(verbose_name="Код 1С", max_length=11, primary_key=True)
-    name = models.CharField(max_length=1000)
+    name = models.CharField(verbose_name="Имя группы", max_length=1000)
 
     def __str__(self):
         return f"{self.name}"

@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path('f/<int:pk>', views.census, name='census'),
     path('load/', views.load_data, name='census_load'),
+    path('test/', views.template_test),
     path('partner-search/', views.get_partners, name='partners'),
     path('point-names/', views.get_point_names, name='point_names'),
     path('point-category/', views.get_point_category, name='point_category'),

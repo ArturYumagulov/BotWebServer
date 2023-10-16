@@ -10,7 +10,7 @@ from .views import TaskViewSet, BaseViewSet, PartnersViewSet, WorkerViewSet, Aut
     ResultDataListView, SupervisorViewSet, AllTasksUpdateView, CensusView, CensusFilterViews
 
 router = DefaultRouter()
-router.get_api_root_view().cls.__name__ = "Tasks_API"
+router.get_api_root_view().cls.__name__ = "Tasks & Census_API"
 router.get_api_root_view().cls.__doc__ = "API для бота по задачам из 1С"
 
 router.register('base', BaseViewSet, basename="base")

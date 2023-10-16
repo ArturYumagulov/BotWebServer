@@ -268,7 +268,7 @@ class CensusSerializer(serializers.ModelSerializer):
     filters = FilterSerializer(many=True)
     accessories_brands = AccessoriesCategoryItemSerializer(many=True)
     point_type = PointTypesSerializer()
-    vector = PointVectorsSerializer()
+    vector = PointVectorsSerializer(many=True)
     sto_type = STOTypeListSerializer()
     category = PointCategorySerializer()
     accessories_category = AccessoriesCategorySerializer()

@@ -687,7 +687,7 @@ class CensusView(ModelViewSet):
     serializer_class = CensusSerializer
     queryset = Census.objects.all()
 
-    def list(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         serializer = self.serializer_class(self.queryset, many=True)
         logger.info(f"{request.method} - {request.path} - {request.META['REMOTE_ADDR']} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
