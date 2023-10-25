@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 import environ
+# from celery.schedules import crontab
+# from tasks.services import del_task
 
 env = environ.Env()
 environ.Env.read_env()
@@ -50,7 +52,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'tasks',
     'api',
-    'census'
+    'census',
+    'core'
 ]
 
 MIDDLEWARE = [
@@ -211,3 +214,9 @@ LOGGING = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+REDIS_PORT = "6379"
+REDIS_HOST = "localhost"
+CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'

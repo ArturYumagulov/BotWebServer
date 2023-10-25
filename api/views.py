@@ -1,14 +1,9 @@
-import json
 import logging
-from django.core import serializers as django_serializer
 
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from urllib.parse import quote, urlencode, unquote
-from rest_framework.viewsets import ModelViewSet, ViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
@@ -22,10 +17,6 @@ from .serializers import TaskSerializer, BasicSerializer, PartnerSerializer, Wor
     ResultGroupSerializer, ResultDataSerializer, SupervisorSerializer, AllTaskListSerializer, CensusSerializer
 
 logger = logging.getLogger(__name__)
-
-
-# class DefaultLimitPagination(PageNumberPagination):
-#     default_limit = 100
 
 
 class TaskViewSet(ModelViewSet):

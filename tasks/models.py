@@ -132,6 +132,7 @@ class Supervisor(models.Model):
 class AuthorComments(models.Model):
     comment = models.TextField(verbose_name="Комментарий")
     author = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name="Автор")
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
         return f"{self.comment} {self.author}"
@@ -144,6 +145,7 @@ class AuthorComments(models.Model):
 class WorkerComments(models.Model):
     comment = models.TextField(verbose_name="Комментарий")
     worker = models.ForeignKey(Worker, verbose_name="Исполнитель", on_delete=models.CASCADE)
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
         return f"{self.comment} {self.worker}"

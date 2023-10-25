@@ -35,7 +35,7 @@ def valid_data(request):
     new_census.address = request.get('address')
     new_census.name = request.get('name')
     task = Task.objects.get(number=request.get('guid'))
-    new_census.task = task
+    new_census.task = task.number
     worker_comment = WorkerComments.objects.create(comment=request.get('result_comment'), worker_id=task.worker.pk)
 
     control_date = None
@@ -76,7 +76,7 @@ def valid_data(request):
         # foreign
         new_census.category = models.PointCategory.objects.get(pk=request.get('category'))
         new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
-        new_census.task = task
+        new_census.task = task.number
         new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
 
         # required

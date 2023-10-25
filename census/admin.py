@@ -16,8 +16,11 @@ class CensusAdmin(admin.ModelAdmin):
               'decision_phone', 'other_brand', 'akb_specify', 'working', 'result', 'task')
 
     def get_task_worker(self, obj):
-        task = Task.objects.get(number=obj.task.number)
-        return f"{task.worker}"
+        try:
+            task = Task.objects.get(number=obj.task)
+            return f"{task.worker}"
+        except AttributeError:
+            return "Удален"
 
     get_task_worker.short_description = "Исполнитель"
 

@@ -7,6 +7,7 @@ from . import models
 # Register your models here.
 
 
+@admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
     list_display = (
         'status',
@@ -55,6 +56,7 @@ class TaskAdmin(admin.ModelAdmin):
     return_author_num.short_description = "Автор"
 
 
+@admin.register(models.Basics)
 class BaseAdmin(admin.ModelAdmin):
     # list_display = ('')
     search_fields = [
@@ -64,6 +66,7 @@ class BaseAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
+@admin.register(models.Partner)
 class PartnerAdmin(admin.ModelAdmin):
     list_display = (
         'name',
@@ -76,6 +79,7 @@ class PartnerAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
+@admin.register(models.PartnerWorker)
 class PartnerWorkersAdmin(admin.ModelAdmin):
     list_display = (
         'name',
@@ -89,6 +93,7 @@ class PartnerWorkersAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
+@admin.register(models.Worker)
 class WorkersAdmin(admin.ModelAdmin):
     list_display = (
         'name',
@@ -124,14 +129,18 @@ class ResultDataAdmin(admin.ModelAdmin):
     list_filter = ('group',)
 
 
-admin.site.register(models.Worker, WorkersAdmin)
-admin.site.register(models.Task, TaskAdmin)
-admin.site.register(models.Basics, BaseAdmin)
-admin.site.register(models.AuthorComments)
-admin.site.register(models.WorkerComments)
-admin.site.register(models.Partner, PartnerAdmin)
+@admin.register(models.WorkerComments)
+class WorkerCommentsAdmin(admin.ModelAdmin):
+    list_display = ('comment', 'worker', 'created_date')
+    list_filter = ('worker',)
+
+
+@admin.register(models.AuthorComments)
+class AuthorCommentsAdmin(admin.ModelAdmin):
+    list_display = ('comment', 'author', 'created_date')
+    list_filter = ('author',)
+
+
 admin.site.register(models.Result)
-# admin.site.register(models.ResultData)
 admin.site.register(models.ResultGroup)
-admin.site.register(models.PartnerWorker, PartnerWorkersAdmin)
 admin.site.register(models.Supervisor)
