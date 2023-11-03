@@ -71,6 +71,7 @@ class Basics(models.Model):
 class Partner(models.Model):
     name = models.CharField(verbose_name="Имя", max_length=1000)
     code = models.CharField(verbose_name="Код 1С", max_length=11, primary_key=True)
+    inn = models.CharField(max_length=12, verbose_name="ИНН", blank=True, null=True, default=None)
 
     def __str__(self):
         return f"{self.name}"
@@ -181,6 +182,7 @@ class Task(models.Model):
     edited = models.BooleanField(verbose_name="Изменено", default=False)
     result = models.ForeignKey(Result, on_delete=models.CASCADE, related_name="task_results", blank=True, null=True,
                                default=None)
+    message_id = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} {self.number} {self.deadline}"

@@ -186,13 +186,14 @@ class Census(models.Model):
                                                 default=None)
     elevators_count = models.PositiveIntegerField(verbose_name="Количество подъемников", default=0, null=True,
                                                   blank=True)
-    oil_debit = models.PositiveIntegerField(default=0, null=True, blank=True)
-    lukoil_debit = models.PositiveIntegerField(default=0, null=True, blank=True)
-    rowe_debit = models.PositiveIntegerField(default=0, null=True, blank=True)
-    motul_debit = models.PositiveIntegerField(default=0, null=True, blank=True)
+    oil_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
+    lukoil_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
+    rowe_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
+    motul_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
     decision_fio = models.CharField(max_length=2000, verbose_name="ЛПР_ФИО", null=True, blank=True)
     decision_email = models.EmailField(verbose_name="ЛПР_email", null=True, blank=True)
     decision_phone = models.CharField(verbose_name="Телефон", max_length=20, null=True, blank=True)
+    decision_function = models.CharField(verbose_name="Должность", max_length=300, null=True, blank=True)
     other_brand = models.TextField(verbose_name="Другие бренды аксессуаров", blank=True, null=True)
     akb_specify = models.BooleanField(default=False, verbose_name="Специализированная точка по АКБ?")
     working = models.ForeignKey(Partner, on_delete=models.PROTECT, verbose_name="Контрагент в 1С", blank=True,
@@ -208,6 +209,7 @@ class Census(models.Model):
     inn = models.CharField(verbose_name="ИНН", max_length=12, blank=True, null=True, default=None)
     organizations_name = models.CharField(verbose_name="Название организации", max_length=2000, blank=True, null=True)
     closing = models.BooleanField(verbose_name="Точка закрыта", default=False)
+    position = models.CharField(verbose_name="Местоположение", max_length=100, blank=True, null=True)
 
     class Meta:
         verbose_name = "Сенсус"
@@ -216,3 +218,16 @@ class Census(models.Model):
 
     def __str__(self):
         return f"{self.address_id}"
+
+
+class CensusFiles(models.Model):
+
+    census = models.ForeignKey(Census, on_delete=models.CASCADE, verbose_name='Сенсус', related_name="files")
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    file = models.FileField(upload_to=f"uploads/", blank=True, null=True)
+    edited = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "Фото Сенсус"
+        verbose_name_plural = "Фото Сенсусы"
+        ordering = ['-created_date']

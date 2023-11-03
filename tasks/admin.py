@@ -2,13 +2,19 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 from urllib.parse import unquote
 
+from import_export.admin import ImportExportModelAdmin
+
 from . import models
+from .resources import TaskResource
+
 
 # Register your models here.
 
 
 @admin.register(models.Task)
-class TaskAdmin(admin.ModelAdmin):
+class TaskAdmin(ImportExportModelAdmin):
+
+    resource_class = TaskResource
     list_display = (
         'status',
         # 'number',
@@ -71,10 +77,12 @@ class PartnerAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'code',
+        'inn'
     )
     search_fields = [
         'name',
-        'code'
+        'code',
+        'inn'
     ]
     list_per_page = 20
 

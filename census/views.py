@@ -3,7 +3,7 @@ import json
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
 
-from tasks.models import Partner, ResultData
+from tasks.models import Partner, ResultData, PartnerWorker
 from . import models
 from .services import valid_data
 
@@ -42,7 +42,7 @@ def census(request, pk):
 
 
 def load_data(request):
-    form = valid_data(request.POST)
+    form = valid_data(request)
     if form:
         return render(request, 'census/ready_census.html')
     else:
@@ -54,6 +54,17 @@ def get_partners(request):
     search_str = json.loads(request.body).get('searchText')
     partners = Partner.objects.filter(name__iregex=search_str)
     return JsonResponse(list(partners.values()), safe=False)
+
+
+def get_partners_inn(request):
+    search_str = json.loads(request.body).get('searchInn')
+    partners = Partner.objects.filter(inn=search_str)
+    return JsonResponse(list(partners.values()), safe=False)
+
+
+def get_partners_workers(request, partner_id):
+    workers = PartnerWorker.objects.filter(partner__name=partner_id)
+    return JsonResponse(list(workers.values()), safe=False)
 
 
 def get_point_names(request):

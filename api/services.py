@@ -2,14 +2,14 @@ import environ
 
 import requests
 import json
-from tasks.models import Worker, Basics, AuthorComments, WorkerComments, Partner  # noqa
+from tasks.models import Worker, Basics, AuthorComments, WorkerComments, Partner, Task  # noqa
 
 env = environ.Env()
 environ.Env.read_env('BotWebServer/.env')
 
 
 def send_message_bot(request):
-
+    task = Task.objects.get(number=request['number'])
     worker = Worker.objects.get(code=request['worker'])
     author = Worker.objects.get(code=request['author'])
     partner = Partner.objects.get(code=request['partner'])
@@ -72,8 +72,8 @@ def send_message_bot(request):
             message += sub_text
 
         reply_markup = {"inline_keyboard": [
-            [{"text": "Выполнена ✅", "callback_data": f"ok_{request['number']}"}],
-            [{"text": "Переадресовать ↪️", "callback_data": f"first_forward_{request['number']}"}]
+            [{"text": "Выполнена", "callback_data": f"ok_{request['number']}"}],  # ✅
+            [{"text": "Переадресовать", "callback_data": f"first_forward_{request['number']}"}]  # ↪️
         ]}
 
     data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup),
@@ -81,7 +81,13 @@ def send_message_bot(request):
 
     r = requests.post(url, data=data)
 
-    return True
+    if r.json()['ok']:
+        task = Task.objects.get(number=request['number'])
+        task.message_id = r.json()['result']['message_id']
+        task.save()
+        return True
+    else:
+        return False
 
 
 if __name__ == '__main__':

@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from django.shortcuts import get_object_or_404
-
 from . import models
 from tasks.models import Partner, Task, Result, ResultData, WorkerComments
 
@@ -31,17 +29,15 @@ def get_integer_valid(item, data_item, value):
 
 
 def valid_data(request):
+
+    request_files = request.FILES
+    request = request.POST
     new_census = models.Census()
     new_census.address = request.get('address')
     new_census.name = request.get('name')
     task = Task.objects.get(number=request.get('guid'))
     new_census.task = task.number
     worker_comment = WorkerComments.objects.create(comment=request.get('result_comment'), worker_id=task.worker.pk)
-
-    control_date = None
-
-    if len(request.get('control_date')) > 0:
-        control_date = datetime.strptime(request.get('control_date'), '%d-%m-%Y')
 
     if request.get('closing') is not None:  # Если закрыто
 
@@ -56,13 +52,26 @@ def valid_data(request):
         new_census.result = result
         new_census.address_id = request.get('address_id')
         new_census.closing = True
+        new_census.position = request.get('position')
         new_census.save()
+
+        if request_files:
+            for file in request_files.getlist('file'):
+                census_files = models.CensusFiles()
+                census_files.census = new_census
+                census_files.file = file
+                census_files.save()
 
         Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
                                                worker_comment=worker_comment)
         return True
 
     else:
+
+        control_date = None
+
+        if len(request.get('control_date')) > 0:
+            control_date = datetime.strptime(request.get('control_date'), '%d-%m-%Y')
 
         result = Result.objects.create(
             base_id=task.base.number,
@@ -78,6 +87,7 @@ def valid_data(request):
         new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
         new_census.task = task.number
         new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
+        new_census.position = request.get('position')
 
         # required
         new_census.address_id = request.get('address_id')
@@ -91,6 +101,7 @@ def valid_data(request):
         new_census.decision_fio = request.get('decision_fio')
         new_census.decision_email = request.get('decision_email')
         new_census.decision_phone = request.get('decision_phone')
+        new_census.decision_function = request.get('decision_function')
 
         # hide
 
@@ -158,6 +169,14 @@ def valid_data(request):
         m2m_save(new_census.vector, models.PointVectors.objects.filter(pk__in=request.getlist('vectors')))
         new_census.edited = True
         new_census.save()
+
+        # files
+        if request_files:
+            for file in request_files.getlist('file'):
+                census_files = models.CensusFiles()
+                census_files.census = new_census
+                census_files.file = file
+                census_files.save()
 
         Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
                                                worker_comment=worker_comment)

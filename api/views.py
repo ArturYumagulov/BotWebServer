@@ -91,10 +91,13 @@ class TaskViewSet(ModelViewSet):
                 serializer.save()
                 logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - saving data - "
                             f"{status.HTTP_201_CREATED}")
-                if send_message_bot(data):
-                    logger.info(f"Сообщение {data} отправлено")
-                else:
-                    logger.error(f"Сообщение {data} не отправлено")
+
+                if serializer.data['status'] == "Новая":
+                    if send_message_bot(data):
+                        logger.info(f"Сообщение {data} отправлено")
+                    else:
+                        logger.error(f"Сообщение {data} не отправлено")
+
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             logger.error(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - не сохранено - "
                          f"serializer_error:{serializer.errors} - {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")

@@ -19,8 +19,10 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
     <!---Datepicker-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=65c2d6fb-b558-4d2c-9982-ccbd7b5a47b1"
+            type="text/javascript"></script>
     {% load static %}
-    <script src="{% static 'js/app.js' %}"></script>
+    <script defer src="{% static 'js/app.js' %}"></script>
     <script>
         let csrf="{{ csrf_token }}";
     </script>
@@ -34,14 +36,14 @@
 </head>
 <body>
 <div class="container" id="todo-app" data-search="{% url 'partners' %}" data-address_id="{{ address_id }}">
+
     <h2 class="text-center m-4">Сенсус торговой точки</h2>
     <p class="text-center mb-3"><span class="fw-bold">Адрес: </span>{{ city }}, {{ street }}, {{ house }}</p>
-    <form class="m-3" action="/census/load/" method="post">
-
+    <form class="m-3" action="/census/load/" method="post" enctype="multipart/form-data">
         <div class="row m-3">
             <div class="form-check form-switch mb-3 col-lg-6">
                 <input class="form-check-input" name="closing" type="checkbox" id="closeCheckbox" value="true">
-                <label class="form-check-label" for="workCheckbox">Точка закрыта</label>
+                <label class="form-check-label" for="workCheckbox">Точка не существует</label>
             </div>
             <div class="form-check form-switch mb-3 col-lg-6">
                 <input class="form-check-input" type="checkbox" id="workCheckbox">
@@ -51,6 +53,25 @@
         <input class="form-control mb-3" name="working" list="contragentsListOptions" placeholder="Контрагент в 1С" id="searchClient"
                style="display: none;">
         <ul class="list-group mb-3" id="contragentsListOptions" style="display: none;"></ul>
+
+{#        ИНН #}
+        <div class="form-floating mb-3" id="innDivId" style="display: block;">
+            <input class="form-control" id="innId" type="text" name="inn" placeholder="ИНН?"
+            aria-describedby="innIdFeedback" data-url="{% url 'partners_inn' %}" required>
+            <label for="otherId">ИНН</label>
+            <div id="innIdFeedback" class="invalid-feedback">Напишите ИНН точки</div>
+        </div>
+
+        <ul class="list-group list-group-flush mb-3" style="display: none" id="innSearchUl">
+            <li class="list-group-item" style="color: red;" disabled>Данный ИНН существует в 1С</li>
+        </ul>
+{#НАЗВАНИЕ ОРГАНИЗАЦИИ#}
+        <div class="form-floating mb-3" id="organizationsNameDivId" style="display: block;">
+            <input class="form-control" id="organizationsNameId" type="text" name="organizations_name" placeholder="Название организации?"
+            aria-describedby="organizationsNameIdFeedback" required>
+            <label for="otherId">Название организации</label>
+            <div id="organizationsNameIdFeedback" class="invalid-feedback">Напишите название организации</div>
+        </div>
 {#        Вывеска -----------------------#}
         <div class="form-floating mb-3" id="boardId">
             <input class="form-control" name="point_name" id="signboardId" type="text" placeholder="Вывеска" aria-describedby="signboardIdFeedback" required>
@@ -58,6 +79,12 @@
             <div id="signboardIdFeedback" class="invalid-feedback">
                 Укажите вывеску торговой точки
             </div>
+        </div>
+{#    ФОТО #}
+        <div class="mb-3">
+          <label for="formFileMultiple" class="form-label">Фотографии точки</label>
+          <input class="form-control" name="file" type="file" id="formFileMultiple" multiple required>
+            <div class="invalid-feedback">Пожалуйста, загрузите фотографии точки</div>
         </div>
 {#        Точка является сетью? -----------------------#}
         <div class="mb-3">
@@ -156,35 +183,56 @@
             </div>
         </div>
 {#    Есть лицо принимающее решение?#}
-        <div class="form-check form-switch mb-3">
+        <div class="form-check form-switch mb-3" style="display: none">
             <input class="form-check-input" type="checkbox" id="decisionCheckboxId">
             <label class="form-check-label" for="decisionCheckboxId">Есть лицо принимающее решение?</label>
         </div>
+{#    contact#}
+{#            <div class="mb-3" id="contactDivId" style="display: none">#}
+{#            <label for="contactLabId" class="form-label">Выберите контактное лицо?</label>#}
+{#            <select class="form-select mb-3" name="category" id="ContactId" data-url="/census/patners/"#}
+{#                    aria-describedby="contactIDFeedback">#}
+{#                <option selected disabled value="">Выберите контактное лицо...</option>#}
+{#            </select>#}
+{#            <div id="contactIDFeedback" class="invalid-feedback">#}
+{#                Выберите контактное лицо#}
+{#            </div>#}
+{#        </div>#}
 {#    ФИО#}
-        <div class="form-floating mb-3" id="fioId" style="display: none;">
-            <input class="form-control" name="decision_fio" id="decisionMakerId" type="text" placeholder="Лицо принимающее решение"
+        <p class="text-start">Контактное лицо?</p>
+        <div class="form-floating mb-3" id="fioId" style="display: block;">
+            <input class="form-control" name="decision_fio" id="decisionMakerId" type="text" placeholder="ФИО контактного лица"
                    aria-describedby="fioIdFeedback">
             <label for="decisionMakerId">ФИО</label>
             <div id="fioIdFeedback" class="invalid-feedback">
-                Укажите ФИО лица принимающего решение
+                Укажите ФИО контактного лица
             </div>
         </div>
 {#    Email#}
-        <div class="form-floating mb-3" id="emailId" style="display: none;">
+        <div class="form-floating mb-3" id="emailId" style="display: block;">
             <input class="form-control" name="decision_email" id="decisionMakerEmailId" type="email" placeholder="Email"
             aria-describedby="decisionMakerEmailIdFeedback">
             <label for="decisionMakerEmailId">Email</label>
             <div id="decisionMakerEmailIdFeedback" class="invalid-feedback">
-                Укажите электронную почту лица принимающего решение
+                Укажите электронную почту контактного лица
             </div>
         </div>
 {#    Телефон#}
-        <div class="form-floating mb-3" id="phoneId" style="display: none;">
+        <div class="form-floating mb-3" id="phoneId" style="display: block;">
             <input class="form-control" name="decision_phone" id="decisionMakerPhoneId" type="phone" placeholder="Телефон"
             aria-describedby="decisionMakerPhoneIdFeedback">
             <label for="decisionMakerPhoneId">Телефон</label>
             <div id="decisionMakerPhoneIdFeedback" class="invalid-feedback">
-                Укажите телефон лица принимающего решение
+                Укажите телефон контактного лица
+            </div>
+        </div>
+{#    Должность #}
+        <div class="form-floating mb-3" id="functionId" style="display: block;">
+            <input class="form-control" name="decision_function" id="decisionMakerFunctionId" type="text" placeholder="Должность"
+                   aria-describedby="functionIdFeedback">
+            <label for="decisionMakerFunctionId">Должность</label>
+            <div id="functionIdFeedback" class="invalid-feedback">
+                Укажите должность контактного лица
             </div>
         </div>
 {#      Какие авто обслуживают?#}
@@ -282,20 +330,6 @@
             <div id="resultCommentFeedback" class="invalid-feedback">Напишите комментарий к задаче</div>
         </div>
 
-        <div class="form-floating mb-3" id="innDivId" style="display: block;">
-            <input class="form-control" id="innId" type="text" name="inn" placeholder="ИНН?"
-            aria-describedby="innIdFeedback" required>
-            <label for="otherId">ИНН</label>
-            <div id="innIdFeedback" class="invalid-feedback">Напишите ИНН точки</div>
-        </div>
-
-        <div class="form-floating mb-3" id="organizationsNameDivId" style="display: block;">
-            <input class="form-control" id="organizationsNameId" type="text" name="organizations_name" placeholder="Название организации?"
-            aria-describedby="organizationsNameIdFeedback" required>
-            <label for="otherId">Название организации</label>
-            <div id="organizationsNameIdFeedback" class="invalid-feedback">Напишите название организации</div>
-        </div>
-
         <div class="d-grid gap-2 mt-5">
             <button class="btn btn-danger" type="submit">Отправить</button>
         </div>
@@ -304,6 +338,7 @@
         <input type="hidden" name="name" value="{{ name }}">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         <input type="hidden" name="guid" value="{{ guid }}">
+        <input type="hidden" name="position" id="position" value="">
     </form>
 </div>
 
@@ -327,6 +362,19 @@
           format:"dd-mm-yyyy"
       });
     });
+
+    ymaps.ready(init);
+
+    function init() {
+        let geolocation = ymaps.geolocation;
+        geolocation.get({
+            provider: 'auto',
+        }).then(function (result) {
+            if (result.geoObjects.position) {
+                document.getElementById('position').setAttribute('value', result.geoObjects.position)
+            }
+        });
+    }
 </script>
 </body>
 </html>

@@ -7,6 +7,8 @@ urlpatterns = [
     path('load/', views.load_data, name='census_load'),
     path('test/', views.template_test),
     path('partner-search/', views.get_partners, name='partners'),
+    path('partner-search-inn/', views.get_partners_inn, name='partners_inn'),
+    path('patners/<str:partner_id>', views.get_partners_workers, name='partners_worker'),
     path('point-names/', views.get_point_names, name='point_names'),
     path('point-category/', views.get_point_category, name='point_category'),
     path('sto-types/', views.get_sto_type, name='sto_types'),

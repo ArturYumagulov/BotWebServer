@@ -21,19 +21,29 @@ ROUTES = {
 }
 
 
-class BaseTests(APITestCase):
-    """Тестирование оснований"""
-
+class DataTestClass(APITestCase):
     base_url = ROUTES['base']
     group_url = ROUTES['result_group']
-    model = models.Basics
+
+    partners_url = ROUTES['partners']
+    partner_worker_url = ROUTES['partner_worker']
+
+    supervisor_url = ROUTES['supervisor']
+    worker_url = ROUTES['workers']
+    author_comment_url = ROUTES['author_comment']
+
+    base_model = models.Basics
+    partner_model = models.Partner
+    partner_worker_model = models.PartnerWorker
+    supervisor_model = models.Supervisor
+    worker_model = models.Worker
 
     group_data = {
         "code": "000000002",
         "name": "Pазработка Контрагента"
     }
 
-    create_data = [
+    base_create_data = [
         {
             "number": "00000142871",
             "name": "Событие 00000142871 от 05.06.2023 16:37:47",
@@ -54,7 +64,7 @@ class BaseTests(APITestCase):
         }
     ]
 
-    update_data = [
+    base_update_data = [
         {
             "number": "00000142871",
             "name": "Изменено",
@@ -62,45 +72,14 @@ class BaseTests(APITestCase):
             "group": "000000002"
         }
     ]
-    error_data = {
+    base_error_data = {
             "number": "00000142871",
             "name": "Изменено",
             "date": "2023-06-05T16:37:47Z",
             "group": "000000002"
         }
 
-    def setUp(self):
-        self.client = APIClient()
-        self.is_authenticated = User.objects.create_user(
-            username=ROUTES['auth_data']['username'],
-            password=ROUTES['auth_data']['password'])
-        self.response = self.client.post(ROUTES['auth'], data=ROUTES['auth_data'])
-        self.token = Token.objects.get(user__username=ROUTES['auth_data']['username'])
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
-    def test_create_and_update_basic(self):
-        create_group = self.client.post(self.group_url, self.group_data)
-        self.assertEqual(create_group.status_code, status.HTTP_201_CREATED)
-        create_response = self.client.post(self.base_url, self.create_data, format='json')
-        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.model.objects.count(), 3)
-        update_response = self.client.put(self.base_url, self.update_data, format='json')
-        self.assertEqual(update_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.model.objects.get(number=self.update_data[0]['number']).name, self.update_data[0]['name'])
-
-    def test_error_list_data(self):
-        error_update_post = self.client.post(self.base_url, self.error_data, format='json')
-        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-
-class PartnersTests(APITestCase):
-
-    base_url = ROUTES['partners']
-    partner_worker_url = ROUTES['partner_worker']
-    model = models.Partner
-    worker_model = models.PartnerWorker
-
-    create_data = [
+    partners_create_data = [
         {
             "code": "ТСО007316",
             "name": "Авангард-Моторс ООО"
@@ -115,13 +94,13 @@ class PartnersTests(APITestCase):
         }
     ]
 
-    update_data = [
+    partners_update_data = [
         {
             "code": "ТСО007316",
             "name": "Изменено"
         }
     ]
-    error_data = {
+    partners_error_data = {
             "number": "00000142871",
             "name": "Изменено",
             "date": "2023-06-05T16:37:47Z"
@@ -135,7 +114,7 @@ class PartnersTests(APITestCase):
             "partner": "ТСО007316"
         },
         {
-            "name": "Сотрулник 2",
+            "name": "Сотрудник 2",
             "positions": "Директор",
             "code": "F00001716",
             "partner": "ТСО017919"
@@ -143,41 +122,7 @@ class PartnersTests(APITestCase):
 
     ]
 
-    def setUp(self):
-        self.client = APIClient()
-        self.is_authenticated = User.objects.create_user(
-            username=ROUTES['auth_data']['username'],
-            password=ROUTES['auth_data']['password'])
-        self.response = self.client.post(ROUTES['auth'], data=ROUTES['auth_data'])
-        self.token = Token.objects.get(user__username=ROUTES['auth_data']['username'])
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
-    def test_create_and_update_partners(self):
-        create_response = self.client.post(self.base_url, self.create_data, format='json')
-        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.model.objects.count(), 3)
-        update_response = self.client.put(self.base_url, self.update_data, format='json')
-        self.assertEqual(update_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.model.objects.get(code=self.update_data[0]['code']).name, self.update_data[0]['name'])
-        create_worker_response = self.client.post(self.partner_worker_url, data=self.partner_worker_data, format='json')
-        self.assertEqual(create_worker_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.worker_model.objects.count(), 2)
-
-    def test_error_list_partners(self):
-        error_update_post = self.client.post(self.base_url, self.error_data, format='json')
-        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-        error_update_post = self.client.post(self.partner_worker_url, self.error_data, format='json')
-        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-
-class SupervisorsWorkerTests(APITestCase):
-
-    supervisor_url = ROUTES['supervisor']
-    worker_url = ROUTES['workers']
-    supervisor_model = models.Supervisor
-    worker_model = models.Worker
-
-    create_data = [
+    supervisor_create_data = [
         {
             "code": "ТСО001951",
             "name": "Алтынбаев Артур Фаридович",
@@ -198,7 +143,7 @@ class SupervisorsWorkerTests(APITestCase):
         }
     ]
 
-    update_data = [
+    supervisor_update_data = [
         {
             "code": "ТСО000780",
             "name": "Изменено",
@@ -206,7 +151,7 @@ class SupervisorsWorkerTests(APITestCase):
             "phone": "79600847615"
         }
     ]
-    error_data = {
+    supervisor_error_data = {
             "number": "00000142871",
             "name": "Изменено",
             "date": "2023-06-05T16:37:47Z"
@@ -231,73 +176,14 @@ class SupervisorsWorkerTests(APITestCase):
         }
 
     ]
-
-    def setUp(self):
-        self.client = APIClient()
-        self.is_authenticated = User.objects.create_user(
-            username=ROUTES['auth_data']['username'],
-            password=ROUTES['auth_data']['password'])
-        self.response = self.client.post(ROUTES['auth'], data=ROUTES['auth_data'])
-        self.token = Token.objects.get(user__username=ROUTES['auth_data']['username'])
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
-    def test_create_and_update_supervisors_workers(self):
-        create_response = self.client.post(self.supervisor_url, self.create_data, format='json')
-
-        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.supervisor_model.objects.count(), 3)
-
-        update_response = self.client.put(self.supervisor_url, self.update_data, format='json')
-
-        self.assertEqual(update_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.supervisor_model.objects.get(code=self.update_data[0]['code']).name,
-                         self.update_data[0]['name'])
-
-        create_worker_response = self.client.post(self.worker_url, data=self.worker_data, format='json')
-
-        self.assertEqual(create_worker_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.worker_model.objects.count(), 2)
-
-    def test_error_list_supervisors_workers(self):
-        error_update_post = self.client.post(self.supervisor_url, self.error_data, format='json')
-
-        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-        error_update_post = self.client.post(self.worker_url, self.error_data, format='json')
-
-        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-
-class AutorCommentTests(APITestCase):
-
-    supervisor_url = ROUTES['supervisor']
-    worker_url = ROUTES['workers']
-    author_comment_url = ROUTES['author_comment']
-
-    author_comment_model = models.AuthorComments
-    supervisor_model = models.Supervisor
-    worker_model = models.Worker
-
-    create_supervisor_data = [{
-            "code": "ТСО001951",
-            "name": "Алтынбаев Артур Фаридович",
-            "chat_id": None,
-            "phone": "79655820336"
-        }]
-
-    create_worker_data = [{
-
-                "code": "ТСО001099",
-                "name": "Trade 10",
-                "chat_id": None,
-                "phone": "79677708030",
-                "controller": False,
-                "supervisor": "ТСО001951"
-    }]
-
     author_comment_data = {
         'comment': "Тестовый коммент",
-        'author': create_worker_data[0]['code']
+        'author': worker_data[0]['code']
+    }
+
+    worker_comment_data = {
+        'comment': "Тестовый коммент",
+        'worker': worker_data[0]['code']
     }
 
     def setUp(self):
@@ -309,20 +195,101 @@ class AutorCommentTests(APITestCase):
         self.token = Token.objects.get(user__username=ROUTES['auth_data']['username'])
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
+
+class BaseTests(DataTestClass, APITestCase):
+    """Тестирование оснований"""
+
+    def test_create_and_update_basic(self):
+        create_group = self.client.post(self.group_url, self.group_data)
+        self.assertEqual(create_group.status_code, status.HTTP_201_CREATED)
+        create_response = self.client.post(self.base_url, self.base_create_data, format='json')
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.base_model.objects.count(), 3)
+        update_response = self.client.put(self.base_url, self.base_update_data, format='json')
+        self.assertEqual(update_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.base_model.objects.get(number=self.base_update_data[0]['number']).name,
+                         self.base_update_data[0]['name'])
+
+    def test_error_list_data(self):
+        error_update_post = self.client.post(self.base_url, self.base_error_data, format='json')
+        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+
+class PartnersTests(DataTestClass):
+
+    def test_create_and_update_partners(self):
+        create_response = self.client.post(self.partners_url, self.partners_create_data, format='json')
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.partner_model.objects.count(), 3)
+        update_response = self.client.put(self.partners_url, self.partners_update_data, format='json')
+        self.assertEqual(update_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.partner_model.objects.get(code=self.partners_update_data[0]['code']).name,
+                         self.partners_update_data[0]['name'])
+        create_worker_response = self.client.post(self.partner_worker_url, data=self.partner_worker_data, format='json')
+        self.assertEqual(create_worker_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.partner_worker_model.objects.count(), 2)
+
+    def test_error_list_partners(self):
+        error_update_post = self.client.post(self.partners_url, self.partners_error_data, format='json')
+        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        error_update_post = self.client.post(self.partner_worker_url, self.partners_error_data, format='json')
+        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+
+class SupervisorsWorkerTests(DataTestClass):
+
+    supervisor_model = models.Supervisor
+    worker_model = models.Worker
+
+    def test_create_and_update_supervisors_workers(self):
+        create_response = self.client.post(self.supervisor_url, self.supervisor_create_data, format='json')
+
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.supervisor_model.objects.count(), 3)
+
+        update_response = self.client.put(self.supervisor_url, self.supervisor_update_data, format='json')
+
+        self.assertEqual(update_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.supervisor_model.objects.get(code=self.supervisor_update_data[0]['code']).name,
+                         self.supervisor_update_data[0]['name'])
+
+        create_worker_response = self.client.post(self.worker_url, data=self.worker_data, format='json')
+
+        self.assertEqual(create_worker_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.worker_model.objects.count(), 2)
+
+    def test_error_list_supervisors_workers(self):
+        error_update_post = self.client.post(self.supervisor_url, self.supervisor_error_data, format='json')
+
+        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+        error_update_post = self.client.post(self.worker_url, self.supervisor_error_data, format='json')
+
+        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+
+class AutorCommentTests(DataTestClass):
+
+    author_comment_model = models.AuthorComments
+    supervisor_model = models.Supervisor
+    worker_model = models.Worker
+
     def test_create_author_comments(self):
 
         #  Создаю супервизора
-        create_supervisor_response = self.client.post(self.supervisor_url, self.create_supervisor_data, format='json')
+        create_supervisor_response = self.client.post(self.supervisor_url, self.supervisor_create_data, format='json')
         self.assertEqual(create_supervisor_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.supervisor_model.objects.count(), 1)
-        self.assertEqual(self.supervisor_model.objects.get().name, self.create_supervisor_data[0]['name'])
+        self.assertEqual(self.supervisor_model.objects.count(), 3)
+        self.assertEqual(self.supervisor_model.objects.get(name=self.supervisor_create_data[0]['name']).name,
+                         self.supervisor_create_data[0]['name'])
 
         #  Создаю торгового
-        create_worker_response = self.client.post(self.worker_url, self.create_worker_data, format='json')
+        create_worker_response = self.client.post(self.worker_url, self.worker_data, format='json')
 
         self.assertEqual(create_worker_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.worker_model.objects.count(), 1)
-        self.assertEqual(self.worker_model.objects.get().name, self.create_worker_data[0]['name'])
+        self.assertEqual(self.worker_model.objects.count(), 2)
+        self.assertEqual(self.worker_model.objects.get(name=self.worker_data[0]['name']).name,
+                         self.worker_data[0]['name'])
 
         #  Создаю комментарий
         create_author_comment_response = self.client.post(self.author_comment_url, data=self.author_comment_data,
@@ -334,60 +301,27 @@ class AutorCommentTests(APITestCase):
         self.assertEqual(self.author_comment_model.objects.get().comment, self.author_comment_data['comment'])
 
 
-class WorkerCommentTests(APITestCase):
+class WorkerCommentTests(DataTestClass):
 
-    supervisor_url = ROUTES['supervisor']
-    worker_url = ROUTES['workers']
     worker_comment_url = ROUTES['worker_comment']
 
     worker_comment_model = models.WorkerComments
-    supervisor_model = models.Supervisor
-    worker_model = models.Worker
-
-    create_supervisor_data = [{
-            "code": "ТСО001951",
-            "name": "Алтынбаев Артур Фаридович",
-            "chat_id": None,
-            "phone": "79655820336"
-        }]
-
-    create_worker_data = [{
-
-                "code": "ТСО001099",
-                "name": "Trade 10",
-                "chat_id": None,
-                "phone": "79677708030",
-                "controller": False,
-                "supervisor": "ТСО001951"
-    }]
-
-    worker_comment_data = {
-        'comment': "Тестовый коммент",
-        'worker': create_worker_data[0]['code']
-    }
-
-    def setUp(self):
-        self.client = APIClient()
-        self.is_authenticated = User.objects.create_user(
-            username=ROUTES['auth_data']['username'],
-            password=ROUTES['auth_data']['password'])
-        self.response = self.client.post(ROUTES['auth'], data=ROUTES['auth_data'])
-        self.token = Token.objects.get(user__username=ROUTES['auth_data']['username'])
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
     def test_create_worker_comments(self):
 
         #  Создаю супервизора
-        create_supervisor_response = self.client.post(self.supervisor_url, self.create_supervisor_data, format='json')
+        create_supervisor_response = self.client.post(self.supervisor_url, self.supervisor_create_data, format='json')
         self.assertEqual(create_supervisor_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.supervisor_model.objects.count(), 1)
-        self.assertEqual(self.supervisor_model.objects.get().name, self.create_supervisor_data[0]['name'])
+        self.assertEqual(self.supervisor_model.objects.count(), 3)
+        self.assertEqual(self.supervisor_model.objects.get(name=self.supervisor_create_data[0]['name']).name,
+                         self.supervisor_create_data[0]['name'])
 
         #  Создаю торгового
-        create_worker_response = self.client.post(self.worker_url, self.create_worker_data, format='json')
+        create_worker_response = self.client.post(self.worker_url, self.worker_data, format='json')
         self.assertEqual(create_worker_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.worker_model.objects.count(), 1)
-        self.assertEqual(self.worker_model.objects.get().name, self.create_worker_data[0]['name'])
+        self.assertEqual(self.worker_model.objects.count(), 2)
+        self.assertEqual(self.worker_model.objects.get(name=self.worker_data[0]['name']).name,
+                         self.worker_data[0]['name'])
 
         #  Создаю комментарий
         create_worker_comment_response = self.client.post(self.worker_comment_url, data=self.worker_comment_data,

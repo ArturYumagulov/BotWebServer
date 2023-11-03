@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from celery import shared_task
 
 from tasks.models import Task, WorkerComments, AuthorComments
+from census.models import CensusFiles
 
 
 logger = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 def del_task():
     date = datetime.now() - timedelta(days=14)
     del_date = make_aware(date)
-    tasks = Task.objects.filter(status="Загружено").filter(deadline__lte=del_date)
+    tasks = Task.objects.exclude(status="Новая").filter(deadline__lte=del_date)
     worker_comments = WorkerComments.objects.filter(created_date__lte=del_date)
     worker_comments_length = len(worker_comments)
     if worker_comments_length > 0:
@@ -35,6 +36,12 @@ def del_task():
             task.delete()
             logger.info(f"Celery удалена задача номер {task_number} - {datetime.now()}")
             print(f"Celery удалена задача номер {task_number} - {datetime.now()}")
-            return True
-    else:
-        return True
+
+    census_files = CensusFiles.objects.filter(created_date__lte=del_date)
+
+    if len(census_files) > 0:
+        for file in census_files:
+            file_path = file.file
+            file.delete()
+            logger.info(f"Celery удален файл {file_path} - {datetime.now()}")
+            print(f"Celery удален файл {file_path} - {datetime.now()}")
