@@ -1,7 +1,73 @@
+import redis
+import requests
+import time
+import json
+import logging
+import environ
+
+from redis.commands.json.path import Path
 from datetime import datetime
 
 from . import models
 from tasks.models import Partner, Task, Result, ResultData, WorkerComments
+
+env = environ.Env()
+environ.Env.read_env()
+
+logger = logging.getLogger(__name__)
+
+
+def unix_to_date(unix):
+    if unix is not None:
+        date = str(unix)[:9]
+        return datetime.utcfromtimestamp(int(date)).strftime('%Y-%m-%d')
+    else:
+        return None
+
+
+class DataInnOnRedis:
+    def __init__(self):
+        self.client = redis.Redis(host="localhost")
+        self.dadata = env('DADATA_URL')
+
+    def save_data(self, inn: str) -> dict | bool:
+
+        headers: dict = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": f"Token {env('DADATA_API_KEY')}"
+        }
+
+        data: dict = {"query": inn}
+
+        r = requests.post(self.dadata, headers=headers, data=json.dumps(data))
+
+        if r.status_code == 200:
+            data: json = r.json()
+            if len(data['suggestions']) > 0:
+                new_data = self.client.json().set(inn, Path.root_path(), data['suggestions'])
+                if new_data:
+                    self.client.close()
+                    return True
+                else:
+                    self.client.close()
+                    return False
+            else:
+                return False
+        else:
+            return False
+
+    def get_data(self, inn):
+        data = self.client.json().get(inn)
+        if data:
+            self.client.close()
+            return data
+        else:
+            self.client.close()
+            return False
+
+    def remove_data(self, inn):
+        return self.client.delete(inn)
 
 
 def m2m_save(item, item_list):

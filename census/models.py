@@ -210,6 +210,8 @@ class Census(models.Model):
     organizations_name = models.CharField(verbose_name="Название организации", max_length=2000, blank=True, null=True)
     closing = models.BooleanField(verbose_name="Точка закрыта", default=False)
     position = models.CharField(verbose_name="Местоположение", max_length=100, blank=True, null=True)
+    dadata = models.ForeignKey('CompanyDatabase', on_delete=models.SET_NULL, blank=True, null=True,
+                               default=None)
 
     class Meta:
         verbose_name = "Сенсус"
@@ -231,3 +233,83 @@ class CensusFiles(models.Model):
         verbose_name = "Фото Сенсус"
         verbose_name_plural = "Фото Сенсусы"
         ordering = ['-created_date']
+
+
+class CompanyDatabase(models.Model):
+    STATUSES = [
+        ('ACTIVE', 'действующая'),
+        ('LIQUIDATING', 'ликвидируется'),
+        ('LIQUIDATED', 'ликвидирована'),
+        ('BANKRUPT', 'банкротство'),
+        ('REORGANIZING', 'в процессе присоединения к другому юр.лицу, с последующей ликвидацией'),
+    ]
+
+    inn = models.CharField(verbose_name="inn", max_length=12, primary_key=True)
+    value = models.CharField(verbose_name="Наименование компании", max_length=2000)
+    kpp = models.CharField(verbose_name="КПП", max_length=9, blank=True, null=True, default=None)
+    ogrn = models.CharField(verbose_name="ОГРН", max_length=50, blank=True, null=True, default=None)
+    # ogrn_date = models.DateField(verbose_name="Дата выдачи ОГРН", blank=True, null=True, default=None)
+    hid = models.CharField(verbose_name="Внутренний идентификатор в Дадате", max_length=2000)
+    type = models.CharField(verbose_name="Тип организации", max_length=10, blank=True, null=True, default=None)
+    full_with_opf = models.CharField(verbose_name="Наименование компании", max_length=2000, blank=True, null=True,
+                                     default=None)
+    short_with_opf = models.CharField(verbose_name="Краткое наименование", max_length=1000, blank=True, null=True,
+                                      default=None)
+    full = models.CharField(verbose_name="Полное наименование без ОПФ", max_length=1000, blank=True, null=True,
+                            default=None)
+    short = models.CharField(verbose_name="Краткое наименование без ОПФ", max_length=1000, blank=True, null=True,
+                             default=None)
+    fio_surname = models.CharField(verbose_name="Фамилия ИП", max_length=1000, blank=True, null=True,
+                                   default=None)
+    fio_name = models.CharField(verbose_name="Имя ИП", max_length=1000, blank=True, null=True,
+                                default=None)
+    fio_patronymic = models.CharField(verbose_name="Отчество ИП", max_length=1000, blank=True, null=True,
+                                      default=None)
+    okato = models.CharField(verbose_name="ОКАТО", max_length=11, blank=True, null=True, default=None)
+    oktmo = models.CharField(verbose_name="ОКТМО", max_length=50, blank=True, null=True, default=None)
+    okpo = models.CharField(verbose_name="ОКПО", max_length=14, blank=True, null=True, default=None)
+    okogu = models.CharField(verbose_name="ОКОГУ", max_length=7, blank=True, null=True, default=None)
+    okfs = models.CharField(verbose_name="ОКФС", max_length=61, blank=True, null=True, default=None)
+    okved = models.CharField(verbose_name="ОКВЭД", max_length=61, blank=True, null=True, default=None)
+    okved_type = models.CharField(verbose_name="Версия справочника ОКВЭД (2001 или 2014)", max_length=4, blank=True,
+                                  null=True, default=None)
+    opf_code = models.CharField(verbose_name="код ОКОПФ", max_length=100, blank=True, null=True, default=None)
+    opf_full = models.CharField(verbose_name="полное название ОПФ", max_length=2000, blank=True, null=True,
+                                default=None)
+    opf_short = models.CharField(verbose_name="краткое название ОПФ", max_length=2000, blank=True, null=True,
+                                 default=None)
+    opf_type = models.CharField(verbose_name="краткое название ОПФ", max_length=4, blank=True, null=True,
+                                default=None)
+    management_name = models.CharField(verbose_name="ФИО руководителя", max_length=1000, blank=True, null=True,
+                                       default=None)
+    management_post = models.CharField(verbose_name="должность руководителя", max_length=1000, blank=True, null=True,
+                                       default=None)
+    branch_count = models.CharField(verbose_name="Количество филиалов", max_length=1000, blank=True, null=True,
+                                    default=None)
+    branch_type = models.CharField(verbose_name="Тип подразделения", max_length=1000, blank=True, null=True,
+                                   default=None)
+    address_value = models.CharField(verbose_name="Адрес одной строкой", max_length=1000, blank=True, null=True,
+                                     default=None)
+    address_unrestricted_value = models.CharField(verbose_name="адрес одной строкой (полный, с индексом)",
+                                                  max_length=1000, blank=True, null=True, default=None)
+    address_data = models.CharField(verbose_name="гранулярный адрес", max_length=1000, blank=True, null=True,
+                                    default=None)
+    address_data_source = models.CharField(verbose_name="адрес одной строкой как в ЕГРЮЛ", max_length=1000, blank=True,
+                                           null=True, default=None)
+    address_qc = models.CharField(verbose_name="код проверки адреса", max_length=1, blank=True, null=True,
+                                  default=None)
+    address_latitude = models.CharField(verbose_name="Широта_DADATA", max_length=50, blank=True, null=True,
+                                        default=None)
+    address_longitude = models.CharField(verbose_name="Долгота_DADATA", max_length=50, blank=True, null=True,
+                                         default=None)
+    # actuality_date = models.DateField(verbose_name="дата последних изменений", blank=True, null=True, default=None)
+    # registration_date = models.DateField(verbose_name="дата регистрации", blank=True, null=True, default=None)
+    # liquidation_date = models.DateField(verbose_name="дата ликвидации", blank=True, null=True, default=None)
+    status = models.CharField(verbose_name="статус организации", blank=True, null=True, default=None, choices=STATUSES)
+
+    def __str__(self):
+        return f"{self.value} - {self.inn}"
+
+    class Meta:
+        verbose_name = 'Организация'
+        verbose_name_plural = 'Организации'

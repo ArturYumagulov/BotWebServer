@@ -1,11 +1,15 @@
 import json
+from django.db.models import Q
 
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
 
+from core.tasks import save_organizations
 from tasks.models import Partner, ResultData, PartnerWorker
 from . import models
-from .services import valid_data
+from .models import CompanyDatabase
+from .services import valid_data, DataInnOnRedis
+
 
 # Create your views here.
 
@@ -221,3 +225,36 @@ def get_providers(request):
     return render(request, template_name='census/index.html')
 
 
+def get_inn(request):
+    if request.method == "POST":
+        result = []
+        search_inn = json.loads(request.body).get('searchInn')
+        try:
+            organization = CompanyDatabase.objects.get(inn=search_inn)
+
+            result.append({
+                'name': organization.value,
+                'inn': organization.inn
+            })
+
+        except CompanyDatabase.DoesNotExist:
+            organization = DataInnOnRedis().get_data(search_inn)
+
+            if organization:
+                save_organizations.delay(search_inn)
+                if organization[0].get('value'):
+                    result.append({
+                        'name': organization[0]['value'],
+                        'inn': organization[0]['data'].get('inn')
+                    })
+            else:
+                if DataInnOnRedis().save_data(search_inn):
+                    save_organizations.delay(search_inn)
+                    organization = DataInnOnRedis().get_data(search_inn)[0]
+                    if organization.get('value'):
+                        result.append({
+                            'name': organization['value'],
+                            'inn': organization['data'].get('inn')
+                        })
+
+        return JsonResponse(result, safe=False)

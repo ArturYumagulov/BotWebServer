@@ -87,3 +87,10 @@ class CensusFilesAdmin(admin.ModelAdmin):
         return obj.census.address
 
     get_census_address.short_description = 'Адрес'
+
+
+@admin.register(models.CompanyDatabase)
+class CompanyDatabaseAdmin(admin.ModelAdmin):
+
+    list_display = ('inn', 'status', 'value')
+    search_fields = ('inn',)
