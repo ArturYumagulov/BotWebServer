@@ -248,7 +248,7 @@ class CompanyDatabase(models.Model):
     value = models.CharField(verbose_name="Наименование компании", max_length=2000)
     kpp = models.CharField(verbose_name="КПП", max_length=9, blank=True, null=True, default=None)
     ogrn = models.CharField(verbose_name="ОГРН", max_length=50, blank=True, null=True, default=None)
-    # ogrn_date = models.DateField(verbose_name="Дата выдачи ОГРН", blank=True, null=True, default=None)
+    ogrn_date = models.DateField(verbose_name="Дата выдачи ОГРН", blank=True, null=True, default=None)
     hid = models.CharField(verbose_name="Внутренний идентификатор в Дадате", max_length=2000)
     type = models.CharField(verbose_name="Тип организации", max_length=10, blank=True, null=True, default=None)
     full_with_opf = models.CharField(verbose_name="Наименование компании", max_length=2000, blank=True, null=True,
@@ -302,10 +302,12 @@ class CompanyDatabase(models.Model):
                                         default=None)
     address_longitude = models.CharField(verbose_name="Долгота_DADATA", max_length=50, blank=True, null=True,
                                          default=None)
-    # actuality_date = models.DateField(verbose_name="дата последних изменений", blank=True, null=True, default=None)
-    # registration_date = models.DateField(verbose_name="дата регистрации", blank=True, null=True, default=None)
-    # liquidation_date = models.DateField(verbose_name="дата ликвидации", blank=True, null=True, default=None)
+    actuality_date = models.DateField(verbose_name="дата последних изменений", blank=True, null=True, default=None)
+    registration_date = models.DateField(verbose_name="дата регистрации", blank=True, null=True, default=None)
+    liquidation_date = models.DateField(verbose_name="дата ликвидации", blank=True, null=True, default=None)
     status = models.CharField(verbose_name="статус организации", blank=True, null=True, default=None, choices=STATUSES)
+    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
 
     def __str__(self):
         return f"{self.value} - {self.inn}"
@@ -313,3 +315,4 @@ class CompanyDatabase(models.Model):
     class Meta:
         verbose_name = 'Организация'
         verbose_name_plural = 'Организации'
+        ordering = ['-created_date']

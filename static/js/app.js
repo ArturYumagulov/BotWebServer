@@ -1,4 +1,9 @@
 (function (qualifiedName) {
+    function cleanSearchBlock(searchBlock) {
+            for (let i = 1; i < searchBlock.children.length; i++) {
+                searchBlock.children[i].remove()
+            }
+        }
     function isInteger(num) {
         if (num < '0' || num > '9') {
             return false;
@@ -508,11 +513,6 @@
         await createControlOption('controlId')
         await createSelectMulti('providers')
         await createSelectMulti('vectorMulti')
-
-        // checkHiddenSearchObjects('decisionCheckboxId', 'fioId', 'decisionMakerId');
-        // checkHiddenSearchObjects('decisionCheckboxId', 'emailId', 'decisionMakerEmailId');
-        // checkHiddenSearchObjects('decisionCheckboxId', 'phoneId', 'decisionMakerPhoneId');
-
         await validSelect('typeId')
         await validSelect('shopCategoryId')
         await validSelect('pointTypeID')
@@ -536,7 +536,7 @@
         floatFormValid('otherProvDivId', 'otherProvId', 'otherProvIdFeedback', false)
         floatFormValid('otherVectorId', 'otherVectorInputId', 'otherVectorFeedback', false)
         floatFormValid('resultCommentDivId', 'resultCommentId', 'resultCommentFeedback', false)
-        floatFormValid('innDivId', 'innId', 'innIdFeedback', false)
+        // floatFormValid('innDivId', 'innId', 'innIdFeedback', false)
         // Автосервис
         await hideChangeFloatElem('pointTypeID', 'elevatorId', 'elevatorCountId','Автосервис')
         await hideChangeSelectElem('pointTypeID', 'stoTypeDiv', 'stoTypeId', 'Автосервис')
@@ -556,7 +556,6 @@
         let control = document.getElementById('controlId')
         let date = document.getElementById('dateDiv')
         let date_input = document.getElementById('date')
-        let date_cursor = document.querySelector('.input-group-text')
         control.addEventListener('change', function () {
             if (control.options[control.selectedIndex].dataset.control === 'true') {
                 date.style.display = 'block'
@@ -581,69 +580,118 @@
         let innDiv = document.getElementById('innDivId')
         let active_check = document.getElementById('workCheckbox')
         let searchBlock = document.getElementById('innSearchUl')
-        let contacts_div = document.getElementById('contactDivId')
-        let contact_select = document.getElementById('ContactId')
-        inn.addEventListener('blur', function (e) {
-            let searchInn = e.target.value
-            let partnersInn = inn.getAttribute('data-url')
-            let org_name_div = document.getElementById('organizationsNameDivId')
-            let org_name = document.getElementById('organizationsNameId')
-                if (searchInn.trim().length > 0) {
-                        fetch(partnersInn,
-                    {
-                        headers: {"X-CSRFToken": csrf},
-                        body: JSON.stringify({searchInn: searchInn}),
-                        method: "POST",
-                        }).then((res) => res.json())
-                    .then((data) => {
-                        if (data.length > 0) {
-                            innDiv.classList.remove('mb-3')
-                            searchBlock.style.display = 'block'
-                            data.forEach((item) => {
-                                let li = document.createElement('li')
-                                li.classList.add('list-group-item', 'result-inn')
-                                li.style.cursor = 'pointer'
-                                li.innerHTML = `${item.name}`
-                                li.setAttribute('data-inn', item.name)
-                                searchBlock.append(li)
-                            })
-                            let result_item = document.querySelectorAll('.list-group-item.result-inn')
-                            result_item.forEach((i) => {
-                                i.addEventListener('click', function () {
-                                    active_check.checked = true
-                                    let contragent = document.getElementById('searchClient')
-                                    contragent.value = i.getAttribute('data-inn')
-                                    contragent.style.display = 'block'
-                                    contragent.classList.add('is-valid')
-                                    innDiv.style.display = 'none'
-                                    inn.innerHTML = ''
-                                    searchBlock.style.display = 'none'
-                                    org_name_div.style.display = 'none'
-                                    org_name.removeAttribute('required')
+        let out = document.querySelector('.out')
+
+        function LengthValue(item, event) {
+            let inn_value = item.value
+
+                if (inn_value.length !== 10 && inn_value.length !== 12){
+                document.getElementById('innId').classList.add('is-invalid')
+                inn.classList.remove('mb-3', 'is-valid')
+                document.getElementById('innIdFeedback').innerHTML = 'Длина ИНН должна содержать 10 или 12 символов'
+                document.getElementById('organizationsNameId').value = ''
+            } else {
+                item.classList.remove('is-invalid')
+                item.classList.add('is-valid')
+            }
+        }
+
+        function HideSearchBlock(hide=false) {
+            if (hide) {
+                searchBlock.style.display = 'none'
+                inn.classList.add('mb-3')
+            } else {
+                inn.classList.remove('mb-3')
+                searchBlock.style.display = 'block'
+            }
+        }
+
+        function createSearchElem(searchBlock, item, source) {
+            let li = document.createElement('li')
+            li.classList.add('list-group-item', 'result-inn')
+            li.style.cursor = 'pointer'
+            li.innerHTML = `${item.name}`
+            li.setAttribute('data-inn', item.inn)
+            li.setAttribute('data-name', item.name)
+            li.setAttribute('data-source', item.source)
+            searchBlock.append(li)
+        }
+
+        function LoadInnSearchBlock(url, event) {
+
+            fetch(url, {
+                headers: {"X-CSRFToken": csrf},
+                body: JSON.stringify({searchInn: event.target.value}),
+                method: "POST",
+            }).then((res) => res.json()).then(
+                (data) => {
+                    if (data.length > 0) {
+                        data.forEach((item) => {
+
+                            if (item.source === "out") {
+                                HideSearchBlock(false)
+                                out.innerHTML = "Данный ИНН существует в 1С"
+                                innDiv.classList.remove('mb-3')
+                                createSearchElem(searchBlock, item)
+
+                                let results_list = document.querySelectorAll('.list-group-item.result-inn')
+                                let contragent = document.getElementById('searchClient')
+                                let orgDiv = document.getElementById('organizationsNameDivId')
+                                results_list.forEach((item) => {
+                                    item.addEventListener('click', () => {
+                                        console.log('1c click')
+                                        active_check.checked = true
+                                        HideSearchBlock(true)
+                                        let items = document.querySelectorAll('.list-group-item.result-inn')
+                                        items.forEach((item) => {
+                                            item.remove()
+                                        })
+                                        contragent.style.display = 'block'
+                                        contragent.value = item.getAttribute('data-name')
+                                        contragent.classList.add('is-valid')
+                                        contragent.setAttribute('required', '')
+                                        inn.value = ''
+                                        inn.removeAttribute('required')
+                                        inn.classList.remove('is-valid')
+                                        innDiv.style.display = 'none'
+                                        orgDiv.style.display = 'none'
+                                    })
                                 })
-                            })
-                        } else {
-                            searchBlock.style.display = 'none'
-                            innDiv.classList.add('mb-3')
 
-                        }
-                    })
-            }
-        })
-        active_check.addEventListener('change', function () {
-            inn.classList.add('mb-3')
-            document.getElementById('innId').value = ''
-            for (let i = 1; i < searchBlock.children.length; i++) {
-                searchBlock.children[i].remove()
-            }
-        })
-        inn.addEventListener('focus', function () {
-            for (let i = 1; i < searchBlock.children.length; i++) {
-                searchBlock.children[i].remove()
-            }
-        })
+                            } else {
+                                HideSearchBlock(false)
+                                out.innerHTML = ''
+                                innDiv.classList.remove('mb-3')
+                                createSearchElem(searchBlock, item)
 
+                                let results_list = document.querySelectorAll('.list-group-item.result-inn')
+                                results_list.forEach((item) => {
+                                    item.addEventListener('click', () => {
+                                        console.log('click')
+                                        // HideSearchBlock(true)
+                                        let orgName = document.getElementById('organizationsNameId')
+                                        orgName.value = item.getAttribute('data-name')
+                                        inn.value = item.getAttribute('data-inn')
+                                        HideSearchBlock(searchBlock)
+                                    })
+                                })
+                            }
+
+                        })
+                    }
+                }
+            )
+        }
+        let partnersInn = inn.getAttribute('data-url')
+        inn.addEventListener('focus', (e) => {
+            LengthValue(inn, e)
+        })
+        inn.addEventListener('blur', (e) => {
+            LengthValue(inn, e)
+            LoadInnSearchBlock(partnersInn, e)
+            cleanSearchBlock(searchBlock)
+            HideSearchBlock(true)
+        })
     }
     window.CreateApp = CreateApp;
-
 })();

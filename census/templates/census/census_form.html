@@ -57,13 +57,13 @@
 {#        ИНН #}
         <div class="form-floating mb-3" id="innDivId" style="display: block;">
             <input class="form-control" id="innId" type="text" name="inn" placeholder="ИНН?"
-            aria-describedby="innIdFeedback" data-url="{% url 'partners_inn' %}" required>
+            aria-describedby="innIdFeedback" data-url="{% url 'get_inn' %}" required>
             <label for="otherId">ИНН</label>
             <div id="innIdFeedback" class="invalid-feedback">Напишите ИНН точки</div>
         </div>
 
         <ul class="list-group list-group-flush mb-3" style="display: none" id="innSearchUl">
-            <li class="list-group-item" style="color: red;" disabled>Данный ИНН существует в 1С</li>
+            <li class="list-group-item out" style="color: red;" disabled></li>
         </ul>
 {#НАЗВАНИЕ ОРГАНИЗАЦИИ#}
         <div class="form-floating mb-3" id="organizationsNameDivId" style="display: block;">

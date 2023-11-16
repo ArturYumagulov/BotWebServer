@@ -10,6 +10,7 @@ from datetime import datetime
 
 from . import models
 from tasks.models import Partner, Task, Result, ResultData, WorkerComments
+from .models import CompanyDatabase
 
 env = environ.Env()
 environ.Env.read_env()
@@ -20,7 +21,7 @@ logger = logging.getLogger(__name__)
 def unix_to_date(unix):
     if unix is not None:
         date = str(unix)[:9]
-        return datetime.utcfromtimestamp(int(date)).strftime('%Y-%m-%d')
+        return datetime.fromtimestamp(int(date)).strftime('%Y-%m-%d')
     else:
         return None
 
@@ -234,6 +235,12 @@ def valid_data(request):
         ))
         m2m_save(new_census.vector, models.PointVectors.objects.filter(pk__in=request.getlist('vectors')))
         new_census.edited = True
+        try:
+            dadata = CompanyDatabase.objects.get(inn=request.get('inn'))
+            new_census.dadata = dadata
+        except CompanyDatabase.DoesNotExist:
+            new_census.dadata = None
+
         new_census.save()
 
         # files

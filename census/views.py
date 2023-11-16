@@ -229,32 +229,43 @@ def get_inn(request):
     if request.method == "POST":
         result = []
         search_inn = json.loads(request.body).get('searchInn')
-        try:
-            organization = CompanyDatabase.objects.get(inn=search_inn)
+        organization_1C = Partner.objects.filter(inn=search_inn)
 
-            result.append({
-                'name': organization.value,
-                'inn': organization.inn
-            })
+        if len(organization_1C) > 0:
+            for organization in organization_1C:
+                result.append({
+                    'name': organization.name,
+                    'inn': organization.inn,
+                    'source': 'out'
+                })
+        else:
+            try:
+                organization = CompanyDatabase.objects.get(inn=search_inn)
+                result.append({
+                    'name': organization.value,
+                    'inn': organization.inn,
+                    'source': 'db'
+                })
 
-        except CompanyDatabase.DoesNotExist:
-            organization = DataInnOnRedis().get_data(search_inn)
-
-            if organization:
-                save_organizations.delay(search_inn)
-                if organization[0].get('value'):
-                    result.append({
-                        'name': organization[0]['value'],
-                        'inn': organization[0]['data'].get('inn')
-                    })
-            else:
-                if DataInnOnRedis().save_data(search_inn):
+            except CompanyDatabase.DoesNotExist:
+                organization = DataInnOnRedis().get_data(search_inn)
+                if organization:
                     save_organizations.delay(search_inn)
-                    organization = DataInnOnRedis().get_data(search_inn)[0]
-                    if organization.get('value'):
+                    if organization[0].get('value'):
                         result.append({
-                            'name': organization['value'],
-                            'inn': organization['data'].get('inn')
+                            'name': organization[0]['value'],
+                            'inn': organization[0]['data'].get('inn'),
+                            'source': 'dadata'
                         })
+                else:
+                    if DataInnOnRedis().save_data(search_inn):
+                        save_organizations.delay(search_inn)
+                        organization = DataInnOnRedis().get_data(search_inn)[0]
+                        if organization.get('value'):
+                            result.append({
+                                'name': organization['value'],
+                                'inn': organization['data'].get('inn'),
+                                'source': 'dadata'
+                            })
 
         return JsonResponse(result, safe=False)

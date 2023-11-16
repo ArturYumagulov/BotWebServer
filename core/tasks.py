@@ -28,14 +28,12 @@ def del_task():
     if author_comments_length > 0:
         author_comments.delete()
         logger.info(f"Celery удалены комментарии авторов - {author_comments_length} шт. - {datetime.now()}")
-        print(f"Celery удалены комментарии авторов - {author_comments_length} шт. - {datetime.now()}")
 
     if len(tasks) > 0:
         for task in tasks:
             task_number = task.number
             task.delete()
             logger.info(f"Celery удалена задача номер {task_number} - {datetime.now()}")
-            print(f"Celery удалена задача номер {task_number} - {datetime.now()}")
 
     census_files = CensusFiles.objects.filter(created_date__lte=del_date)
 
@@ -44,7 +42,6 @@ def del_task():
             file_path = file.file
             file.delete()
             logger.info(f"Celery удален файл {file_path} - {datetime.now()}")
-            print(f"Celery удален файл {file_path} - {datetime.now()}")
 
 
 @shared_task
@@ -116,6 +113,7 @@ def save_organizations(inn):
             new_data.status = clean_data['data']['state'].get('status')
 
         if new_data.save():
+            logger.info(f"{inn} - {new_data.value} - сохранено в БД")
             if DataInnOnRedis().remove_data(inn):
-                print(f"{inn} - удалено")
+                logger.info(f"{inn} - {new_data.value} - удалено из Redis")
             return True

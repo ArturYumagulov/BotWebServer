@@ -6,7 +6,7 @@ from rest_framework import serializers
 from django.conf import settings
 
 from census.models import Census, CarsList, OilList, ProviderList, FilterList, AccessoriesCategoryItem, \
-    AccessoriesCategory, PointTypes, PointVectors, STOTypeList, PointCategory, CensusFiles
+    AccessoriesCategory, PointTypes, PointVectors, STOTypeList, PointCategory, CensusFiles, CompanyDatabase
 from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerComments, Result, PartnerWorker, \
     ResultGroup, ResultData, Supervisor  # noqa
 
@@ -272,6 +272,13 @@ class CensusFilesSerializer(serializers.ModelSerializer):
         fields = ('file',)
 
 
+class DadataSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CompanyDatabase
+        fields = '__all__'
+
+
 class CensusSerializer(serializers.ModelSerializer):
     result = ResultSerializer()
     cars = CarsSerializer(many=True)
@@ -285,6 +292,7 @@ class CensusSerializer(serializers.ModelSerializer):
     category = PointCategorySerializer()
     accessories_category = AccessoriesCategorySerializer()
     files = CensusFilesSerializer(many=True)
+    dadata = DadataSerializer()
 
     class Meta:
         model = Census
