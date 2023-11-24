@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'import_export',
     'rest_framework.authtoken',
+    'django_celery_results',
     'django_filters',
     'corsheaders',
     'tasks',
@@ -220,4 +221,6 @@ REDIS_PORT = "6379"
 REDIS_HOST = "localhost"
 CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
-CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_RESULT_EXTENDED = True
