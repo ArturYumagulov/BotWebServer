@@ -22,7 +22,7 @@
     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=65c2d6fb-b558-4d2c-9982-ccbd7b5a47b1"
             type="text/javascript"></script>
     {% load static %}
-    <script defer src="{% static 'js/app.js' %}"></script>
+    <script defer src="{% static 'js/b2c.js' %}"></script>
     <script>
         let csrf="{{ csrf_token }}";
     </script>
@@ -334,6 +334,7 @@
             <button class="btn btn-danger" type="submit">Отправить</button>
         </div>
         <input type="hidden" name="address_id" value="{{ address_id }}">
+        <input type="hidden" name="depart" value="{{ depart }}">
         <input type="hidden" name="address" value="{{ city }}, {{ street }}, {{ house }}">
         <input type="hidden" name="name" value="{{ name }}">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">

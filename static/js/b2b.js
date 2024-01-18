@@ -12,10 +12,9 @@
         }
     }
     function floatFormValid(div_id, input_id, label_id, hidden=true, is_integer=false) {
-        let div = document.getElementById(div_id)
+        // let div = document.getElementById(div_id)
         let input = document.getElementById(input_id)
-        let label = document.getElementById(label_id)
-
+        // let label = document.getElementById(label_id)
 
 
         input.addEventListener('keyup', function (e) {
@@ -100,6 +99,7 @@
         data.forEach((i) => {
             let option = document.createElement("option")
             option.setAttribute('value', i.id)
+            option.setAttribute('data-slug', i.slug)
             option.innerHTML = i.name
             item.append(option)
         })
@@ -122,8 +122,10 @@
     async function loadData(url){
 
         let response = await fetch(url, {
-            // headers: {"X-CSRFToken": csrf},
-            method: "GET"});
+            headers: {"X-CSRFToken": csrf},
+            method: "POST",
+            body: JSON.stringify({department: 'b2b'})
+        });
         if (response.ok) {
             let json = await response.json()
             return json
@@ -134,7 +136,10 @@
     async function loadDataCategory(item, category_id){
         let url = item.dataset.url + '/' + category_id
         let response = await fetch(url,
-            {headers: {"X-CSRFToken": csrf}, method: "GET"});
+            {
+                headers: {"X-CSRFToken": csrf},
+                method: "POST"
+            });
         if (response.ok) {
             let json = await response.json()
             return json
@@ -143,10 +148,10 @@
         }
     }
     async function createMultiSelectOption(select, category_id, valuesList) {
-
         valuesList.forEach((value) => {
             let option = document.createElement('option')
             option.setAttribute('value', value.id)
+            option.setAttribute('data-slug', value.slug)
             option.innerHTML = value.name
             select.append(option)
         })
@@ -296,124 +301,77 @@
         })
     }
     function vectorHideBlock(){
-        let oilDebt = document.getElementById('debitId')
-        let oilDebtInput = document.getElementById('iolDebitId')
-
-        let lukoilDebt = document.getElementById('lukDebitId')
-        let lukoilDebtInput = document.getElementById('lukoilDebitId')
-
-        let roweDebt = document.getElementById('RowDebitId')
-        let roweDebtInput = document.getElementById('RoweDebitId')
-
-        let motulDebt = document.getElementById('motDebitId')
-        let motulDebtInput = document.getElementById('motulDebitId')
-
-        let oilsDiv = document.getElementById('oilsDiv')
-        let oilsSelect = document.getElementById('oils')
-
-        let filters = document.getElementById('filtersDiv')
-        let filtersInput = document.getElementById('filters')
-
-        let accessDiv = document.getElementById('accessDiv')
-        let accessInput = document.getElementById('accessId')
-
-        let akbDiv = document.getElementById('akbDiv')
-        let akbInput = document.getElementById('akbId')
-
-        let otherVectorDiv = document.getElementById('otherVectorId')
-        let otherVectorInput = document.getElementById('otherVectorInputId')
-
+        function createFloatDiv(element, category_name, text="") {
+            return `<div class="form-floating mb-3" id="${category_name}${element.id}DivId">
+            <input class="form-control" name="${category_name}_${element.id}" id="${category_name}_${element.id}" 
+            type="text" placeholder="${text} ${element.text}" aria-describedby="${category_name}IdFeedback">
+            <label for="${category_name}Id">${text} ${element.text}</label>
+            <div id="${category_name}IdFeedback" class="invalid-feedback">Укажите ${text} ${element.text}</div>
+            </div>`
+        }
+        function LoadMultiDivData(element, url) {
+            return fetch(url, {
+                headers: {"X-CSRFToken": csrf},
+                method: "POST",
+                body: JSON.stringify({department: 'b2b'})
+            }).then((res) => res.json())
+                    .then((data) => {
+                        return data})
+        }
 
         $('#vectorMulti').on('select2:select', function (e) {
-            if(e.params.data.text === 'Масло') {
-                oilDebt.style.display = 'block'
-                oilDebtInput.setAttribute('required', '')
-                roweDebt.style.display = 'block'
-                roweDebtInput.setAttribute('required', '')
-                motulDebt.style.display = 'block'
-                motulDebtInput.setAttribute('required', '')
-                lukoilDebt.style.display = 'block'
-                lukoilDebtInput.setAttribute('required', '')
-                oilsDiv.style.display = 'block'
-                oilsSelect.setAttribute('required', '')
-                oilsDiv.classList.add('was-validated')
-            }
-            else if(e.params.data.text === 'Фильтры') {
-                filters.style.display = 'block'
-                filters.classList.add('was-validated')
-                filtersInput.setAttribute('required', '')
-            }
-            else if(e.params.data.text === 'Аксессуары') {
-                accessDiv.style.display = 'block'
-                accessInput.setAttribute('required', '')
-            }
-            else if(e.params.data.text === 'АКБ') {
-                akbDiv.style.display = 'block'
-                akbInput.setAttribute('required', '')
+            let element = e.params.data
+            let category = e.params.data.element.dataset.slug
+            let select = document.getElementById(`${category}_load`).children[1]
+            let url = select.dataset.url
+            let data = LoadMultiDivData(element, url)
 
-            }
-            else if(e.params.data.text === 'Другое') {
-                otherVectorDiv.style.display = 'block'
-                otherVectorInput.setAttribute('required', '')
+            data.then((result)=>{
 
+                result.forEach((item) => {
+                    let option = document.createElement('option')
+                    option.setAttribute('value', item.id)
+                    option.innerHTML = item.name
+                    select.append(option)
+                })
+            });
+            select.parentNode.style.display = 'block'
+
+            if (element.text === "Другое") {
+                console.log(category)
+                let other = createFloatDiv(element, category )
+                console.log(other)
             }
+
         })
-        $('#vectorMulti').on('select2:unselect', function (e) {
-            if(e.params.data.text === 'Масло') {
-                oilDebt.style.display = 'none'
-                oilDebtInput.removeAttribute('required')
-                roweDebt.style.display = 'none'
-                roweDebtInput.removeAttribute('required')
-                motulDebt.style.display = 'none'
-                motulDebtInput.removeAttribute('required')
-                lukoilDebt.style.display = 'none'
-                lukoilDebtInput.removeAttribute('required')
-                oilsDiv.style.display = 'none'
-                oilsSelect.removeAttribute('required')
-                oilsDiv.classList.remove('was-validated')
-            }
-            else if(e.params.data.text === 'Фильтры') {
-                filters.style.display = 'none'
-                filters.classList.remove('was-validated')
-                filtersInput.removeAttribute('required')
-            }
-            else if(e.params.data.text === 'Аксессуары') {
-                accessDiv.style.display = 'none'
-                accessInput.removeAttribute('required')
-                accessInput.value = ''
-                let other = document.getElementById('otherDivId')
-                let access_select = document.getElementById('accessId')
-                let access_select_items = document.querySelectorAll('.acc_div')
-                let access_list = document.querySelectorAll('.access')
-                other.style.display = 'none'
-                access_select.value = ''
-                access_select.classList.remove('is-valid')
-                access_select_items.forEach((item) => {
-                    item.style.display = 'none'
-                    item.removeAttribute('required')
-                })
-                access_list.forEach((item) => {
-                    item.style.display = 'none'
-                    item.removeAttribute('required')
-                })
-            }
-            else if(e.params.data.text === 'АКБ') {
-                akbDiv.style.display = 'none'
-                akbInput.removeAttribute('required')
-                akbInput.value = ''
-                akbInput.classList.remove('is-valid', 'is-invalid')
-            }
-            else if(e.params.data.text === 'Другое') {
-                otherVectorDiv.style.display = 'none'
-                otherVectorInput.removeAttribute('required')
-                otherVectorInput.value = ''
-                otherVectorInput.classList.remove('is-valid', 'is-invalid')
 
-            }
+        $('#vectorMulti').on('select2:unselect', function (e) {
+            let element = e.params.data
+            let category = e.params.data.element.dataset.slug
+            let select = document.getElementById(`${category}_load`).children[1]
+            select.removeAttribute('required')
+            select.parentNode.style.display = 'none'
+        })
+
+        $('#volumeMultiDiv').on('select2:select', function (e) {
+            let category_name = this.children[0].name
+            let element = e.params.data
+            let div = createFloatDiv(element, category_name, 'Объем потребления масла')
+            this.insertAdjacentHTML("afterend", div)
+            floatFormValid(`${category_name}${element.id}DivId`,
+                          `${category_name}_${element.id}`, `${category_name}Id`, false,
+                true)
+        })
+
+        $('#volumeMultiDiv').on('select2:unselect', function (e) {
+            document.getElementById(`${this.children[0].name}_${e.params.data.id}`).parentNode.remove()
         })
     }
+
     function otherProviders(){
+
             // Другие поставщики
+
             $('#providers').on('select2:select', function (e) {
                 let other_prov_div = document.getElementById('otherProvDivId')
                 let other_input = document.getElementById('otherProvId')
@@ -454,7 +412,8 @@
         let elements = []
         let ids = []
         inputs.forEach((i) => {
-            if(i.id !== 'closeCheckbox' && i.type !== 'hidden' && i.id !== 'resultCommentId' && i.id !== 'formFileMultiple') {
+            if(i.id !== 'closeCheckbox' && i.type !== 'hidden' && i.id !== 'resultCommentId'
+                && i.id !== 'formFileMultiple' && i.id !== 'communicateCheckbox') {
                 elements.push(i)
             }
         })
@@ -495,52 +454,60 @@
                 addReq(ids)
             }
         })
+
+        let communicate = document.getElementById('communicateCheckbox')
+
+        communicate.addEventListener('change', function () {
+            if (this.checked) {
+                elements.slice(1)
+                elements.forEach((item) => {
+                    item.setAttribute('disabled', '')
+                })
+                function removeReq(iterElem) {
+                    iterElem.forEach((elem) => {
+                        let el = document.getElementById(elem)
+                        el.removeAttribute('required')
+                    })
+                }
+                removeReq(ids);
+            } else {
+                elements.forEach((item) => {
+                    item.removeAttribute('disabled')
+                })
+                function addReq(iterElem) {
+                    iterElem.forEach((elem) => {
+                        let el = document.getElementById(elem)
+                        el.setAttribute('required', '')
+                    })
+                }
+                addReq(ids)
+            }
+        })
     }
 
     async function CreateApp(container) {
         loadValidPartners();
         checkHiddenSearchObjects('workCheckbox', 'searchClient', null, true);
         floatFormValid('boardId', 'signboardId', 'signboardId', true)
-        await createOption('pointTypeID')
         await createOption('shopCategoryId')
-        await createOption('stoTypeId')
-        // await createOption('pointVectorId')
-        await createOption('accessId')
-        HideMultiSelectItem(document.getElementById('accessId'))
-        await createSelectMulti('cars')
-        await createSelectMulti('oils')
-        await createSelectMulti('filters')
+        // await createSelectMulti('oils')
+        // await createSelectMulti('filters')
         await createControlOption('controlId')
         await createSelectMulti('providers')
         await createSelectMulti('vectorMulti')
-        await validSelect('typeId')
+        await createSelectMulti('volumeId')
+        await createSelectMulti('equipmentId')
         await validSelect('shopCategoryId')
-        await validSelect('pointTypeID')
-        // await validSelect('pointVectorId')
-        await validSelect('stoTypeId')
-        await validSelect('accessId')
         await validSelect('controlId')
-        await validSelect('akbId')
 
         floatFormValid('fioId', 'decisionMakerId', 'fioIdFeedback', false)
         floatFormValid('emailId', 'decisionMakerEmailId', 'decisionMakerEmailIdFeedback', false)
         floatFormValid('phoneId', 'decisionMakerPhoneId', 'decisionMakerPhoneIdFeedback', false)
         floatFormValid('functionId', 'decisionMakerFunctionId', 'functionIdFeedback', false)
-        floatFormValid('elevatorId', 'elevatorCountId', 'elevatorCountIdFeedback', false,
-            true)
-        floatFormValid('debitId', 'iolDebitId', 'iolDebitIdFeedback', false, true)
-        floatFormValid('lukDebitId', 'lukoilDebitId', 'lukoilDebitIdFeedback', false, true)
-        floatFormValid('RowDebitId', 'RoweDebitId', 'RoweDebitIdFeedback', false, true)
-        floatFormValid('motDebitId', 'motulDebitId', 'motulDebitIdFeedback', false, true)
-        floatFormValid('otherDivId', 'otherId', 'otherIdFeedback', false)
         floatFormValid('otherProvDivId', 'otherProvId', 'otherProvIdFeedback', false)
         floatFormValid('otherVectorId', 'otherVectorInputId', 'otherVectorFeedback', false)
         floatFormValid('resultCommentDivId', 'resultCommentId', 'resultCommentFeedback', false)
-        // floatFormValid('innDivId', 'innId', 'innIdFeedback', false)
-        // Автосервис
-        await hideChangeFloatElem('pointTypeID', 'elevatorId', 'elevatorCountId','Автосервис')
-        await hideChangeSelectElem('pointTypeID', 'stoTypeDiv', 'stoTypeId', 'Автосервис')
-        await hideSelectMultiElement('pointTypeID', 'carsDiv', 'cars', 'Автосервис')
+
 
         let access_items = document.querySelectorAll('.access')
 
@@ -627,7 +594,6 @@
                 (data) => {
                     if (data.length > 0) {
                         data.forEach((item) => {
-
                             if (item.source === "out") {
                                 HideSearchBlock(false)
                                 out.innerHTML = "Данный ИНН существует в 1С"
@@ -639,7 +605,6 @@
                                 let orgDiv = document.getElementById('organizationsNameDivId')
                                 results_list.forEach((item) => {
                                     item.addEventListener('click', () => {
-                                        console.log('1c click')
                                         active_check.checked = true
                                         HideSearchBlock(true)
                                         let items = document.querySelectorAll('.list-group-item.result-inn')
@@ -667,7 +632,6 @@
                                 let results_list = document.querySelectorAll('.list-group-item.result-inn')
                                 results_list.forEach((item) => {
                                     item.addEventListener('click', () => {
-                                        console.log('click')
                                         // HideSearchBlock(true)
                                         let orgName = document.getElementById('organizationsNameId')
                                         orgName.value = item.getAttribute('data-name')

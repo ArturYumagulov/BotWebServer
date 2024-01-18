@@ -10,7 +10,6 @@ from datetime import datetime
 
 from . import models
 from tasks.models import Partner, Task, Result, ResultData, WorkerComments
-from .models import CompanyDatabase
 
 env = environ.Env()
 environ.Env.read_env()
@@ -101,9 +100,12 @@ def valid_data(request):
     request = request.POST
     new_census = models.Census()
     new_census.address = request.get('address')
+    new_census.department = models.Department.objects.get(name=request.get('depart'))
     new_census.name = request.get('name')
     task = Task.objects.get(number=request.get('guid'))
     new_census.task = task.number
+    new_census.position = request.get('position')
+    new_census.address_id = request.get('address_id')
     worker_comment = WorkerComments.objects.create(comment=request.get('result_comment'), worker_id=task.worker.pk)
 
     if request.get('closing') is not None:  # Если закрыто
@@ -111,15 +113,14 @@ def valid_data(request):
         result = Result.objects.create(
             base_id=task.base.number,
             type='meet',
-            result=ResultData.objects.get(code="00000000099"),
+            result=ResultData.objects.get(code="000000068"),
             task_number=task,
             contact_person="",
             control_date=None
         )
         new_census.result = result
-        new_census.address_id = request.get('address_id')
         new_census.closing = True
-        new_census.position = request.get('position')
+        new_census.not_communicate = False
         new_census.save()
 
         if request_files:
@@ -131,6 +132,27 @@ def valid_data(request):
 
         Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
                                                worker_comment=worker_comment)
+        return True
+
+    elif request.get('not_communicate'):   # Если нет коммуникации
+
+        result = Result.objects.create(
+            base_id=task.base.number,
+            type='meet',
+            result=ResultData.objects.get(code="000000067"),
+            task_number=task,
+            contact_person="",
+            control_date=None
+        )
+
+        new_census.not_communicate = True
+        new_census.result = result
+        new_census.closing = False
+        new_census.save()
+
+        Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
+                                               worker_comment=worker_comment)
+
         return True
 
     else:
@@ -236,9 +258,9 @@ def valid_data(request):
         m2m_save(new_census.vector, models.PointVectors.objects.filter(pk__in=request.getlist('vectors')))
         new_census.edited = True
         try:
-            dadata = CompanyDatabase.objects.get(inn=request.get('inn'))
+            dadata = models.CompanyDatabase.objects.get(inn=request.get('inn'))
             new_census.dadata = dadata
-        except CompanyDatabase.DoesNotExist:
+        except models.CompanyDatabase.DoesNotExist:
             new_census.dadata = None
 
         new_census.save()

@@ -10,8 +10,11 @@ from . import models
 from .models import CompanyDatabase
 from .services import valid_data, DataInnOnRedis
 
-
 # Create your views here.
+
+# departments
+_b2b = 'b2b'
+_b2c = 'b2c'
 
 
 def template_test(request):
@@ -25,7 +28,7 @@ def census(request, pk):
     street = request.GET['street']
     house = request.GET['house']
     guid = request.GET['guid']
-    categories = models.AccessoriesCategory.objects.filter(is_active=True).exclude(name="Другое")
+    depart = request.GET['depart']
 
     try:
         models.Census.objects.get(address_id=pk)
@@ -33,30 +36,57 @@ def census(request, pk):
 
     except models.Census.DoesNotExist:
 
-        context = {
-            'name': name,
-            'city': city,
-            'street': street,
-            'house': house,
-            'address_id': pk,
-            'guid': guid,
-            'categories': categories
-        }
-        return render(request, 'census/census_form.html', context)
+        if depart == _b2b:
+            products = models.PointVectors.objects\
+                .filter(is_active=True)\
+                .filter(department__name=_b2b)
+
+            context = {
+                'name': name,
+                'city': city,
+                'street': street,
+                'house': house,
+                'address_id': pk,
+                'guid': guid,
+                'products': products,
+                'depart': depart
+            }
+            return render(request, 'census/b2b_census_form.html', context)
+
+        elif depart == _b2c:
+
+            categories = models.AccessoriesCategory.objects\
+                .filter(is_active=True)\
+                .filter(department__name=_b2c)\
+                .exclude(name="Другое")
+
+            context = {
+                'name': name,
+                'city': city,
+                'street': street,
+                'house': house,
+                'address_id': pk,
+                'guid': guid,
+                'categories': categories,
+                'depart': depart
+            }
+            return render(request, 'census/b2c_census_form.html', context)
 
 
 def load_data(request):
+    """Запись результатов Сенсуса"""
+
     form = valid_data(request)
     if form:
         return render(request, 'census/ready_census.html')
     else:
-        return HttpResponse("<h1>Ошибка<h1>")
+        return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
     # дописать валидацию и сохранение в БД
 
 
 def get_partners(request):
     search_str = json.loads(request.body).get('searchText')
-    partners = Partner.objects.filter(name__iregex=search_str)
+    partners = Partner.objects.filter(name__iregex=search_str).distinct()
     return JsonResponse(list(partners.values()), safe=False)
 
 
@@ -74,7 +104,7 @@ def get_partners_workers(request, partner_id):
 def get_point_names(request):
     """Тип"""
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         result = []
         point_names = models.PointTypes.objects.filter(is_active=True)
         for item in point_names:
@@ -82,27 +112,32 @@ def get_point_names(request):
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'Not Found'}], safe=False)
 
 
 def get_point_category(request):
-    """Категория точки"""
+    """Категория/Сегмент точки"""
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         result = []
-        categories = models.PointCategory.objects.filter(is_active=True)
+        if json.loads(request.body)['department'] == _b2b:
+            categories = models.PointCategory.objects.filter(department__name=_b2b).filter(is_active=True)
+        elif json.loads(request.body)['department'] == _b2c:
+            categories = models.PointCategory.objects.filter(department__name=_b2c).filter(is_active=True)
+        else:
+            categories = models.PointCategory.objects.filter(is_active=True)
         for item in categories:
             data = {'id': item.pk, 'name': item.name}
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'point_category not found'}], safe=False)
 
 
 def get_sto_type(request):
     """Категория точки"""
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         result = []
         sto_types = models.STOTypeList.objects.filter(is_active=True)
         for item in sto_types:
@@ -110,27 +145,32 @@ def get_sto_type(request):
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'Not Found'}], safe=False)
 
 
 def get_point_vector(request):
     """Категория точки"""
-
-    if request.method == 'GET':
+    if request.method == 'POST':
         result = []
-        point_vectors = models.PointVectors.objects.filter(is_active=True)
+        if json.loads(request.body)['department'] == _b2b:
+            point_vectors = models.PointVectors.objects.filter(department__name=_b2b).filter(is_active=True)
+        elif json.loads(request.body)['department'] == _b2c:
+            point_vectors = models.PointVectors.objects.filter(department__name=_b2c).filter(is_active=True)
+        else:
+            point_vectors = models.PointVectors.objects.filter(is_active=True)
+
         for item in point_vectors:
-            data = {'id': item.pk, 'name': item.name}
+            data = {'id': item.pk, 'name': item.name, 'slug': item.slug}
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'Not Found'}], safe=False)
 
 
 def get_accessories_category(request):
     """Категория точки"""
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         result = []
         category = models.AccessoriesCategory.objects.filter(is_active=True)
         for item in category:
@@ -138,12 +178,11 @@ def get_accessories_category(request):
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'Not Found'}], safe=False)
 
 
 def get_accessories_category_item(request, category_id):
     """Категория точки"""
-
     if request.method == 'GET':
         result = []
         items = models.AccessoriesCategoryItem.objects.filter(is_active=True).filter(category=category_id)
@@ -152,13 +191,13 @@ def get_accessories_category_item(request, category_id):
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'Not Found'}], safe=False)
 
 
 def get_cars(request):
     """Категория точки"""
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         result = []
         cars = models.CarsList.objects.filter(is_active=True)
         for item in cars:
@@ -166,27 +205,27 @@ def get_cars(request):
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'Not Found'}], safe=False)
 
 
 def get_oils(request):
     """Категория точки"""
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         result = []
         oils = models.OilList.objects.filter(is_active=True)
         for item in oils:
-            data = {'id': item.pk, 'name': item.name}
+            data = {'id': item.pk, 'name': item.name, 'slug': item.slug}
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'Not Found'}], safe=False)
 
 
 def get_filters(request):
     """Категория точки"""
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         result = []
         filters = models.FilterList.objects.filter(is_active=True)
         for item in filters:
@@ -194,13 +233,13 @@ def get_filters(request):
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'Not Found'}], safe=False)
 
 
 def get_control_data(request):
     """Категория точки"""
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         result = []
         controls = ResultData.objects.filter(group__code="000000001")
         for item in controls:
@@ -208,21 +247,26 @@ def get_control_data(request):
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'Not Found'}], safe=False)
 
 
 def get_providers(request):
-    """Категория точки"""
+    """Поставщик точки"""
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         result = []
-        providers = models.ProviderList.objects.filter(is_active=True)
+        if json.loads(request.body)['department'] == _b2b:
+            providers = models.ProviderList.objects.filter(department__name=_b2b).filter(is_active=True)
+        elif json.loads(request.body)['department'] == _b2c:
+            providers = models.ProviderList.objects.filter(department__name=_b2c).filter(is_active=True)
+        else:
+            providers = models.ProviderList.objects.filter(is_active=True)
         for item in providers:
             data = {'id': item.pk, 'name': item.name}
             result.append(data)
         return JsonResponse(list(result), safe=False)
 
-    return render(request, template_name='census/index.html')
+    return JsonResponse([{'detail': 'providers not found'}], safe=False)
 
 
 def get_inn(request):
@@ -269,3 +313,44 @@ def get_inn(request):
                             })
 
         return JsonResponse(result, safe=False)
+
+
+def get_volume_data(request):
+    result = []
+    if request.method == "POST":
+        volumes = models.Volume.objects.filter(is_active=True)
+        for volume in volumes:
+            result.append({'id': volume.pk, 'name': volume.name})
+        return JsonResponse(list(result), safe=False)
+    return JsonResponse([{'detail': 'Volume Not Found'}], safe=False)
+
+
+def get_equipment_park(request):
+    result = []
+    if request.method == "POST":
+        equipments = models.EquipmentList.objects.filter(is_active=True)
+        for equipment in equipments:
+            result.append({'id': equipment.pk, 'name': equipment.name})
+        return JsonResponse(list(result), safe=False)
+    return JsonResponse([{'detail': 'equipment Not Found'}], safe=False)
+
+
+def get_vectors_items(request, slug):
+    result = []
+    if request.method == "POST":
+        if json.loads(request.body)['department'] == _b2b:
+            vectors_item = models.PointVectorsItem.objects.filter(vectors__slug=slug).filter(is_active=True).filter(department__name=_b2b)
+        elif json.loads(request.body)['department'] == _b2c:
+            vectors_item = models.PointVectorsItem.objects.filter(vectors__slug=slug).filter(department__name=_b2c)
+        else:
+            vectors_item = models.PointVectorsItem.objects.filter(vectors__slug=slug)
+
+        for item in vectors_item:
+            data = {
+                'id': item.pk,
+                'name': item.name
+            }
+            result.append(data)
+        return JsonResponse(list(result), safe=False, status=200)
+    return JsonResponse({'result': 'vectors_item not fount'}, safe=False, status=404)
+

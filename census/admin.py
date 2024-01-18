@@ -11,12 +11,12 @@ from .models import Census
 @admin.register(models.Census)
 class CensusAdmin(admin.ModelAdmin):
     list_display = ('address_id', 'address', 'name', 'closing', 'created_date', 'edit_date', 'get_task_worker')
-    readonly_fields = ('address_id', 'created_date', 'edit_date')
-    fields = ('closing', 'address_id', 'created_date', 'edit_date', 'point_name', 'point_type', 'category', 'providers', 'vector', 'nets',
+    readonly_fields = ('created_date', 'edit_date')
+    fields = ('closing', 'department', 'address_id', 'created_date', 'edit_date', 'point_name', 'point_type', 'category', 'providers', 'vector', 'nets',
               'sto_type', 'cars', 'oils', 'filters', 'accessories_category', 'accessories_brands', 'elevators_count',
               'oil_debit', 'lukoil_debit', 'rowe_debit', 'motul_debit', 'decision_fio', 'decision_email',
               'decision_phone', 'decision_function', 'other_brand', 'akb_specify', 'working', 'result', 'task',
-              'position', 'dadata')
+              'volume', 'equipment', 'tender', 'position', 'dadata')
 
     def get_task_worker(self, obj):
         try:
@@ -34,8 +34,8 @@ class CensusAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.PointVectors)
-class CensusAdmin(admin.ModelAdmin):
-    pass
+class PointVectorsAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ('name',)}
 
 
 @admin.register(models.PointCategory)
@@ -54,27 +54,27 @@ class CensusAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.ProviderList)
-class CensusAdmin(admin.ModelAdmin):
+class ProviderAdmin(admin.ModelAdmin):
     pass
 
 
 @admin.register(models.FilterList)
-class CensusAdmin(admin.ModelAdmin):
+class FilterListAdmin(admin.ModelAdmin):
     pass
 
 
 @admin.register(models.STOTypeList)
-class CensusAdmin(admin.ModelAdmin):
+class STOTypeListAdmin(admin.ModelAdmin):
     pass
 
 
 @admin.register(models.AccessoriesCategory)
-class CensusAdmin(admin.ModelAdmin):
+class AccessoriesCategoryAdmin(admin.ModelAdmin):
     pass
 
 
 @admin.register(models.AccessoriesCategoryItem)
-class CensusAdmin(admin.ModelAdmin):
+class AccessoriesCategoryItemAdmin(admin.ModelAdmin):
     pass
 
 
@@ -94,3 +94,33 @@ class CompanyDatabaseAdmin(admin.ModelAdmin):
 
     list_display = ('inn', 'status', 'value', 'created_date')
     search_fields = ('inn',)
+
+
+@admin.register(models.Volume)
+class VolumeAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.VolumeItem)
+class VolumeItemAdmin(admin.ModelAdmin):
+    pass
+
+
+# @admin.register(models.VolumeItemValue)
+# class VolumeItemValueAdmin(admin.ModelAdmin):
+#     pass
+
+
+@admin.register(models.EquipmentList)
+class EquipmentListItemValueAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.PointVectorsItem)
+class PointVectorsItemAdmin(admin.ModelAdmin):
+    pass

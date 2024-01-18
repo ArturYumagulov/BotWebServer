@@ -6,11 +6,24 @@ from tasks.models import Partner, Result, Task
 # Create your models here.
 
 
+class Department(models.Model):
+    is_active = models.BooleanField(verbose_name="Активность", default=False)
+    name = models.CharField(verbose_name="Имя", max_length=20)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Подразделение"
+        verbose_name_plural = "Подразделения"
+
+
 class PointTypes(models.Model):
     is_active = models.BooleanField(default=False, verbose_name="Активность")
     name = models.CharField(verbose_name="Тип торговой точки", max_length=500)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='types')
 
     class Meta:
         verbose_name = "Тип"
@@ -22,14 +35,16 @@ class PointTypes(models.Model):
 
 
 class PointVectors(models.Model):
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='vectors')
     is_active = models.BooleanField(default=False, verbose_name="Активность")
     name = models.CharField(verbose_name="Имя направления торговой точки", max_length=500)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+    slug = models.SlugField(blank=True, null=True, default=None)
 
     class Meta:
-        verbose_name = "Направленность"
-        verbose_name_plural = "Направленность"
+        verbose_name = "Направленность/Используемые продукты"
+        verbose_name_plural = "Направленность/Используемые продукты"
         ordering = ['-created_date']
 
     def __str__(self):
@@ -37,14 +52,16 @@ class PointVectors(models.Model):
 
 
 class PointCategory(models.Model):
+
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='category')
     is_active = models.BooleanField(default=False, verbose_name="Активность")
     name = models.CharField(verbose_name="Имя категории", max_length=500)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
 
     class Meta:
-        verbose_name = "Категория торговой точки"
-        verbose_name_plural = "Категории торговых точек"
+        verbose_name = "Категория/Сегмент торговой точки"
+        verbose_name_plural = "Категории/Сегмент торговых точек"
         ordering = ['-created_date']
 
     def __str__(self):
@@ -52,6 +69,7 @@ class PointCategory(models.Model):
 
 
 class CarsList(models.Model):
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='cars')
     is_active = models.BooleanField(default=False, verbose_name="Активность")
     name = models.CharField(verbose_name="Марка автомобиля", max_length=500)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
@@ -67,10 +85,12 @@ class CarsList(models.Model):
 
 
 class OilList(models.Model):
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='oils')
     is_active = models.BooleanField(default=False, verbose_name="Активность")
     name = models.CharField(verbose_name="Марка масла", max_length=500)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+    slug = models.SlugField(blank=True, null=True, default=None)
 
     class Meta:
         verbose_name = "Список масел торговой точки"
@@ -84,6 +104,7 @@ class OilList(models.Model):
 class ProviderList(models.Model):
     is_active = models.BooleanField(default=False, verbose_name="Активность")
     name = models.CharField(verbose_name="Марка масла", max_length=500)
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='providers')
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
 
@@ -99,6 +120,7 @@ class ProviderList(models.Model):
 class FilterList(models.Model):
     is_active = models.BooleanField(default=False, verbose_name="Активность")
     name = models.CharField(verbose_name="Марка фильтра", max_length=500)
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='filters')
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
 
@@ -114,6 +136,7 @@ class FilterList(models.Model):
 class STOTypeList(models.Model):
     is_active = models.BooleanField(default=False, verbose_name="Активность")
     name = models.CharField(verbose_name="Тип СТО", max_length=500)
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='sto_types')
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
 
@@ -130,6 +153,7 @@ class AccessoriesCategory(models.Model):
     is_active = models.BooleanField(default=False, verbose_name="Активность")
     name = models.CharField(verbose_name="Категория аксессуаров", max_length=1000)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='accessories_category')
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
 
     class Meta:
@@ -157,12 +181,64 @@ class AccessoriesCategoryItem(models.Model):
         return self.name
 
 
+class Volume(models.Model):
+    is_active = models.BooleanField(default=False, verbose_name="Активность")
+    name = models.CharField(verbose_name="Название", max_length=500)
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='volume')
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Объем"
+        verbose_name_plural = "Объем"
+
+
+class VolumeItem(models.Model):
+    census = models.ForeignKey("Census", on_delete=models.CASCADE)
+    volume = models.ForeignKey(Volume, on_delete=models.CASCADE)
+    value = models.CharField(verbose_name="Значение", max_length=500, default=0)
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+
+
+class EquipmentList(models.Model):
+    is_active = models.BooleanField(default=False, verbose_name="Активность")
+    name = models.CharField(verbose_name="Название", max_length=500)
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='equipment_list')
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Парк техники"
+        verbose_name_plural = "Парк техники"
+
+
+class PointVectorsItem(models.Model):
+    is_active = models.BooleanField(default=False)
+    vectors = models.ForeignKey(PointVectors, on_delete=models.CASCADE)
+    name = models.CharField(verbose_name="Название", max_length=1000)
+    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='point_vectors')
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 def get_default_task():
     return Task.objects.get(number="00000000001")
 
 
 class Census(models.Model):
+
     address_id = models.PositiveBigIntegerField(verbose_name="ID адреса в 1С")
+    department = models.ForeignKey(Department, verbose_name="Подразделение", on_delete=models.PROTECT, default=None)
     address = models.CharField(verbose_name="Адрес", max_length=2000, blank=True, null=True)
     name = models.CharField(verbose_name="Название", max_length=1000, blank=True, null=True)
     point_name = models.CharField(max_length=1000, verbose_name="Вывеска", blank=True, null=True,
@@ -207,11 +283,16 @@ class Census(models.Model):
                                        default=None)
     task = models.CharField(verbose_name='Номер задачи', null=True, blank=True, max_length=1000)
     inn = models.CharField(verbose_name="ИНН", max_length=12, blank=True, null=True, default=None)
+    volume = models.ManyToManyField(VolumeItem, blank=True, related_name='census_volumes')
+    equipment = models.ManyToManyField(EquipmentList, related_name='census_equipments', blank=True, default=None)
     organizations_name = models.CharField(verbose_name="Название организации", max_length=2000, blank=True, null=True)
+    tender = models.BooleanField(verbose_name="Тендер", default=False)
     closing = models.BooleanField(verbose_name="Точка закрыта", default=False)
+    not_communicate = models.BooleanField(verbose_name="Нет коммуникации", default=False)
     position = models.CharField(verbose_name="Местоположение", max_length=100, blank=True, null=True)
     dadata = models.ForeignKey('CompanyDatabase', on_delete=models.SET_NULL, blank=True, null=True,
                                default=None)
+    vectors = models.ManyToManyField(PointVectorsItem, blank=True, default=None)
 
     class Meta:
         verbose_name = "Сенсус"
