@@ -304,7 +304,7 @@
         function createFloatDiv(element, category_name, text="") {
             return `<div class="form-floating mb-3" id="${category_name}${element.id}DivId">
             <input class="form-control" name="${category_name}_${element.id}" id="${category_name}_${element.id}" 
-            type="text" placeholder="${text} ${element.text}" aria-describedby="${category_name}IdFeedback">
+            type="text" placeholder="${text} ${element.text}" aria-describedby="${category_name}IdFeedback" required>
             <label for="${category_name}Id">${text} ${element.text}</label>
             <div id="${category_name}IdFeedback" class="invalid-feedback">Укажите ${text} ${element.text}</div>
             </div>`
@@ -326,21 +326,21 @@
             let url = select.dataset.url
             let data = LoadMultiDivData(element, url)
 
-            data.then((result)=>{
 
-                result.forEach((item) => {
+            if (element.text === "Другое") {
+                let other = document.getElementById('otherVectorId')
+                other.style.display = 'block'
+                other.children[0].setAttribute('required', '')
+            } else if (element.text !== "Другое") {
+                data.then((result)=>{
+                    result.forEach((item) => {
                     let option = document.createElement('option')
                     option.setAttribute('value', item.id)
                     option.innerHTML = item.name
                     select.append(option)
-                })
-            });
-            select.parentNode.style.display = 'block'
-
-            if (element.text === "Другое") {
-                console.log(category)
-                let other = createFloatDiv(element, category )
-                console.log(other)
+                    })
+                });
+                select.parentNode.style.display = 'block'
             }
 
         })
@@ -349,8 +349,39 @@
             let element = e.params.data
             let category = e.params.data.element.dataset.slug
             let select = document.getElementById(`${category}_load`).children[1]
+
+            if (element.text === "Другое") {
+                let other = document.getElementById('otherVectorId')
+                other.children[0].removeAttribute('required')
+                other.children[0].value = ""
+                other.style.display = 'none'
+            } else if (element.text !== "Другое") {
+                select.parentNode.style.display = 'block'
+                for (let i = select.options.length - 1; i >= 0; i--) {
+                    select.options[i].remove()
+                }
+            }
             select.removeAttribute('required')
             select.parentNode.style.display = 'none'
+        })
+
+        $('#equipmentId').on('select2:select', function (e) {
+            let element = e.params.data
+            let category_name = this.name
+            if (element.text === "Другое"){
+                let div = createFloatDiv(element, category_name, 'Техника')
+                this.parentNode.insertAdjacentHTML("afterend", div)
+                            floatFormValid(`${category_name}${element.id}DivId`,
+                          `${category_name}_${element.id}`, `${category_name}Id`, false,
+                true)
+            }
+        })
+
+        $('#equipmentId').on('select2:unselect', function (e) {
+            let element = e.params.data
+            let category_name = this.name
+            let item = document.getElementById(`${category_name}${element.id}DivId`)
+            item.remove()
         })
 
         $('#volumeMultiDiv').on('select2:select', function (e) {
@@ -361,10 +392,25 @@
             floatFormValid(`${category_name}${element.id}DivId`,
                           `${category_name}_${element.id}`, `${category_name}Id`, false,
                 true)
+            if (element.text === "Другое") {
+                category_name = 'other_volume_name'
+                let div = createFloatDiv(element, category_name, 'Какое масло')
+                this.insertAdjacentHTML("afterend", div)
+                floatFormValid(`${category_name}${element.id}DivId`,
+                          `${category_name}_${element.id}`, `${category_name}Id`, false,
+                true)
+            }
         })
 
         $('#volumeMultiDiv').on('select2:unselect', function (e) {
-            document.getElementById(`${this.children[0].name}_${e.params.data.id}`).parentNode.remove()
+            let element = e.params.data
+            let category_name = 'other_volume_name'
+            if (element.text !== "Другое") {
+                document.getElementById(`${this.children[0].name}_${e.params.data.id}`).parentNode.remove()
+            } else {
+                document.getElementById(`${category_name}${element.id}DivId`).remove()
+                document.getElementById(`${this.children[0].name}_${e.params.data.id}`).parentNode.remove()
+            }
         })
     }
 

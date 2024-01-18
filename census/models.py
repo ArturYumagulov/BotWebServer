@@ -293,6 +293,7 @@ class Census(models.Model):
     dadata = models.ForeignKey('CompanyDatabase', on_delete=models.SET_NULL, blank=True, null=True,
                                default=None)
     vectors = models.ManyToManyField(PointVectorsItem, blank=True, default=None)
+    b2b = models.ForeignKey("B2BOthers", on_delete=models.CASCADE, blank=True, default=None)
 
     class Meta:
         verbose_name = "Сенсус"
@@ -397,3 +398,9 @@ class CompanyDatabase(models.Model):
         verbose_name = 'Организация'
         verbose_name_plural = 'Организации'
         ordering = ['-created_date']
+
+
+class B2BOthers(models.Model):
+    equipment = models.CharField(verbose_name="Другой парк техники")
+
+

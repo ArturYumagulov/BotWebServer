@@ -108,17 +108,18 @@
         {% if products %}
             {% for product in products %}
             <div class="mb-3 multi_res was-validated" id="{{ product.slug }}_load" style="display: none">
-                <label clasfor="{{ product.slug }}">{{ product.name }}</label>
+                <label class="form-label" for="{{ product.slug }}">{{ product.name }}</label>
                 <select class="form-select multiple mb-3" name="{{ product.slug }}" id="{{ product.slug }}" required
                         data-placeholder="Какие {{ product.name }}?" multiple data-url="{% url 'get_vectors_items' product.slug %}">
                 </select>
             </div>
             {% endfor %}
         {% endif %}
-{#        Используемые продукты?? -----------------------#}
+
+        {#        Другие Используемые продукты?? -----------------------#}
         <div class="form-floating mb-3" id="otherVectorId" style="display: none;">
             <input class="form-control" name="other_vector" id="otherVectorInputId" type="text"
-                   placeholder="Направление" aria-describedby="otherVectorFeedback">
+                   placeholder="Другие продукты" aria-describedby="otherVectorFeedback">
             <label for="otherVectorInputId">Какие другие продукты?</label>
             <div id="otherVectorFeedback" class="invalid-feedback">Выберите другие продукты торговой точки</div>
         </div>
@@ -129,6 +130,7 @@
                     required data-placeholder="Парк техники?" multiple data-url="{% url 'get_equipment_park' %}">
             </select>
         </div>
+
         {#        Поставщик         #}
         <div class="was-validated mb-3" id="providersDiv">
             <select class="form-select multiple" name="providers" data-placeholder="Поставщик" id="providers" data-url="{% url 'providers' %}" multiple required></select>
