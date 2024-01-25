@@ -8,13 +8,14 @@ from rest_framework import status
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 
-from census.models import Census
+from census.models import Census, VolumeItem
 from .services import send_message_bot
 from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerComments, PartnerWorker, Result, \
     ResultGroup, ResultData, Supervisor  # noqa
 from .serializers import TaskSerializer, BasicSerializer, PartnerSerializer, WorkerSerializer, \
     AuthorCommentsSerializer, WorkerCommentsSerializer, TaskListSerializer, PartnerWorkerSerializer, ResultSerializer, \
-    ResultGroupSerializer, ResultDataSerializer, SupervisorSerializer, AllTaskListSerializer, CensusSerializer
+    ResultGroupSerializer, ResultDataSerializer, SupervisorSerializer, AllTaskListSerializer, CensusSerializer, \
+    VolumeItemSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -663,6 +664,13 @@ class PartnerWorkerFilterViews(generics.ListAPIView):
     filterset_fields = ['partner', 'id', 'code']
 
 
+class VolumeFilterViews(generics.ListAPIView):
+    queryset = VolumeItem.objects.all()
+    serializer_class = VolumeItemSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['census']
+
+
 class ResultDataFilterViews(generics.ListAPIView):
 
     serializer_class = ResultDataSerializer
@@ -694,4 +702,12 @@ class CensusFilterViews(generics.ListAPIView):
     filterset_fields = ['task']
 
 
-# TODO установить django import-export
+class CensusVolumes(ModelViewSet):
+
+    serializer_class = VolumeItemSerializer
+    queryset = VolumeItem.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        serializer = self.serializer_class(self.queryset, many=True)
+        logger.info(f"{request.method} - {request.path} - {request.META['REMOTE_ADDR']} - {status.HTTP_200_OK}")
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -37,6 +37,7 @@ def census(request, pk):
     except models.Census.DoesNotExist:
 
         if depart == _b2b:
+
             products = models.PointVectors.objects\
                 .filter(is_active=True)\
                 .filter(department__name=_b2b)
@@ -241,7 +242,7 @@ def get_control_data(request):
 
     if request.method == 'POST':
         result = []
-        controls = ResultData.objects.filter(group__code="000000001")
+        controls = ResultData.objects.filter(group__code="000000004")
         for item in controls:
             data = {'id': item.pk, 'name': item.name, 'control_data': item.control_data}
             result.append(data)

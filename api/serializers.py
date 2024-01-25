@@ -6,7 +6,8 @@ from rest_framework import serializers
 from django.conf import settings
 
 from census.models import Census, CarsList, OilList, ProviderList, FilterList, AccessoriesCategoryItem, \
-    AccessoriesCategory, PointTypes, PointVectors, STOTypeList, PointCategory, CensusFiles, CompanyDatabase
+    AccessoriesCategory, PointTypes, PointVectors, STOTypeList, PointCategory, CensusFiles, CompanyDatabase, VolumeItem, \
+    Volume, EquipmentList, Department, PointVectorsItem
 from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerComments, Result, PartnerWorker, \
     ResultGroup, ResultData, Supervisor  # noqa
 
@@ -279,7 +280,47 @@ class DadataSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class VolumeItemSerializer(serializers.ModelSerializer):
+
+    volume = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
+    class Meta:
+        model = VolumeItem
+        fields = ('volume', 'value')
+
+
+class EquipmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EquipmentList
+        fields = ('name',)
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Department
+        fields = ('name',)
+
+
+class PointVectorsItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PointVectorsItem
+        fields = '__all__'
+
+
+class VolumeSerializer(serializers.ModelSerializer):
+
+    volume = serializers.SlugRelatedField(slug_field='volumes', read_only=True)
+
+    class Meta:
+        model = Volume
+        fields = ('volume', )
+
+
 class CensusSerializer(serializers.ModelSerializer):
+    department = DepartmentSerializer()
     result = ResultSerializer()
     cars = CarsSerializer(many=True)
     oils = OilsSerializer(many=True)
@@ -293,7 +334,48 @@ class CensusSerializer(serializers.ModelSerializer):
     accessories_category = AccessoriesCategorySerializer()
     files = CensusFilesSerializer(many=True)
     dadata = DadataSerializer()
+    equipment = EquipmentSerializer(many=True)
 
     class Meta:
         model = Census
-        fields = '__all__'
+        fields = [
+            'department',
+            'closing',
+            'not_communicate',
+            'address_id',
+            'point_name',
+            'point_type',
+            'sto_type',
+            'cars',
+            'oils',
+            'filters',
+            'accessories_category',
+            'accessories_brands',
+            'elevators_count',
+            'oil_debit',
+            'lukoil_debit',
+            'rowe_debit',
+            'motul_debit',
+            'decision_fio',
+            'decision_email',
+            'decision_phone',
+            'decision_function',
+            'other_brand',
+            'akb_specify',
+            'working',
+            'result',
+            'task',
+            'id',
+            'dadata',
+            'accessories_brands',
+            'accessories_category',
+            'category',
+            'vector',
+            'equipment',
+            'filters',
+            'point_type',
+            'sto_type',
+            'files',
+            'result',
+            'providers',
+        ]

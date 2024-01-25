@@ -322,9 +322,9 @@
         $('#vectorMulti').on('select2:select', function (e) {
             let element = e.params.data
             let category = e.params.data.element.dataset.slug
-            let select = document.getElementById(`${category}_load`).children[1]
-            let url = select.dataset.url
-            let data = LoadMultiDivData(element, url)
+            // let select = document.getElementById(`${category}_load`).children[1]
+            // let url = select.dataset.url
+            // let data = LoadMultiDivData(element, url)
 
 
             if (element.text === "Другое") {
@@ -332,12 +332,17 @@
                 other.style.display = 'block'
                 other.children[0].setAttribute('required', '')
             } else if (element.text !== "Другое") {
+                let select = document.getElementById(`${category}_load`).children[1]
+                let url = select.dataset.url
+                let data = LoadMultiDivData(element, url)
                 data.then((result)=>{
                     result.forEach((item) => {
-                    let option = document.createElement('option')
-                    option.setAttribute('value', item.id)
-                    option.innerHTML = item.name
-                    select.append(option)
+
+                        let option = document.createElement('option')
+                        option.setAttribute('value', item.id)
+                        option.innerHTML = item.name
+                        select.append(option)
+
                     })
                 });
                 select.parentNode.style.display = 'block'
@@ -348,7 +353,6 @@
         $('#vectorMulti').on('select2:unselect', function (e) {
             let element = e.params.data
             let category = e.params.data.element.dataset.slug
-            let select = document.getElementById(`${category}_load`).children[1]
 
             if (element.text === "Другое") {
                 let other = document.getElementById('otherVectorId')
@@ -356,13 +360,17 @@
                 other.children[0].value = ""
                 other.style.display = 'none'
             } else if (element.text !== "Другое") {
+
+                let select = document.getElementById(`${category}_load`).children[1]
                 select.parentNode.style.display = 'block'
                 for (let i = select.options.length - 1; i >= 0; i--) {
+                    console.log(select.options[i])
                     select.options[i].remove()
                 }
+                select.removeAttribute('required')
+                select.parentNode.style.display = 'none'
             }
-            select.removeAttribute('required')
-            select.parentNode.style.display = 'none'
+
         })
 
         $('#equipmentId').on('select2:select', function (e) {
@@ -373,7 +381,7 @@
                 this.parentNode.insertAdjacentHTML("afterend", div)
                             floatFormValid(`${category_name}${element.id}DivId`,
                           `${category_name}_${element.id}`, `${category_name}Id`, false,
-                true)
+                false)
             }
         })
 
@@ -398,7 +406,7 @@
                 this.insertAdjacentHTML("afterend", div)
                 floatFormValid(`${category_name}${element.id}DivId`,
                           `${category_name}_${element.id}`, `${category_name}Id`, false,
-                true)
+                false)
             }
         })
 
@@ -666,6 +674,7 @@
                                         inn.classList.remove('is-valid')
                                         innDiv.style.display = 'none'
                                         orgDiv.style.display = 'none'
+                                        orgDiv.children[0].removeAttribute('required')
                                     })
                                 })
 

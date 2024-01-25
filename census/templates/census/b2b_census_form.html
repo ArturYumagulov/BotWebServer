@@ -107,12 +107,15 @@
 {#    hide products----------------- #}
         {% if products %}
             {% for product in products %}
+                {% if product.name != "Другое" %}
             <div class="mb-3 multi_res was-validated" id="{{ product.slug }}_load" style="display: none">
                 <label class="form-label" for="{{ product.slug }}">{{ product.name }}</label>
-                <select class="form-select multiple mb-3" name="{{ product.slug }}" id="{{ product.slug }}" required
-                        data-placeholder="Какие {{ product.name }}?" multiple data-url="{% url 'get_vectors_items' product.slug %}">
+                <select class="form-select multiple mb-3" name="{{ product.slug }}" id="{{ product.slug }}"
+                        data-placeholder="Какие {{ product.name }}?"
+                        multiple data-url="{% url 'get_vectors_items' product.slug %}">
                 </select>
             </div>
+                {% endif %}
             {% endfor %}
         {% endif %}
 

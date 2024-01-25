@@ -17,6 +17,10 @@ environ.Env.read_env()
 logger = logging.getLogger(__name__)
 
 
+_b2b = env('B2B')
+_b2c = env('B2C')
+
+
 def unix_to_date(unix):
     if unix is not None:
         date = str(unix)[:9]
@@ -93,6 +97,19 @@ def get_integer_valid(item, data_item, value):
             data_item.value = 0
     return data_item.value
 
+#b2b
+#  <QueryDict: {'working': [''], 'inn': ['1616011428'], 'organizations_name': ['ИП ООО'],
+#  'point_name': ['Motul'], 'category': ['5', '6'], 'vectors': ['12', '10', '11', '4', '6'], 'maslo': ['1'],
+#  'filtry': ['4'], 'akb': ['7'], 'soj': ['8'], 'other_vector': [''], 'equipment': ['1', '2', '3', '4'],
+#  'equipment_4': ['ываыва'], 'providers': ['4', '5', '3'], 'volume': ['1', '2', '3', '4'],
+#  'other_volume_name_4': ['ываыва'], 'volume_4': ['1'], 'volume_3': ['2'], 'volume_2': ['3'],
+#  'volume_1': ['4'], 'decision_fio': ['Пупкин Вася'], 'decision_email': ['zico.13288@gmail.com'],
+#  'decision_phone': ['89999999995'], 'decision_function': ['Директор'], 'tender': ['1'], 'other_providers': ['ХЗ'],
+#  'result': ['000000068'], 'control_date': [''], 'result_comment': ['тест_комм'], 'address_id': ['14'],
+#  'address': ['Казань, Калинина, 15к1'], 'depart': ['b2b'], 'name': ['Под мостом'],
+#  'csrfmiddlewaretoken': ['MjpH1b5n7Xl9lU15HClXUtJBRiO5bkWvGQmBOrugabjgTJ833SH0gH11PrJqosci'],
+#  'guid': ['00000000002'], 'position': ['55.796289,49.108795']}>
+
 
 def valid_data(request):
 
@@ -104,8 +121,25 @@ def valid_data(request):
     new_census.name = request.get('name')
     task = Task.objects.get(number=request.get('guid'))
     new_census.task = task.number
-    new_census.position = request.get('position')
+    new_census.position = request.get('position')  # Координаты
     new_census.address_id = request.get('address_id')
+    new_census.edited = True
+    print(request)
+
+    # new_census.save()
+
+    try:
+        dadata = models.CompanyDatabase.objects.get(inn=request.get('inn'))
+        new_census.dadata = dadata
+    except models.CompanyDatabase.DoesNotExist:
+        new_census.dadata = None
+
+    if request.get('working'):
+        new_census.working = Partner.objects.get(name=request.get('working'))
+    else:
+        pass
+
+    new_census.point_name = request.get('point_name')  # Вывеска
     worker_comment = WorkerComments.objects.create(comment=request.get('result_comment'), worker_id=task.worker.pk)
 
     if request.get('closing') is not None:  # Если закрыто
@@ -160,7 +194,7 @@ def valid_data(request):
         control_date = None
 
         if len(request.get('control_date')) > 0:
-            control_date = datetime.strptime(request.get('control_date'), '%d-%m-%Y')
+            control_date = datetime.strptime(request.get('control_date'), '%d-%m-%Y')  # Если есть контрольная дата
 
         result = Result.objects.create(
             base_id=task.base.number,
@@ -171,101 +205,111 @@ def valid_data(request):
             control_date=control_date
         )
         new_census.result = result
-        # foreign
+
         new_census.category = models.PointCategory.objects.get(pk=request.get('category'))
-        new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
-        new_census.task = task.number
-        new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
-        new_census.position = request.get('position')
 
-        # required
-        new_census.address_id = request.get('address_id')
-        new_census.point_name = request.get('point_name')
-        new_census.nets = request.get('nets')
+        if request.get('depart') == _b2c:
+            new_census.b2b = None
+            new_census.nets = request.get('nets')
+            new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
+            new_census.other_brand = request.get('other_brand')
 
-        # null
+            new_census.save()
+
+            m2m_save(new_census.cars, models.CarsList.objects.filter(pk__in=request.getlist('cars')))
+            m2m_save(new_census.accessories_brands, models.AccessoriesCategoryItem.objects.filter(
+                pk__in=request.getlist('accessories_brands')
+            ))
+
+            if request.get('sto_type') is not None:
+                new_census.sto_type = models.STOTypeList.objects.get(pk=request.get('sto_type'))
+            else:
+                pass
+
+            if request.get('accessories_category') is not None:
+                new_census.accessories_category = models.AccessoriesCategory.objects.get(
+                    pk=request.get('accessories_category')
+                )
+            else:
+                pass
+
+            try:
+                if isinstance(int(request.get('oil_debit')), int):
+                    new_census.oil_debit = request.get('oil_debit')
+            except ValueError:
+                new_census.oil_debit = 0
+
+            try:
+                if isinstance(int(request.get('lukoil_debit')), int):
+                    new_census.lukoil_debit = request.get('lukoil_debit')
+            except ValueError:
+                new_census.lukoil_debit = 0
+
+            try:
+                if isinstance(int(request.get('rowe_debit')), int):
+                    new_census.rowe_debit = request.get('rowe_debit')
+            except ValueError:
+                new_census.rowe_debit = 0
+
+            try:
+                if isinstance(int(request.get('motul_debit')), int):
+                    new_census.motul_debit = request.get('motul_debit')
+            except ValueError:
+                new_census.motul_debit = 0
+
+            try:
+                if isinstance(int(request.get('elevators_count')), int):
+                    new_census.elevators_count = request.get('elevators_count')
+            except ValueError:
+                new_census.elevators_count = 0
+
+        elif request.get('depart') == _b2b:
+
+            new_census.tender = request.get('tender')
+
+            vectors = models.PointVectors.objects.filter(pk__in=request.get('vectors'))
+
+            for vector in vectors:
+                if request.get(vector) is not None:
+                    item = models.PointVectorsItem.objects.get(vectors__slug=vector)
+                    m2m_save(item, models.PointVectorsItem.objects.filter(request.getlist(vector)))
+                    new_census.vectors = item
+
+            other_eq = models.EquipmentList.objects.get(name="Другое")
+
+            if request.get(f"equipment_{other_eq.pk}"):
+                other = models.B2BOthers.objects.create(equipment=request.get(f"equipment_{other_eq.pk}"))
+                new_census.b2b = other
+
+            new_census.save()
+
+            for volume in request.getlist('volume'):
+                new_volume_item = models.VolumeItem.objects.create(
+                    census=new_census,
+                    volume=models.Volume.objects.get(pk=volume),
+                    value=request.get(f'volume_{volume}')
+                )
+
+            m2m_save(new_census.equipment, models.EquipmentList.objects.filter(pk__in=request.getlist('equipment')))
+
         new_census.other_vector = request.get('other_vector')
-        new_census.other_brand = request.get('other_brand')
         new_census.other_providers = request.get('other_providers')
+
         new_census.decision_fio = request.get('decision_fio')
         new_census.decision_email = request.get('decision_email')
         new_census.decision_phone = request.get('decision_phone')
         new_census.decision_function = request.get('decision_function')
 
-        # hide
-
-        # working
-        if get_valid(request.get('working')):
-            new_census.working = Partner.objects.get(name=request.get('working'))
-        else:
-            pass
-
-        # sto_type
-        if request.get('sto_type') is not None:
-            new_census.sto_type = models.STOTypeList.objects.get(pk=request.get('sto_type'))
-        else:
-            pass
-
-        # accessories_category
-        if request.get('accessories_category') is not None:
-            new_census.accessories_category = models.AccessoriesCategory.objects.get(
-                pk=request.get('accessories_category')
-            )
-        else:
-            pass
-
-        try:
-            if isinstance(int(request.get('oil_debit')), int):
-                new_census.oil_debit = request.get('oil_debit')
-        except ValueError:
-            new_census.oil_debit = 0
-
-        # lukoil_debit
-        try:
-            if isinstance(int(request.get('lukoil_debit')), int):
-                new_census.lukoil_debit = request.get('lukoil_debit')
-        except ValueError:
-            new_census.lukoil_debit = 0
-        # rowe_debit
-        try:
-            if isinstance(int(request.get('rowe_debit')), int):
-                new_census.rowe_debit = request.get('rowe_debit')
-        except ValueError:
-            new_census.rowe_debit = 0
-        # motul_debit
-        try:
-            if isinstance(int(request.get('motul_debit')), int):
-                new_census.motul_debit = request.get('motul_debit')
-        except ValueError:
-            new_census.motul_debit = 0
-        # elevators_count
-        try:
-            if isinstance(int(request.get('elevators_count')), int):
-                new_census.elevators_count = request.get('elevators_count')
-        except ValueError:
-            new_census.elevators_count = 0
-
-        new_census.save()
+        # new_census.save()
 
         # m2m
         m2m_save(new_census.providers, models.ProviderList.objects.filter(pk__in=request.getlist('providers')))
-        m2m_save(new_census.cars, models.CarsList.objects.filter(pk__in=request.getlist('cars')))
         m2m_save(new_census.oils, models.OilList.objects.filter(pk__in=request.getlist('oils')))
         m2m_save(new_census.filters, models.FilterList.objects.filter(pk__in=request.getlist('filters')))
-        m2m_save(new_census.accessories_brands, models.AccessoriesCategoryItem.objects.filter(
-            pk__in=request.getlist('accessories_brands')
-        ))
         m2m_save(new_census.vector, models.PointVectors.objects.filter(pk__in=request.getlist('vectors')))
-        new_census.edited = True
-        try:
-            dadata = models.CompanyDatabase.objects.get(inn=request.get('inn'))
-            new_census.dadata = dadata
-        except models.CompanyDatabase.DoesNotExist:
-            new_census.dadata = None
 
         new_census.save()
 
-        # files
         if request_files:
             for file in request_files.getlist('file'):
                 census_files = models.CensusFiles()

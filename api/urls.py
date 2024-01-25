@@ -7,7 +7,8 @@ from .serializers import WorkerSerializer, TaskListSerializer, PartnerWorkerSeri
 from .views import TaskViewSet, BaseViewSet, PartnersViewSet, WorkerViewSet, AuthorCommentsViews, \
     WorkerCommentsViews, TasksFilterViews, WorkerFilterViews, TaskViewListSet, \
     PartnersWorkerViewSet, PartnerWorkerFilterViews, ResultListView, ResultDataFilterViews, ResultGroupListView, \
-    ResultDataListView, SupervisorViewSet, AllTasksUpdateView, CensusView, CensusFilterViews
+    ResultDataListView, SupervisorViewSet, AllTasksUpdateView, CensusView, CensusFilterViews, CensusVolumes, \
+    VolumeFilterViews
 
 router = DefaultRouter()
 router.get_api_root_view().cls.__name__ = "Tasks & Census_API"
@@ -41,7 +42,8 @@ urlpatterns = [
                                                                serializer_class=PartnerWorkerSerializer),
          name='partner-worker_filter'),
     path('result-data_f/', ResultDataFilterViews.as_view(), name='result_filter'),
-    path('census-task/', CensusFilterViews.as_view(), name='census_filter')
+    path('census-task/', CensusFilterViews.as_view(), name='census_filter'),
+    path('census-volume-f/', VolumeFilterViews.as_view(), name='census_volumes'),
 ]
 
 

@@ -197,11 +197,14 @@ class Volume(models.Model):
 
 
 class VolumeItem(models.Model):
-    census = models.ForeignKey("Census", on_delete=models.CASCADE)
+    census = models.ForeignKey("Census", on_delete=models.CASCADE, blank=True, default=None)
     volume = models.ForeignKey(Volume, on_delete=models.CASCADE)
     value = models.CharField(verbose_name="Значение", max_length=500, default=0)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+
+    def __str__(self):
+        return f"{self.volume} - {self.value}"
 
 
 class EquipmentList(models.Model):
@@ -293,7 +296,7 @@ class Census(models.Model):
     dadata = models.ForeignKey('CompanyDatabase', on_delete=models.SET_NULL, blank=True, null=True,
                                default=None)
     vectors = models.ManyToManyField(PointVectorsItem, blank=True, default=None)
-    b2b = models.ForeignKey("B2BOthers", on_delete=models.CASCADE, blank=True, default=None)
+    b2b = models.ForeignKey("B2BOthers", on_delete=models.CASCADE, blank=True, null=True, default=None)
 
     class Meta:
         verbose_name = "Сенсус"
@@ -385,7 +388,8 @@ class CompanyDatabase(models.Model):
     address_longitude = models.CharField(verbose_name="Долгота_DADATA", max_length=50, blank=True, null=True,
                                          default=None)
     actuality_date = models.DateField(verbose_name="дата последних изменений", blank=True, null=True, default=None)
-    registration_date = models.DateField(verbose_name="дата регистрации", blank=True, null=True, default=None)
+    registration_date = \
+        models.DateField(verbose_name="дата регистрации", blank=True, null=True, default=None)
     liquidation_date = models.DateField(verbose_name="дата ликвидации", blank=True, null=True, default=None)
     status = models.CharField(verbose_name="статус организации", blank=True, null=True, default=None, choices=STATUSES)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
