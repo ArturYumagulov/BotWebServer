@@ -340,11 +340,11 @@ def get_vectors_items(request, slug):
     result = []
     if request.method == "POST":
         if json.loads(request.body)['department'] == _b2b:
-            vectors_item = models.PointVectorsItem.objects.filter(vectors__slug=slug).filter(is_active=True).filter(department__name=_b2b)
+            vectors_item = models.PointVectorsSelectItem.objects.filter(vectors__slug=slug).filter(is_active=True).filter(department__name=_b2b)
         elif json.loads(request.body)['department'] == _b2c:
-            vectors_item = models.PointVectorsItem.objects.filter(vectors__slug=slug).filter(department__name=_b2c)
+            vectors_item = models.PointVectorsSelectItem.objects.filter(vectors__slug=slug).filter(department__name=_b2c)
         else:
-            vectors_item = models.PointVectorsItem.objects.filter(vectors__slug=slug)
+            vectors_item = models.PointVectorsSelectItem.objects.filter(vectors__slug=slug)
 
         for item in vectors_item:
             data = {
@@ -353,5 +353,5 @@ def get_vectors_items(request, slug):
             }
             result.append(data)
         return JsonResponse(list(result), safe=False, status=200)
-    return JsonResponse({'result': 'vectors_item not fount'}, safe=False, status=404)
+    return JsonResponse({'result': 'vectors_item not found'}, safe=False, status=404)
 

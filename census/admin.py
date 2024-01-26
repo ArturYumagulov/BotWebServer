@@ -16,7 +16,7 @@ class CensusAdmin(admin.ModelAdmin):
               'sto_type', 'cars', 'oils', 'filters', 'accessories_category', 'accessories_brands', 'elevators_count',
               'oil_debit', 'lukoil_debit', 'rowe_debit', 'motul_debit', 'decision_fio', 'decision_email',
               'decision_phone', 'decision_function', 'other_brand', 'akb_specify', 'working', 'result', 'task',
-              'volume', 'equipment', 'tender', 'position', 'dadata')
+              'volume', 'equipment', 'tender', 'position', 'dadata', 'vectors')
 
     def get_task_worker(self, obj):
         try:
@@ -123,4 +123,9 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(models.PointVectorsItem)
 class PointVectorsItemAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.PointVectorsSelectItem)
+class PointVectorsSelectItemAdmin(admin.ModelAdmin):
     pass

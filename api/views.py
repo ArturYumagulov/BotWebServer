@@ -12,10 +12,7 @@ from census.models import Census, VolumeItem
 from .services import send_message_bot
 from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerComments, PartnerWorker, Result, \
     ResultGroup, ResultData, Supervisor  # noqa
-from .serializers import TaskSerializer, BasicSerializer, PartnerSerializer, WorkerSerializer, \
-    AuthorCommentsSerializer, WorkerCommentsSerializer, TaskListSerializer, PartnerWorkerSerializer, ResultSerializer, \
-    ResultGroupSerializer, ResultDataSerializer, SupervisorSerializer, AllTaskListSerializer, CensusSerializer, \
-    VolumeItemSerializer
+from . import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +44,7 @@ class TaskViewSet(ModelViewSet):
     """
 
     model = Task
-    serializer_class = TaskSerializer
+    serializer_class = serializers.TaskSerializer
     queryset = Task.objects.all()
     pagination_class = PageNumberPagination
 
@@ -123,7 +120,7 @@ class BaseViewSet(ModelViewSet):
     """
 
     model = Basics
-    serializer_class = BasicSerializer
+    serializer_class = serializers.BasicSerializer
     queryset = Basics.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -196,7 +193,7 @@ class PartnersViewSet(ModelViewSet):
     <b><em>name</em></b> - Имя \n
     """
 
-    serializer_class = PartnerSerializer
+    serializer_class = serializers.PartnerSerializer
     queryset = Partner.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -247,7 +244,7 @@ class PartnersViewSet(ModelViewSet):
 class PartnersWorkerViewSet(ModelViewSet):
 
     model = PartnerWorker
-    serializer_class = PartnerWorkerSerializer
+    serializer_class = serializers.PartnerWorkerSerializer
     queryset = PartnerWorker.objects.all()
 
     def list(self, request):  # noqa
@@ -276,7 +273,7 @@ class PartnersWorkerViewSet(ModelViewSet):
 
 class WorkerViewSet(ModelViewSet):
 
-    serializer_class = WorkerSerializer
+    serializer_class = serializers.WorkerSerializer
     queryset = Worker.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -330,7 +327,7 @@ class WorkerViewSet(ModelViewSet):
 
 class SupervisorViewSet(ModelViewSet):
 
-    serializer_class = SupervisorSerializer
+    serializer_class = serializers.SupervisorSerializer
     queryset = Supervisor.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -382,7 +379,7 @@ class SupervisorViewSet(ModelViewSet):
 
 class AuthorCommentsViews(ModelViewSet):
 
-    serializer_class = AuthorCommentsSerializer
+    serializer_class = serializers.AuthorCommentsSerializer
     queryset = AuthorComments.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -411,7 +408,7 @@ class AuthorCommentsViews(ModelViewSet):
 
 class WorkerCommentsViews(ModelViewSet):
 
-    serializer_class = WorkerCommentsSerializer
+    serializer_class = serializers.WorkerCommentsSerializer
     queryset = WorkerComments.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -440,7 +437,7 @@ class WorkerCommentsViews(ModelViewSet):
 
 class TaskViewListSet(ModelViewSet):
 
-    serializer_class = TaskListSerializer
+    serializer_class = serializers.TaskListSerializer
     queryset = Task.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -454,7 +451,7 @@ class TaskViewListSet(ModelViewSet):
 
 class ResultListView(ModelViewSet):
 
-    serializer_class = ResultSerializer
+    serializer_class = serializers.ResultSerializer
     queryset = Result.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -499,7 +496,7 @@ class ResultListView(ModelViewSet):
 
 class ResultGroupListView(ModelViewSet):
 
-    serializer_class = ResultGroupSerializer
+    serializer_class = serializers.ResultGroupSerializer
     queryset = ResultGroup.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -544,7 +541,7 @@ class ResultGroupListView(ModelViewSet):
 
 class ResultDataListView(ModelViewSet):
 
-    serializer_class = ResultDataSerializer
+    serializer_class = serializers.ResultDataSerializer
     queryset = ResultData.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -590,7 +587,7 @@ class ResultDataListView(ModelViewSet):
 class AllTasksUpdateView(ModelViewSet):
     """Вывод только измененных задач"""
     queryset = Task.objects.filter(edited=True).exclude(status="Загружено")
-    serializer_class = AllTaskListSerializer
+    serializer_class = serializers.AllTaskListSerializer
 
     def create(self, request):  # noqa
 
@@ -633,7 +630,7 @@ class WorkerForwardViewSet(ModelViewSet):
     исключается number запросившего и chat_id=null
     """
 
-    serializer_class = WorkerSerializer
+    serializer_class = serializers.WorkerSerializer
     queryset = Worker.objects.all()
 
     def list(self, request, code):  # noqa
@@ -645,35 +642,35 @@ class WorkerForwardViewSet(ModelViewSet):
 
 class TasksFilterViews(generics.ListAPIView):
     queryset = Task.objects.all()
-    serializer_class = TaskListSerializer
+    serializer_class = serializers.TaskListSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['worker', 'edited', 'status']
 
 
 class WorkerFilterViews(generics.ListAPIView):
     queryset = Worker.objects.all()
-    serializer_class = WorkerSerializer
+    serializer_class = serializers.WorkerSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['chat_id', 'phone', 'controller', 'code']
 
 
 class PartnerWorkerFilterViews(generics.ListAPIView):
     queryset = PartnerWorker.objects.all()
-    serializer_class = PartnerWorkerSerializer
+    serializer_class = serializers.PartnerWorkerSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['partner', 'id', 'code']
 
 
-class VolumeFilterViews(generics.ListAPIView):
-    queryset = VolumeItem.objects.all()
-    serializer_class = VolumeItemSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['census']
+# class VolumeFilterViews(generics.ListAPIView):
+#     queryset = VolumeItem.objects.all()
+#     serializer_class = VolumeItemSerializer
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_fields = ['census']
 
 
 class ResultDataFilterViews(generics.ListAPIView):
 
-    serializer_class = ResultDataSerializer
+    serializer_class = serializers.ResultDataSerializer
 
     def get_queryset(self):
         queryset = ResultData.objects.all()
@@ -686,7 +683,7 @@ class ResultDataFilterViews(generics.ListAPIView):
 
 class CensusView(ModelViewSet):
 
-    serializer_class = CensusSerializer
+    serializer_class = serializers.CensusSerializer
     queryset = Census.objects.all()
 
     def get(self, request, *args, **kwargs):
@@ -697,17 +694,7 @@ class CensusView(ModelViewSet):
 
 class CensusFilterViews(generics.ListAPIView):
     queryset = Census.objects.all()
-    serializer_class = CensusSerializer
+    serializer_class = serializers.CensusSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['task']
 
-
-class CensusVolumes(ModelViewSet):
-
-    serializer_class = VolumeItemSerializer
-    queryset = VolumeItem.objects.all()
-
-    def get(self, request, *args, **kwargs):
-        serializer = self.serializer_class(self.queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META['REMOTE_ADDR']} - {status.HTTP_200_OK}")
-        return Response(serializer.data, status=status.HTTP_200_OK)

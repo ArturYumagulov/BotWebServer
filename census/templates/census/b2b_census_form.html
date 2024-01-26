@@ -93,10 +93,21 @@
 
 {#        Сегмент? -----------------------#}
 
-        <div class="mb-3 multi_res was-validated" id="categoryMultiDiv">
-            <select class="form-select multiple mb-3" name="category" id="shopCategoryId"
-                    required data-placeholder="Сегмент?" multiple data-url="{% url 'point_category' %}">
+{#        <div class="mb-3 multi_res was-validated" id="categoryMultiDiv">#}
+{#            <select class="form-select multiple mb-3" name="category" id="shopCategoryId"#}
+{#                    required data-placeholder="Сегмент?" multiple data-url="{% url 'point_category' %}">#}
+{#            </select>#}
+{#        </div>#}
+
+            <div class="mb-3">
+        <label for="shopCategoryId" class="form-label">Категория точки?</label>
+            <select class="form-select mb-3" name="category" id="shopCategoryId" data-url="{% url 'point_category' %}"
+                    aria-describedby="pointCategoryIDFeedback" required>
+                <option selected disabled value="">Выберите категорию...</option>
             </select>
+            <div id="pointCategoryIDFeedback" class="invalid-feedback">
+                Выберите нужную категорию торговой точки
+            </div>
         </div>
     {#        Используемые продукты? -----------------------#}
         <div class="mb-3 multi_res was-validated" id="vectorMultiDiv">

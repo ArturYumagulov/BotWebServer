@@ -208,7 +208,7 @@ def valid_data(request):
 
         new_census.category = models.PointCategory.objects.get(pk=request.get('category'))
 
-        if request.get('depart') == _b2c:
+        if request.get('depart') == _b2c:  # B2C
             new_census.b2b = None
             new_census.nets = request.get('nets')
             new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
@@ -263,17 +263,9 @@ def valid_data(request):
             except ValueError:
                 new_census.elevators_count = 0
 
-        elif request.get('depart') == _b2b:
+        elif request.get('depart') == _b2b:  # B2B
 
             new_census.tender = request.get('tender')
-
-            vectors = models.PointVectors.objects.filter(pk__in=request.get('vectors'))
-
-            for vector in vectors:
-                if request.get(vector) is not None:
-                    item = models.PointVectorsItem.objects.get(vectors__slug=vector)
-                    m2m_save(item, models.PointVectorsItem.objects.filter(request.getlist(vector)))
-                    new_census.vectors = item
 
             other_eq = models.EquipmentList.objects.get(name="Другое")
 
@@ -283,12 +275,28 @@ def valid_data(request):
 
             new_census.save()
 
+            #  сохранение направления
+            for vector in models.PointVectors.objects.filter(pk__in=request.getlist('vectors')):
+
+                if request.getlist(vector.slug):
+                    new_vector_item = models.PointVectorsItem.objects.create(
+                        census=new_census,
+                        vectors=vector,
+                    )
+                    for vector_pk in request.getlist(vector.slug):
+                        new_value = models.PointVectorsSelectItem.objects.get(pk=vector_pk)
+                        new_vector_item.value.add(new_value)
+                    for new_vector in models.PointVectorsItem.objects.filter(census__pk=new_census.pk):
+                        new_census.vectors.add(new_vector)
+
+            #  сохранение объема
             for volume in request.getlist('volume'):
                 new_volume_item = models.VolumeItem.objects.create(
                     census=new_census,
                     volume=models.Volume.objects.get(pk=volume),
                     value=request.get(f'volume_{volume}')
                 )
+                new_census.volume.add(new_volume_item)
 
             m2m_save(new_census.equipment, models.EquipmentList.objects.filter(pk__in=request.getlist('equipment')))
 
@@ -299,8 +307,6 @@ def valid_data(request):
         new_census.decision_email = request.get('decision_email')
         new_census.decision_phone = request.get('decision_phone')
         new_census.decision_function = request.get('decision_function')
-
-        # new_census.save()
 
         # m2m
         m2m_save(new_census.providers, models.ProviderList.objects.filter(pk__in=request.getlist('providers')))

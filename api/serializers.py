@@ -196,34 +196,6 @@ class AllTaskListSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CarsSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = CarsList
-        fields = ("name", )
-
-
-class OilsSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = OilList
-        fields = ('name',)
-
-
-class ProviderSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ProviderList
-        fields = ('name',)
-
-
-class FilterSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = FilterList
-        fields = ('name',)
-
-
 class AccessoriesCategoryItemSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -231,38 +203,10 @@ class AccessoriesCategoryItemSerializer(serializers.ModelSerializer):
         fields = ('name',)
 
 
-class AccessoriesCategorySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = AccessoriesCategory
-        fields = ('name',)
-
-
-class PointTypesSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = PointTypes
-        fields = ('name',)
-
-
 class PointVectorsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PointVectors
-        fields = ('name',)
-
-
-class STOTypeListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = STOTypeList
-        fields = ('name',)
-
-
-class PointCategorySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = PointCategory
         fields = ('name',)
 
 
@@ -289,52 +233,34 @@ class VolumeItemSerializer(serializers.ModelSerializer):
         fields = ('volume', 'value')
 
 
-class EquipmentSerializer(serializers.ModelSerializer):
+class PointVectorItemsSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = EquipmentList
-        fields = ('name',)
-
-
-class DepartmentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Department
-        fields = ('name',)
-
-
-class PointVectorsItemSerializer(serializers.ModelSerializer):
+    value = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+    vectors = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
         model = PointVectorsItem
-        fields = '__all__'
-
-
-class VolumeSerializer(serializers.ModelSerializer):
-
-    volume = serializers.SlugRelatedField(slug_field='volumes', read_only=True)
-
-    class Meta:
-        model = Volume
-        fields = ('volume', )
+        fields = ('vectors', 'value',)
 
 
 class CensusSerializer(serializers.ModelSerializer):
-    department = DepartmentSerializer()
-    result = ResultSerializer()
-    cars = CarsSerializer(many=True)
-    oils = OilsSerializer(many=True)
-    providers = ProviderSerializer(many=True)
-    filters = FilterSerializer(many=True)
-    accessories_brands = AccessoriesCategoryItemSerializer(many=True)
-    point_type = PointTypesSerializer()
-    vector = PointVectorsSerializer(many=True)
-    sto_type = STOTypeListSerializer()
-    category = PointCategorySerializer()
-    accessories_category = AccessoriesCategorySerializer()
+    department = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    cars = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    oils = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    providers = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    filters = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    accessories_brands = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+    point_type = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    vector = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+    sto_type = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    accessories_category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    equipment = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
     files = CensusFilesSerializer(many=True)
+    result = ResultSerializer()
     dadata = DadataSerializer()
-    equipment = EquipmentSerializer(many=True)
+    volume = VolumeItemSerializer(many=True)
+    vectors = PointVectorItemsSerializer(many=True)
 
     class Meta:
         model = Census
@@ -363,10 +289,8 @@ class CensusSerializer(serializers.ModelSerializer):
             'other_brand',
             'akb_specify',
             'working',
-            'result',
             'task',
             'id',
-            'dadata',
             'accessories_brands',
             'accessories_category',
             'category',
@@ -376,6 +300,9 @@ class CensusSerializer(serializers.ModelSerializer):
             'point_type',
             'sto_type',
             'files',
-            'result',
             'providers',
+            'result',
+            'dadata',
+            'volume',
+            'vectors'
         ]

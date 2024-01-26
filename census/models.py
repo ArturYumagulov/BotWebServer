@@ -204,7 +204,7 @@ class VolumeItem(models.Model):
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
 
     def __str__(self):
-        return f"{self.volume} - {self.value}"
+        return f"{self.volume}_{self.value}"
 
 
 class EquipmentList(models.Model):
@@ -222,7 +222,7 @@ class EquipmentList(models.Model):
         verbose_name_plural = "Парк техники"
 
 
-class PointVectorsItem(models.Model):
+class PointVectorsSelectItem(models.Model):
     is_active = models.BooleanField(default=False)
     vectors = models.ForeignKey(PointVectors, on_delete=models.CASCADE)
     name = models.CharField(verbose_name="Название", max_length=1000)
@@ -232,6 +232,17 @@ class PointVectorsItem(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+
+class PointVectorsItem(models.Model):
+    census = models.ForeignKey("Census", on_delete=models.CASCADE, blank=True, default=None)
+    vectors = models.ForeignKey(PointVectors, on_delete=models.CASCADE)
+    value = models.ManyToManyField(PointVectorsSelectItem, related_name="vector_items", blank=True, default=None)
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+
+    def __str__(self):
+        return f"{self.census} - {self.vectors} - {self.value}"
 
 
 def get_default_task():
@@ -295,7 +306,7 @@ class Census(models.Model):
     position = models.CharField(verbose_name="Местоположение", max_length=100, blank=True, null=True)
     dadata = models.ForeignKey('CompanyDatabase', on_delete=models.SET_NULL, blank=True, null=True,
                                default=None)
-    vectors = models.ManyToManyField(PointVectorsItem, blank=True, default=None)
+    vectors = models.ManyToManyField(PointVectorsItem, blank=True, default=None, related_name='census_vectors')
     b2b = models.ForeignKey("B2BOthers", on_delete=models.CASCADE, blank=True, null=True, default=None)
 
     class Meta:
