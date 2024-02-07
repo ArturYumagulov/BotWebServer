@@ -23,6 +23,8 @@
             type="text/javascript"></script>
     {% load static %}
     <script defer src="{% static 'js/b2b.js' %}"></script>
+    <script defer src="{% static 'js/search_inn.js' %}"></script>
+
     <script>
         let csrf="{{ csrf_token }}";
     </script>
@@ -49,7 +51,7 @@
                 <input class="form-check-input" name="not_communicate" type="checkbox" id="communicateCheckbox" value="true">
                 <label class="form-check-label" for="communicateCheckbox">Нет коммуникации</label>
             </div>
-            <div class="form-check form-switch mb-3 col-lg-4">
+            <div class="form-check form-switch mb-3 col-lg-4" id="closeDiv">
                 <input class="form-check-input" name="closing" type="checkbox" id="closeCheckbox" value="true">
                 <label class="form-check-label" for="workCheckbox">Точка не существует</label>
             </div>
@@ -91,14 +93,6 @@
             <div class="invalid-feedback">Пожалуйста, загрузите фотографии точки</div>
         </div>
 
-{#        Сегмент? -----------------------#}
-
-{#        <div class="mb-3 multi_res was-validated" id="categoryMultiDiv">#}
-{#            <select class="form-select multiple mb-3" name="category" id="shopCategoryId"#}
-{#                    required data-placeholder="Сегмент?" multiple data-url="{% url 'point_category' %}">#}
-{#            </select>#}
-{#        </div>#}
-
             <div class="mb-3">
         <label for="shopCategoryId" class="form-label">Категория точки?</label>
             <select class="form-select mb-3" name="category" id="shopCategoryId" data-url="{% url 'point_category' %}"
@@ -139,7 +133,7 @@
         </div>
 
 {#        Парк техники? -----------------------#}
-        <div class="mb-3 multi_res was-validated" id="equipmentMultiDiv">
+        <div class="mb-3 multi_res was-validated" id="equipmentIdDiv">
             <select class="form-select multiple mb-3" name="equipment" id="equipmentId"
                     required data-placeholder="Парк техники?" multiple data-url="{% url 'get_equipment_park' %}">
             </select>
@@ -150,49 +144,67 @@
             <select class="form-select multiple" name="providers" data-placeholder="Поставщик" id="providers" data-url="{% url 'providers' %}" multiple required></select>
         </div>
 
-        <div class="mb-3 multi_res was-validated" id="volumeMultiDiv">
+        <div class="mb-3 multi_res was-validated" id="volumeIdDiv">
             <select class="form-select multiple mb-3" name="volume" id="volumeId" required data-placeholder="Объем потребления?" multiple data-url="{% url 'get_volume_data' %}">
             </select>
         </div>
 {#Контактное лицо?------------------------------------------#}
         <p class="text-start">Контактное лицо?</p>
-        <div class="form-floating mb-3" id="fioId" style="display: block;">
-            <input class="form-control" name="decision_fio" id="decisionMakerId" type="text" placeholder="ФИО контактного лица"
-                   aria-describedby="fioIdFeedback">
-            <label for="decisionMakerId">ФИО</label>
-            <div id="fioIdFeedback" class="invalid-feedback">
-                Укажите ФИО контактного лица
+        <div class="form-floating mb-3" id="firstnameId">
+            <input class="form-control" name="firstname" id="firstnameMakerId" type="text" placeholder="Фамилия контактного лица"
+                   aria-describedby="firstnameIdFeedback" required>
+            <label for="firstnameMakerId">Фамилия контактного лица</label>
+            <div id="firstnameIdFeedback" class="invalid-feedback">
+                Укажите фамилию контактного лица
+            </div>
+        </div>
+
+            <div class="form-floating mb-3" id="lastnameId">
+            <input class="form-control" name="lastname" id="lastnameMakerId" type="text" placeholder="Имя контактного лица"
+                   aria-describedby="lastnameIdFeedback" required>
+            <label for="lastnameMakerId">Имя контактного лица</label>
+            <div id="lastnameIdFeedback" class="invalid-feedback">
+                Укажите имя контактного лица
+            </div>
+        </div>
+
+            <div class="form-floating mb-3" id="surnameId">
+            <input class="form-control" name="surname" id="surnameMakerId" type="text" placeholder="Отчество контактного лица"
+                   aria-describedby="surnameIdFeedback">
+            <label for="surnameMakerId">Отчество контактного лица</label>
+            <div id="surnameIdFeedback" class="invalid-feedback">
+                Укажите отчество контактного лица
             </div>
         </div>
 {#    Email#}
-        <div class="form-floating mb-3" id="emailId" style="display: block;">
+        <div class="form-floating mb-3" id="emailId">
             <input class="form-control" name="decision_email" id="decisionMakerEmailId" type="email" placeholder="Email"
-            aria-describedby="decisionMakerEmailIdFeedback">
+            aria-describedby="decisionMakerEmailIdFeedback" required>
             <label for="decisionMakerEmailId">Email</label>
             <div id="decisionMakerEmailIdFeedback" class="invalid-feedback">
                 Укажите электронную почту контактного лица
             </div>
         </div>
 {#    Телефон#}
-        <div class="form-floating mb-3" id="phoneId" style="display: block;">
+        <div class="form-floating mb-3" id="phoneId">
             <input class="form-control" name="decision_phone" id="decisionMakerPhoneId" type="phone" placeholder="Телефон"
-            aria-describedby="decisionMakerPhoneIdFeedback">
+            aria-describedby="decisionMakerPhoneIdFeedback" required>
             <label for="decisionMakerPhoneId">Телефон</label>
             <div id="decisionMakerPhoneIdFeedback" class="invalid-feedback">
                 Укажите телефон контактного лица
             </div>
         </div>
 {#    Должность #}
-        <div class="form-floating mb-3" id="functionId" style="display: block;">
-            <input class="form-control" name="decision_function" id="decisionMakerFunctionId" type="text" placeholder="Должность" aria-describedby="functionIdFeedback">
+        <div class="form-floating mb-3" id="functionId">
+            <input class="form-control" name="decision_function" id="decisionMakerFunctionId" type="text" placeholder="Должность" aria-describedby="functionIdFeedback" required>
             <label for="decisionMakerFunctionId">Должность</label>
             <div id="functionIdFeedback" class="invalid-feedback">Укажите должность контактного лица</div>
         </div>
 
-        <div class="mb-3" id="tenderDiv" style="display: block">
+        <div class="mb-3" id="tenderDiv">
             <label for="tenderId" class="form-label">Работает по тендеру?</label>
             <select class="form-select mb-3" selected="" name="tender" id="tenderId" style="display: block;"
-                    aria-describedby="tenderFeedback">
+                    aria-describedby="tenderFeedback" required>
                 <option selected disabled value="">Выберите...</option>
                 <option value="1">Да</option>
                 <option value="0">Нет</option>

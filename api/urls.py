@@ -35,11 +35,10 @@ urlpatterns = [
     path('worker_f/', views.WorkerFilterViews.as_view(queryset=Worker.objects.all(), serializer_class=WorkerSerializer),
          name='workers_filter'),
     path('partner-worker_f/', views.PartnerWorkerFilterViews.as_view(queryset=PartnerWorker.objects.all(),
-                                                               serializer_class=PartnerWorkerSerializer),
+                                                                     serializer_class=PartnerWorkerSerializer),
          name='partner-worker_filter'),
     path('result-data_f/', views.ResultDataFilterViews.as_view(), name='result_filter'),
     path('census-task/', views.CensusFilterViews.as_view(), name='census_filter'),
-    # path('census-volume-f/', VolumeFilterViews.as_view(), name='census_volumes'),
 ]
 
 

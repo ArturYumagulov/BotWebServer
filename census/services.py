@@ -267,7 +267,10 @@ def valid_data(request):
 
             new_census.tender = request.get('tender')
 
-            other_eq = models.EquipmentList.objects.get(name="Другое")
+            try:
+                other_eq = models.EquipmentList.objects.get(name="Другое")
+            except models.EquipmentList.DoesNotExist:
+                return None
 
             if request.get(f"equipment_{other_eq.pk}"):
                 other = models.B2BOthers.objects.create(equipment=request.get(f"equipment_{other_eq.pk}"))
@@ -303,7 +306,9 @@ def valid_data(request):
         new_census.other_vector = request.get('other_vector')
         new_census.other_providers = request.get('other_providers')
 
-        new_census.decision_fio = request.get('decision_fio')
+        new_census.decision_firstname = request.get('firstname')
+        new_census.decision_lastname = request.get('lastname')
+        new_census.decision_surname = request.get('surname')
         new_census.decision_email = request.get('decision_email')
         new_census.decision_phone = request.get('decision_phone')
         new_census.decision_function = request.get('decision_function')

@@ -132,13 +132,29 @@
             <select class="form-select multiple mb-3" name="vectors" id="vectorMulti" required data-placeholder="Направления точки?" multiple data-url="{% url 'point_vectors' %}">
             </select>
         </div>
-{#        Направление? -----------------------#}
+
+    {#    hide products----------------- #}
+        {% if products %}
+            {% for product in products %}
+                {% if product.name != "Другое" %}
+            <div class="mb-3 multi_res was-validated" id="{{ product.slug }}_load" style="display: none">
+                <label class="form-label" for="{{ product.slug }}">{{ product.name }}</label>
+                <select class="form-select multiple mb-3" name="{{ product.slug }}" id="{{ product.slug }}"
+                        data-placeholder="Какие {{ product.name }}?"
+                        multiple data-url="{% url 'get_vectors_items' product.slug %}">
+                </select>
+            </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
         <div class="form-floating mb-3" id="otherVectorId" style="display: none;">
             <input class="form-control" name="other_vector" id="otherVectorInputId" type="text"
-                   placeholder="Направление" aria-describedby="otherVectorFeedback">
-            <label for="otherVectorInputId">Какое направление?</label>
-            <div id="otherVectorFeedback" class="invalid-feedback">Выберите направление торговой точки</div>
+                   placeholder="Другие продукты" aria-describedby="otherVectorFeedback">
+            <label for="otherVectorInputId">Какие другие продукты?</label>
+            <div id="otherVectorFeedback" class="invalid-feedback">Выберите другие продукты торговой точки</div>
         </div>
+
 {#    Количество подъемников#}
         <div class="form-floating mb-3" id="elevatorId" style="display: none;">
             <input class="form-control" id="elevatorCountId" name="elevators_count" type="text" placeholder="Количество подъемников"
@@ -182,10 +198,15 @@
                 Укажите пролив Motul в месяц в литрах
             </div>
         </div>
-{#    Есть лицо принимающее решение?#}
-        <div class="form-check form-switch mb-3" style="display: none">
-            <input class="form-check-input" type="checkbox" id="decisionCheckboxId">
-            <label class="form-check-label" for="decisionCheckboxId">Есть лицо принимающее решение?</label>
+
+        {#    Пролив Vitex в месяц#}
+        <div class="form-floating mb-3" id="vitDebitId" style="display: none;">
+            <input class="form-control" id="vitexDebitId" name="vitex_debit" type="text" placeholder="Пролив Vitex в месяц, л"
+            aria-describedby="vitexDebitIdFeedback">
+            <label for="vitexDebitId">Пролив Vitex в месяц, л</label>
+            <div id="vitexDebitIdFeedback" class="invalid-feedback">
+                Укажите пролив Vitex в месяц в литрах
+            </div>
         </div>
 
         <p class="text-start">Контактное лицо?</p>
@@ -230,15 +251,15 @@
             </select>
         </div>
 {#    Какие масла используют?#}
-        <div class="mb-3 multi" id="oilsDiv">
-            <select class="form-select multiple multiple mb-3" name="oils" id="oils" data-placeholder="Какие масла используют?" multiple data-url="{% url 'oil_list' %}">
-            </select>
-        </div>
+{#        <div class="mb-3 multi" id="oilsDiv">#}
+{#            <select class="form-select multiple multiple mb-3" name="oils" id="oils" data-placeholder="Какие масла используют?" multiple data-url="{% url 'oil_list' %}">#}
+{#            </select>#}
+{#        </div>#}
 {#    Какие фильтры используют?#}
-        <div class="mb-3 multi" id="filtersDiv">
-            <select class="form-select multiple mb-3" name="filters" id="filters" data-placeholder="Какие фильтры используют?" multiple data-url="{% url 'filter_list' %}">
-            </select>
-        </div>
+{#        <div class="mb-3 multi" id="filtersDiv">#}
+{#            <select class="form-select multiple mb-3" name="filters" id="filters" data-placeholder="Какие фильтры используют?" multiple data-url="{% url 'filter_list' %}">#}
+{#            </select>#}
+{#        </div>#}
 {#       Категория аксессуаров #}
         <div class="mb-3" id="accessDiv" style="display: none">
             <label for="accessId" class="form-label">Категория аксессуаров</label>

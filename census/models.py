@@ -280,7 +280,10 @@ class Census(models.Model):
     lukoil_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
     rowe_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
     motul_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
-    decision_fio = models.CharField(max_length=2000, verbose_name="ЛПР_ФИО", null=True, blank=True)
+    vitex_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
+    decision_firstname = models.CharField(max_length=2000, verbose_name="Фамилия", null=True, blank=True)
+    decision_lastname = models.CharField(max_length=2000, verbose_name="Имя", null=True, blank=True)
+    decision_surname = models.CharField(max_length=2000, verbose_name="Отчество", null=True, blank=True)
     decision_email = models.EmailField(verbose_name="ЛПР_email", null=True, blank=True)
     decision_phone = models.CharField(verbose_name="Телефон", max_length=20, null=True, blank=True)
     decision_function = models.CharField(verbose_name="Должность", max_length=300, null=True, blank=True)
@@ -402,7 +405,7 @@ class CompanyDatabase(models.Model):
     registration_date = \
         models.DateField(verbose_name="дата регистрации", blank=True, null=True, default=None)
     liquidation_date = models.DateField(verbose_name="дата ликвидации", blank=True, null=True, default=None)
-    status = models.CharField(verbose_name="статус организации", blank=True, null=True, default=None, choices=STATUSES)
+    status = models.CharField(verbose_name="статус организации", blank=True, null=True, default=None, choices=STATUSES, max_length=500)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
 
@@ -416,6 +419,6 @@ class CompanyDatabase(models.Model):
 
 
 class B2BOthers(models.Model):
-    equipment = models.CharField(verbose_name="Другой парк техники")
+    equipment = models.CharField(verbose_name="Другой парк техники", max_length=200)
 
 

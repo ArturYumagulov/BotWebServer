@@ -56,6 +56,10 @@ def census(request, pk):
 
         elif depart == _b2c:
 
+            products = models.PointVectors.objects\
+                .filter(is_active=True)\
+                .filter(department__name=_b2c)
+
             categories = models.AccessoriesCategory.objects\
                 .filter(is_active=True)\
                 .filter(department__name=_b2c)\
@@ -68,6 +72,7 @@ def census(request, pk):
                 'house': house,
                 'address_id': pk,
                 'guid': guid,
+                'products': products,
                 'categories': categories,
                 'depart': depart
             }
@@ -77,12 +82,18 @@ def census(request, pk):
 def load_data(request):
     """Запись результатов Сенсуса"""
 
-    form = valid_data(request)
-    if form:
-        return render(request, 'census/ready_census.html')
-    else:
-        return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
-    # дописать валидацию и сохранение в БД
+    try:
+        models.Census.objects.get(address_id=request.POST.get('address_id'))
+        return render(request, 'census/exist_census.html')
+
+    except models.Census.DoesNotExist:
+        form = valid_data(request)
+
+        if form:
+            return render(request, 'census/ready_census.html')
+        else:
+            return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
+        # дописать валидацию и сохранение в БД
 
 
 def get_partners(request):
