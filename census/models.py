@@ -5,7 +5,6 @@ from tasks.models import Partner, Result, Task
 
 # Create your models here.
 
-
 class Department(models.Model):
     is_active = models.BooleanField(verbose_name="Активность", default=False)
     name = models.CharField(verbose_name="Имя", max_length=20)
@@ -249,81 +248,9 @@ def get_default_task():
     return Task.objects.get(number="00000000001")
 
 
-class Census(models.Model):
-
-    address_id = models.PositiveBigIntegerField(verbose_name="ID адреса в 1С")
-    department = models.ForeignKey(Department, verbose_name="Подразделение", on_delete=models.PROTECT, default=None)
-    address = models.CharField(verbose_name="Адрес", max_length=2000, blank=True, null=True)
-    name = models.CharField(verbose_name="Название", max_length=1000, blank=True, null=True)
-    point_name = models.CharField(max_length=1000, verbose_name="Вывеска", blank=True, null=True,
-                                  default=None)
-    point_type = models.ForeignKey(PointTypes, on_delete=models.PROTECT, verbose_name="Тип", blank=True, null=True,
-                                   default=None)
-    vector = models.ManyToManyField(PointVectors, verbose_name="Направленность", blank=True, default=None)
-    other_vector = models.CharField(verbose_name="Другое направление", max_length=1000, blank=True, null=True,
-                                    default=None)
-    nets = models.BooleanField(verbose_name="Сетевой", default=False)
-    sto_type = models.ForeignKey(STOTypeList, on_delete=models.PROTECT, verbose_name="Тип СТО", blank=True, null=True)
-    category = models.ForeignKey(PointCategory, on_delete=models.PROTECT, verbose_name="Категория", blank=True, null=True,
-                                 default=None)
-    cars = models.ManyToManyField(CarsList, verbose_name="Автомобили обслуживают", blank=True, default=None)
-    oils = models.ManyToManyField(OilList, verbose_name="Масла используют", blank=True, default=None)
-    providers = models.ManyToManyField(ProviderList, verbose_name="Основные поставщики", blank=True, default=None)
-    filters = models.ManyToManyField(FilterList, verbose_name="Фильтры используют", blank=True, default=None)
-    accessories_category = models.ForeignKey(AccessoriesCategory, verbose_name="Категории аксессуаров",
-                                             on_delete=models.PROTECT, blank=True, default=None, null=True)
-    accessories_brands = models.ManyToManyField(AccessoriesCategoryItem, verbose_name="Бренды аксессуаров", blank=True,
-                                                default=None)
-    elevators_count = models.PositiveIntegerField(verbose_name="Количество подъемников", default=0, null=True,
-                                                  blank=True)
-    oil_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
-    lukoil_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
-    rowe_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
-    motul_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
-    vitex_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
-    decision_firstname = models.CharField(max_length=2000, verbose_name="Фамилия", null=True, blank=True)
-    decision_lastname = models.CharField(max_length=2000, verbose_name="Имя", null=True, blank=True)
-    decision_surname = models.CharField(max_length=2000, verbose_name="Отчество", null=True, blank=True)
-    decision_email = models.EmailField(verbose_name="ЛПР_email", null=True, blank=True)
-    decision_phone = models.CharField(verbose_name="Телефон", max_length=20, null=True, blank=True)
-    decision_function = models.CharField(verbose_name="Должность", max_length=300, null=True, blank=True)
-    other_brand = models.TextField(verbose_name="Другие бренды аксессуаров", blank=True, null=True)
-    akb_specify = models.BooleanField(default=False, verbose_name="Специализированная точка по АКБ?")
-    working = models.ForeignKey(Partner, on_delete=models.PROTECT, verbose_name="Контрагент в 1С", blank=True,
-                                null=True)
-    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
-    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
-    edited = models.BooleanField(default=False)
-    result = models.ForeignKey(Result, on_delete=models.SET_NULL, verbose_name="Результат встречи", null=True,
-                               blank=True, default=None)
-    other_providers = models.CharField(max_length=1000, verbose_name="Другие поставщики", blank=True, null=True,
-                                       default=None)
-    task = models.CharField(verbose_name='Номер задачи', null=True, blank=True, max_length=1000)
-    inn = models.CharField(verbose_name="ИНН", max_length=12, blank=True, null=True, default=None)
-    volume = models.ManyToManyField(VolumeItem, blank=True, related_name='census_volumes')
-    equipment = models.ManyToManyField(EquipmentList, related_name='census_equipments', blank=True, default=None)
-    organizations_name = models.CharField(verbose_name="Название организации", max_length=2000, blank=True, null=True)
-    tender = models.BooleanField(verbose_name="Тендер", default=False)
-    closing = models.BooleanField(verbose_name="Точка закрыта", default=False)
-    not_communicate = models.BooleanField(verbose_name="Нет коммуникации", default=False)
-    position = models.CharField(verbose_name="Местоположение", max_length=100, blank=True, null=True)
-    dadata = models.ForeignKey('CompanyDatabase', on_delete=models.SET_NULL, blank=True, null=True,
-                               default=None)
-    vectors = models.ManyToManyField(PointVectorsItem, blank=True, default=None, related_name='census_vectors')
-    b2b = models.ForeignKey("B2BOthers", on_delete=models.CASCADE, blank=True, null=True, default=None)
-
-    class Meta:
-        verbose_name = "Сенсус"
-        verbose_name_plural = "Сенсусы"
-        ordering = ['-created_date']
-
-    def __str__(self):
-        return f"{self.address_id}"
-
-
 class CensusFiles(models.Model):
 
-    census = models.ForeignKey(Census, on_delete=models.CASCADE, verbose_name='Сенсус', related_name="files")
+    census = models.ForeignKey("Census", on_delete=models.CASCADE, verbose_name='Сенсус', related_name="files")
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     file = models.FileField(upload_to=f"uploads/", blank=True, null=True)
     edited = models.BooleanField(default=False)
@@ -418,7 +345,81 @@ class CompanyDatabase(models.Model):
         ordering = ['-created_date']
 
 
-class B2BOthers(models.Model):
-    equipment = models.CharField(verbose_name="Другой парк техники", max_length=200)
+class Others(models.Model):
+    census = models.ForeignKey("Census", on_delete=models.CASCADE, related_name='census_others')
+    equipment = models.CharField(max_length=2000, null=True, blank=True, default=None)
+    vector = models.CharField(max_length=2000, null=True, blank=True, default=None)
+    access_brand = models.CharField(max_length=2000, null=True, blank=True, default=None)
+    providers = models.CharField(max_length=2000, null=True, blank=True, default=None)
+    volume_name = models.CharField(max_length=2000, null=True, blank=True, default=None)
+    volume_value = models.CharField(max_length=2000, null=True, blank=True, default=None)
+
+
+class Census(models.Model):
+
+    address_id = models.PositiveBigIntegerField(verbose_name="ID адреса в 1С")
+    department = models.ForeignKey(Department, verbose_name="Подразделение", on_delete=models.PROTECT, default=None)
+    address = models.CharField(verbose_name="Адрес", max_length=2000, blank=True, null=True)
+    name = models.CharField(verbose_name="Название", max_length=1000, blank=True, null=True)
+    point_name = models.CharField(max_length=1000, verbose_name="Вывеска", blank=True, null=True,
+                                  default=None)
+    point_type = models.ForeignKey(PointTypes, on_delete=models.PROTECT, verbose_name="Тип", blank=True, null=True,
+                                   default=None)
+    # vector = models.ManyToManyField(PointVectors, verbose_name="Направленность", blank=True, default=None)
+    nets = models.BooleanField(verbose_name="Сетевой", default=False)
+    sto_type = models.ForeignKey(STOTypeList, on_delete=models.PROTECT, verbose_name="Тип СТО", blank=True, null=True)
+    category = models.ForeignKey(PointCategory, on_delete=models.PROTECT, verbose_name="Категория", blank=True, null=True,
+                                 default=None)
+    cars = models.ManyToManyField(CarsList, verbose_name="Автомобили обслуживают", blank=True, default=None)
+    oils = models.ManyToManyField(OilList, verbose_name="Масла используют", blank=True, default=None)
+    providers = models.ManyToManyField(ProviderList, verbose_name="Основные поставщики", blank=True, default=None)
+    filters = models.ManyToManyField(FilterList, verbose_name="Фильтры используют", blank=True, default=None)
+    accessories_category = models.ForeignKey(AccessoriesCategory, verbose_name="Категории аксессуаров",
+                                             on_delete=models.PROTECT, blank=True, default=None, null=True)
+    accessories_brands = models.ManyToManyField(AccessoriesCategoryItem, verbose_name="Бренды аксессуаров", blank=True,
+                                                default=None)
+    elevators_count = models.PositiveIntegerField(verbose_name="Количество подъемников", default=0, null=True,
+                                                  blank=True)
+    oil_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
+    lukoil_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
+    rowe_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
+    motul_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
+    vitex_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
+    decision_firstname = models.CharField(max_length=2000, verbose_name="Фамилия", null=True, blank=True)
+    decision_lastname = models.CharField(max_length=2000, verbose_name="Имя", null=True, blank=True)
+    decision_surname = models.CharField(max_length=2000, verbose_name="Отчество", null=True, blank=True)
+    decision_email = models.EmailField(verbose_name="ЛПР_email", null=True, blank=True)
+    decision_phone = models.CharField(verbose_name="Телефон", max_length=20, null=True, blank=True)
+    decision_function = models.CharField(verbose_name="Должность", max_length=300, null=True, blank=True)
+    akb_specify = models.BooleanField(default=False, verbose_name="Специализированная точка по АКБ?")
+    working = models.ForeignKey(Partner, on_delete=models.PROTECT, verbose_name="Контрагент в 1С", blank=True,
+                                null=True)
+    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    edited = models.BooleanField(default=False)
+    result = models.ForeignKey(Result, on_delete=models.SET_NULL, verbose_name="Результат встречи", null=True,
+                               blank=True, default=None)
+    task = models.CharField(verbose_name='Номер задачи', null=True, blank=True, max_length=1000)
+    inn = models.CharField(verbose_name="ИНН", max_length=12, blank=True, null=True, default=None)
+    volume = models.ManyToManyField(VolumeItem, blank=True, related_name='census_volumes')
+    equipment = models.ManyToManyField(EquipmentList, related_name='census_equipments', blank=True, default=None)
+    organizations_name = models.CharField(verbose_name="Название организации", max_length=2000, blank=True, null=True)
+    tender = models.BooleanField(verbose_name="Тендер", default=False)
+    closing = models.BooleanField(verbose_name="Точка закрыта", default=False)
+    not_communicate = models.BooleanField(verbose_name="Нет коммуникации", default=False)
+    position = models.CharField(verbose_name="Местоположение", max_length=100, blank=True, null=True)
+    dadata = models.ForeignKey('CompanyDatabase', on_delete=models.SET_NULL, blank=True, null=True,
+                               default=None)
+    vectors = models.ManyToManyField(PointVectorsItem, blank=True, default=None, related_name='census_vectors')
+    others = models.ForeignKey("Others", on_delete=models.CASCADE, blank=True, null=True, default=None,
+                               related_name='census_others')
+
+    class Meta:
+        verbose_name = "Сенсус"
+        verbose_name_plural = "Сенсусы"
+        ordering = ['-created_date']
+
+    def __str__(self):
+        return f"{self.address_id}"
 
 

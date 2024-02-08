@@ -87,13 +87,13 @@ def load_data(request):
         return render(request, 'census/exist_census.html')
 
     except models.Census.DoesNotExist:
+
         form = valid_data(request)
 
         if form:
             return render(request, 'census/ready_census.html')
         else:
             return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
-        # дописать валидацию и сохранение в БД
 
 
 def get_partners(request):

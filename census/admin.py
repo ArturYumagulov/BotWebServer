@@ -12,12 +12,46 @@ from .models import Census
 class CensusAdmin(admin.ModelAdmin):
     list_display = ('address_id', 'address', 'name', 'closing', 'created_date', 'edit_date', 'get_task_worker')
     readonly_fields = ('created_date', 'edit_date')
-    fields = ('closing', 'not_communicate', 'department', 'address_id', 'created_date', 'edit_date', 'point_name',
-              'point_type', 'category', 'providers', 'vector', 'nets', 'sto_type', 'cars', 'oils', 'filters',
-              'accessories_category', 'accessories_brands', 'elevators_count', 'oil_debit', 'lukoil_debit',
-              'rowe_debit', 'motul_debit', 'decision_firstname', 'decision_lastname', 'decision_surname',
-              'decision_email', 'decision_phone', 'decision_function', 'other_brand', 'akb_specify', 'working',
-              'result', 'task', 'volume', 'equipment', 'tender', 'position', 'dadata', 'vectors')
+    fields = ('closing',
+              'not_communicate',
+              'department',
+              'address_id',
+              'created_date',
+              'edit_date',
+              'point_name',
+              'point_type',
+              'category',
+              'providers',
+              'nets',
+              'sto_type',
+              'cars',
+              'oils',
+              'filters',
+              'accessories_category',
+              'accessories_brands',
+              'elevators_count',
+              'oil_debit',
+              'lukoil_debit',
+              'rowe_debit',
+              'motul_debit',
+              'decision_firstname',
+              'decision_lastname',
+              'decision_surname',
+              'decision_email',
+              'decision_phone',
+              'decision_function',
+              'akb_specify',
+              'working',
+              'result',
+              'task',
+              'volume',
+              'equipment',
+              'tender',
+              'position',
+              'dadata',
+              'vectors',
+              'others'
+              )
 
     def get_task_worker(self, obj):
         try:

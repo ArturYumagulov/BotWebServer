@@ -97,22 +97,9 @@ def get_integer_valid(item, data_item, value):
             data_item.value = 0
     return data_item.value
 
-#b2b
-#  <QueryDict: {'working': [''], 'inn': ['1616011428'], 'organizations_name': ['ИП ООО'],
-#  'point_name': ['Motul'], 'category': ['5', '6'], 'vectors': ['12', '10', '11', '4', '6'], 'maslo': ['1'],
-#  'filtry': ['4'], 'akb': ['7'], 'soj': ['8'], 'other_vector': [''], 'equipment': ['1', '2', '3', '4'],
-#  'equipment_4': ['ываыва'], 'providers': ['4', '5', '3'], 'volume': ['1', '2', '3', '4'],
-#  'other_volume_name_4': ['ываыва'], 'volume_4': ['1'], 'volume_3': ['2'], 'volume_2': ['3'],
-#  'volume_1': ['4'], 'decision_fio': ['Пупкин Вася'], 'decision_email': ['zico.13288@gmail.com'],
-#  'decision_phone': ['89999999995'], 'decision_function': ['Директор'], 'tender': ['1'], 'other_providers': ['ХЗ'],
-#  'result': ['000000068'], 'control_date': [''], 'result_comment': ['тест_комм'], 'address_id': ['14'],
-#  'address': ['Казань, Калинина, 15к1'], 'depart': ['b2b'], 'name': ['Под мостом'],
-#  'csrfmiddlewaretoken': ['MjpH1b5n7Xl9lU15HClXUtJBRiO5bkWvGQmBOrugabjgTJ833SH0gH11PrJqosci'],
-#  'guid': ['00000000002'], 'position': ['55.796289,49.108795']}>
-
 
 def valid_data(request):
-
+    _other_name = "Другое"
     request_files = request.FILES
     request = request.POST
     new_census = models.Census()
@@ -267,16 +254,29 @@ def valid_data(request):
 
             new_census.tender = request.get('tender')
 
-            try:
-                other_eq = models.EquipmentList.objects.get(name="Другое")
-            except models.EquipmentList.DoesNotExist:
-                return None
-
-            if request.get(f"equipment_{other_eq.pk}"):
-                other = models.B2BOthers.objects.create(equipment=request.get(f"equipment_{other_eq.pk}"))
-                new_census.b2b = other
-
             new_census.save()
+
+            # Others
+            new_others = models.Others.objects.create(census=new_census)
+            try:
+                other_eq = models.EquipmentList.objects.get(name=_other_name)
+                new_others.equipment = request.get(f"equipment_{other_eq.pk}")
+            except models.EquipmentList.DoesNotExist:
+                new_others.equipment = None
+
+            try:
+                other_volume = models.Volume.objects.get(name=_other_name)
+                new_others.volume_name = request.get(f'other_volume_name_{other_volume.pk}')
+                new_others.volume_value = request.get(f'volume_{other_volume.pk}')
+            except models.Volume.DoesNotExist:
+                new_others.volume_name = None
+                new_others.volume_value = None
+
+            new_others.providers = request.get('other_providers')
+            new_others.vector = request.get('other_vector')
+            new_others.save()
+
+            new_census.others = new_others
 
             #  сохранение направления
             for vector in models.PointVectors.objects.filter(pk__in=request.getlist('vectors')):
@@ -303,9 +303,6 @@ def valid_data(request):
 
             m2m_save(new_census.equipment, models.EquipmentList.objects.filter(pk__in=request.getlist('equipment')))
 
-        new_census.other_vector = request.get('other_vector')
-        new_census.other_providers = request.get('other_providers')
-
         new_census.decision_firstname = request.get('firstname')
         new_census.decision_lastname = request.get('lastname')
         new_census.decision_surname = request.get('surname')
@@ -317,7 +314,7 @@ def valid_data(request):
         m2m_save(new_census.providers, models.ProviderList.objects.filter(pk__in=request.getlist('providers')))
         m2m_save(new_census.oils, models.OilList.objects.filter(pk__in=request.getlist('oils')))
         m2m_save(new_census.filters, models.FilterList.objects.filter(pk__in=request.getlist('filters')))
-        m2m_save(new_census.vector, models.PointVectors.objects.filter(pk__in=request.getlist('vectors')))
+        m2m_save(new_census.vectors, models.PointVectorsItem.objects.filter(pk__in=request.getlist('vectors')))
 
         new_census.save()
 

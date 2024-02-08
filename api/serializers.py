@@ -1,31 +1,24 @@
-from django.utils import timezone
-
-import pytz
 from rest_framework import serializers
 
-from django.conf import settings
 
-from census.models import Census, CarsList, OilList, ProviderList, FilterList, AccessoriesCategoryItem, \
-    AccessoriesCategory, PointTypes, PointVectors, STOTypeList, PointCategory, CensusFiles, CompanyDatabase, VolumeItem, \
-    Volume, EquipmentList, Department, PointVectorsItem
-from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerComments, Result, PartnerWorker, \
-    ResultGroup, ResultData, Supervisor  # noqa
+from census import models as census_models
+from tasks import models as task_models  # noqa
 
 
 class AuthorCommentsSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = AuthorComments
+        model = task_models.AuthorComments
         fields = '__all__'
 
     def create(self, validated_data):
-        return AuthorComments.objects.create(**validated_data)
+        return task_models.AuthorComments.objects.create(**validated_data)
 
 
 class WorkerCommentsSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = WorkerComments
+        model = task_models.WorkerComments
         fields = '__all__'
 
     def create(self, validated_data):
@@ -35,18 +28,18 @@ class WorkerCommentsSerializer(serializers.ModelSerializer):
 class WorkerSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Worker
+        model = task_models.Worker
         fields = "__all__"
 
 
 class SupervisorSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Supervisor
+        model = task_models.Supervisor
         fields = "__all__"
 
     def create(self, validated_data):
-        return Supervisor.objects.create(**validated_data)
+        return task_models.Supervisor.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.code = validated_data.get('code', instance.code)
@@ -61,11 +54,11 @@ class SupervisorSerializer(serializers.ModelSerializer):
 class PartnerSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Partner
+        model = task_models.Partner
         fields = ('code', 'name', 'inn')
 
     def create(self, validated_data):
-        return Partner.objects.create(**validated_data)
+        return task_models.Partner.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.code = validated_data.get('code', instance.code)
@@ -79,21 +72,21 @@ class PartnerSerializer(serializers.ModelSerializer):
 class PartnerWorkerSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = PartnerWorker
+        model = task_models.PartnerWorker
         fields = "__all__"
 
     def create(self, validated_data):
-        return PartnerWorker.objects.create(**validated_data)
+        return task_models.PartnerWorker.objects.create(**validated_data)
 
 
 class BasicSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Basics
+        model = task_models.Basics
         fields = "__all__"
 
     def create(self, validated_data):
-        return Basics.objects.create(**validated_data)
+        return task_models.Basics.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.number = validated_data.get('number', instance.number)
@@ -107,21 +100,21 @@ class BasicSerializer(serializers.ModelSerializer):
 class ResultGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = ResultGroup
+        model = task_models.ResultGroup
         fields = "__all__"
 
 
 class ResultDataSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = ResultData
+        model = task_models.ResultData
         fields = "__all__"
 
 
 class ResultSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Result
+        model = task_models.Result
         fields = "__all__"
 
 
@@ -135,11 +128,11 @@ class TaskSerializer(serializers.ModelSerializer):
     author_comments = AuthorCommentsSerializer(read_only=True)
 
     class Meta:
-        model = Task
+        model = task_models.Task
         fields = '__all__'
 
     def create(self, validated_data):
-        task = Task.objects.create(**validated_data)
+        task = task_models.Task.objects.create(**validated_data)
 
         return task
 
@@ -174,7 +167,7 @@ class TaskListSerializer(serializers.ModelSerializer):
     result = ResultSerializer()
 
     class Meta:
-        model = Task
+        model = task_models.Task
         fields = '__all__'
 
 
@@ -186,7 +179,7 @@ class AllTaskListSerializer(serializers.ModelSerializer):
     result = ResultSerializer(read_only=True)
 
     class Meta:
-        model = Task
+        model = task_models.Task
         fields = '__all__'
 
     def update(self, instance, validated_data):
@@ -199,28 +192,28 @@ class AllTaskListSerializer(serializers.ModelSerializer):
 class AccessoriesCategoryItemSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = AccessoriesCategoryItem
+        model = census_models.AccessoriesCategoryItem
         fields = ('name',)
 
 
 class PointVectorsSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = PointVectors
+        model = census_models.PointVectors
         fields = ('name',)
 
 
 class CensusFilesSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = CensusFiles
+        model = census_models.CensusFiles
         fields = ('file',)
 
 
 class DadataSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = CompanyDatabase
+        model = census_models.CompanyDatabase
         fields = '__all__'
 
 
@@ -229,7 +222,7 @@ class VolumeItemSerializer(serializers.ModelSerializer):
     volume = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
-        model = VolumeItem
+        model = census_models.VolumeItem
         fields = ('volume', 'value')
 
 
@@ -239,8 +232,14 @@ class PointVectorItemsSerializer(serializers.ModelSerializer):
     vectors = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
-        model = PointVectorsItem
+        model = census_models.PointVectorsItem
         fields = ('vectors', 'value',)
+
+
+class OtherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = census_models.Others
+        fields = ("equipment", "volume_name", "volume_value", 'vector', 'access_brand', 'providers')
 
 
 class CensusSerializer(serializers.ModelSerializer):
@@ -251,7 +250,6 @@ class CensusSerializer(serializers.ModelSerializer):
     filters = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
     accessories_brands = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
     point_type = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    vector = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
     sto_type = serializers.SlugRelatedField(slug_field='name', read_only=True)
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
     accessories_category = serializers.SlugRelatedField(slug_field='name', read_only=True)
@@ -261,9 +259,10 @@ class CensusSerializer(serializers.ModelSerializer):
     dadata = DadataSerializer()
     volume = VolumeItemSerializer(many=True)
     vectors = PointVectorItemsSerializer(many=True)
+    others = OtherSerializer()
 
     class Meta:
-        model = Census
+        model = census_models.Census
         fields = [
             'department',
             'closing',
@@ -289,7 +288,6 @@ class CensusSerializer(serializers.ModelSerializer):
             'decision_email',
             'decision_phone',
             'decision_function',
-            'other_brand',
             'akb_specify',
             'working',
             'task',
@@ -297,7 +295,6 @@ class CensusSerializer(serializers.ModelSerializer):
             'accessories_brands',
             'accessories_category',
             'category',
-            'vector',
             'equipment',
             'filters',
             'point_type',
@@ -307,5 +304,6 @@ class CensusSerializer(serializers.ModelSerializer):
             'result',
             'dadata',
             'volume',
-            'vectors'
+            'vectors',
+            'others'
         ]

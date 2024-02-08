@@ -171,8 +171,5 @@ class MySeleniumTests(StaticLiveServerTestCase):
             item.send_keys(self.test_comment)
             self.assertEqual(self.invalid_class in item.get_attribute('class').split(' '), True)
 
-
         time.sleep(60)
-
-
-
+у

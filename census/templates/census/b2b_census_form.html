@@ -148,6 +148,14 @@
             <select class="form-select multiple mb-3" name="volume" id="volumeId" required data-placeholder="Объем потребления?" multiple data-url="{% url 'get_volume_data' %}">
             </select>
         </div>
+
+    {#        Другой поставщик #}
+        <div class="form-floating mb-3" id="otherProvDivId" style="display: none;">
+            <input class="form-control" id="otherProvId" type="text" name="other_providers" placeholder="Какие другие поставщики?"
+            aria-describedby="otherProvIdFeedback">
+            <label for="otherId">Какие другие поставщики?</label>
+            <div id="otherProvIdFeedback" class="invalid-feedback">Напишите других поставщиков торговой точки</div>
+        </div>
 {#Контактное лицо?------------------------------------------#}
         <p class="text-start">Контактное лицо?</p>
         <div class="form-floating mb-3" id="firstnameId">
@@ -210,14 +218,6 @@
                 <option value="0">Нет</option>
             </select>
             <div id="tenderFeedback" class="invalid-feedback">Работает по тендеру?</div>
-        </div>
-
-{#        Другой поставщик #}
-        <div class="form-floating mb-3" id="otherProvDivId" style="display: none;">
-            <input class="form-control" id="otherProvId" type="text" name="other_providers" placeholder="Какие другие поставщики?"
-            aria-describedby="otherProvIdFeedback">
-            <label for="otherId">Какие другие поставщики?</label>
-            <div id="otherProvIdFeedback" class="invalid-feedback">Напишите других поставщиков торговой точки</div>
         </div>
 
         <div class="mb-3" id="controlDiv" style="display: block">
