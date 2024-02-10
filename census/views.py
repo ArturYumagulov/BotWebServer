@@ -82,18 +82,21 @@ def census(request, pk):
 def load_data(request):
     """Запись результатов Сенсуса"""
 
-    try:
-        models.Census.objects.get(address_id=request.POST.get('address_id'))
-        return render(request, 'census/exist_census.html')
+    if request.method == "POST":
+        try:
+            models.Census.objects.get(address_id=request.POST.get('address_id'))
+            return render(request, 'census/exist_census.html')
 
-    except models.Census.DoesNotExist:
+        except models.Census.DoesNotExist:
 
-        form = valid_data(request)
+            form = valid_data(request)
 
-        if form:
-            return render(request, 'census/ready_census.html')
-        else:
-            return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
+            if form:
+                return render(request, 'census/ready_census.html')
+            else:
+                return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
+
+    return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
 
 
 def get_partners(request):

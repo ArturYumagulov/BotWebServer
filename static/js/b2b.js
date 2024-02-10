@@ -195,6 +195,9 @@
                 let other = document.getElementById('otherVectorId')
                 other.style.display = 'block'
                 other.children[0].setAttribute('required', '')
+                other.children[0].classList.remove('is-valid')
+                other.children[0].classList.add('is-invalid')
+                console.log('test')
             } else if (element.text !== "Другое") {
                 let select = document.getElementById(`${category}_load`).children[1]
                 select.setAttribute('required', '')
@@ -222,6 +225,8 @@
             if (element.text === "Другое") {
                 let other = document.getElementById('otherVectorId')
                 other.children[0].removeAttribute('required')
+                other.children[0].classList.remove('is-valid')
+                other.children[0].classList.add('is-invalid')
                 other.children[0].value = ""
                 other.style.display = 'none'
             } else if (element.text !== "Другое") {
@@ -422,7 +427,7 @@
         floatFormValid('decisionMakerPhoneId',  false, true, false)
         floatFormValid('decisionMakerFunctionId', false)
         floatFormValid('otherProvId', false)
-        floatFormValid( 'otherVectorInputId', false)
+        floatFormValid( 'otherVectorInputId', true)
         floatFormValid('resultCommentId', false)
 
 
