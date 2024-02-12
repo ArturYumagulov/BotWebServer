@@ -77,6 +77,8 @@ def census(request, pk):
                 'depart': depart
             }
             return render(request, 'census/b2c_census_form.html', context)
+        else:
+            return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
 
 
 def load_data(request):

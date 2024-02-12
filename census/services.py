@@ -195,6 +195,22 @@ def valid_data(request):
 
         new_census.category = models.PointCategory.objects.get(pk=request.get('category'))
 
+        #  сохранение направления
+        for vector in models.PointVectors.objects.filter(pk__in=request.getlist('vectors')):
+
+            if request.getlist(vector.slug):
+                new_vector_item = models.PointVectorsItem.objects.create(
+                    census=new_census,
+                    vectors=vector,
+                )
+                for vector_pk in request.getlist(vector.slug):
+                    new_value = models.PointVectorsSelectItem.objects.get(pk=vector_pk)
+                    new_vector_item.value.add(new_value)
+                for new_vector in models.PointVectorsItem.objects.filter(census__pk=new_census.pk):
+                    new_census.vectors.add(new_vector)
+
+            new_census.save()
+
         if request.get('depart') == _b2c:  # B2C
             new_census.b2b = None
             new_census.nets = request.get('nets')
@@ -210,8 +226,6 @@ def valid_data(request):
 
             if request.get('sto_type') is not None:
                 new_census.sto_type = models.STOTypeList.objects.get(pk=request.get('sto_type'))
-            else:
-                pass
 
             if request.get('accessories_category') is not None:
                 new_census.accessories_category = models.AccessoriesCategory.objects.get(
@@ -241,6 +255,12 @@ def valid_data(request):
             try:
                 if isinstance(int(request.get('motul_debit')), int):
                     new_census.motul_debit = request.get('motul_debit')
+            except ValueError:
+                new_census.motul_debit = 0
+
+            try:
+                if isinstance(int(request.get('vitex_debit')), int):
+                    new_census.motul_debit = request.get('vitex_debit')
             except ValueError:
                 new_census.motul_debit = 0
 
@@ -279,18 +299,18 @@ def valid_data(request):
             new_census.others = new_others
 
             #  сохранение направления
-            for vector in models.PointVectors.objects.filter(pk__in=request.getlist('vectors')):
-
-                if request.getlist(vector.slug):
-                    new_vector_item = models.PointVectorsItem.objects.create(
-                        census=new_census,
-                        vectors=vector,
-                    )
-                    for vector_pk in request.getlist(vector.slug):
-                        new_value = models.PointVectorsSelectItem.objects.get(pk=vector_pk)
-                        new_vector_item.value.add(new_value)
-                    for new_vector in models.PointVectorsItem.objects.filter(census__pk=new_census.pk):
-                        new_census.vectors.add(new_vector)
+            # for vector in models.PointVectors.objects.filter(pk__in=request.getlist('vectors')):
+            #
+            #     if request.getlist(vector.slug):
+            #         new_vector_item = models.PointVectorsItem.objects.create(
+            #             census=new_census,
+            #             vectors=vector,
+            #         )
+            #         for vector_pk in request.getlist(vector.slug):
+            #             new_value = models.PointVectorsSelectItem.objects.get(pk=vector_pk)
+            #             new_vector_item.value.add(new_value)
+            #         for new_vector in models.PointVectorsItem.objects.filter(census__pk=new_census.pk):
+            #             new_census.vectors.add(new_vector)
 
             #  сохранение объема
             for volume in request.getlist('volume'):

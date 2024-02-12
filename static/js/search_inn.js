@@ -75,7 +75,9 @@ function LoadInnSearchBlock(url, event) {
                         results_list.forEach((item) => {
                             item.addEventListener('click', () => {
                                 active_check.checked = true
-                                document.getElementById('communicateCheckbox').setAttribute('disabled', '')
+                                try {
+                                    document.getElementById('communicateCheckbox').setAttribute('disabled', '')
+                                } catch (TypeError) {}
                                 document.getElementById('closeCheckbox').setAttribute('disabled', '')
                                 HideSearchBlock(true)
                                 let items = document.querySelectorAll('.list-group-item.result-inn')
@@ -192,7 +194,10 @@ function checkHiddenSearchObjects(check_obj_id, hidden_id, input_id=null, org_hi
     item.addEventListener('change', function () {
         if (this.checked) {
             // console.log(communicate)
-            communicate.setAttribute('disabled', '')
+            try {
+                communicate.setAttribute('disabled', '')
+            } catch (TypeError) {}
+
             closing.setAttribute('disabled', '')
             hidden_item.style.display = 'block'
             hidden_item.setAttribute('required', '')
@@ -215,7 +220,9 @@ function checkHiddenSearchObjects(check_obj_id, hidden_id, input_id=null, org_hi
                 }
             })
         } else {
-            communicate.removeAttribute('disabled')
+            try {
+                communicate.removeAttribute('disabled')
+            } catch (TypeError) {}
             closing.removeAttribute('disabled')
             hidden_item.style.display = 'none'
             search_place.style.display = 'none'
