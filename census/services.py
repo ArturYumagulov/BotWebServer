@@ -219,6 +219,8 @@ def valid_data(request):
                 for new_vector in models.PointVectorsItem.objects.filter(census__pk=new_census.pk):
                     new_census.vectors.add(new_vector)
 
+            new_census.save()
+
         if request.get('depart') == _b2c:  # B2C
 
             new_census.nets = request.get('nets')
@@ -229,6 +231,13 @@ def valid_data(request):
 
             if request.get('sto_type') is not None:
                 new_census.sto_type = models.STOTypeList.objects.get(pk=request.get('sto_type'))
+
+            if request.get('accessories_category') is not None:
+                new_census.accessories_category = models.AccessoriesCategory.objects.get(
+                    pk=request.get('accessories_category')
+                )
+            else:
+                pass
 
             try:
                 if isinstance(int(request.get('oil_debit')), int):

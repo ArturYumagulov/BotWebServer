@@ -297,6 +297,7 @@
                 other.children[0].value = ""
                 other.style.display = 'none'
             } else if (element.text === "Масло") {
+<<<<<<< HEAD
                 DelOilsItem()
 
                 try {
@@ -308,6 +309,29 @@
                 } catch (TypeError) {}
 
             } else if (element.text !== "Другое") {
+=======
+                oilDebt.style.display = 'none'
+                oilDebtInput.removeAttribute('required')
+                roweDebt.style.display = 'none'
+                roweDebtInput.removeAttribute('required')
+                motulDebt.style.display = 'none'
+                motulDebtInput.removeAttribute('required')
+                lukoilDebt.style.display = 'none'
+                lukoilDebtInput.removeAttribute('required')
+                vitexDebt.style.display = 'none'
+                vitexDebtInput.removeAttribute('required')
+                try {
+                    document.getElementById('maslo_load').style.display = 'none';
+                    let select = document.getElementById(`maslo_load`).children[1]
+                    for (let i = select.options.length - 1; i >= 0; i--) {
+                        console.log(select.options[i])
+                        select.options[i].remove()
+                    }
+                } catch (TypeError) {}
+
+            } else if (element.text !== "Другое") {
+                console.log(element.text)
+>>>>>>> 085bcd5aba228142c045b84e15ed291dc237fb81
                 let select = document.getElementById(`${category}_load`).children[1]
                 select.parentNode.style.display = 'block'
                 for (let i = select.options.length - 1; i >= 0; i--) {
@@ -408,9 +432,25 @@
         let point_type = document.getElementById('pointTypeID')
         point_type.addEventListener('change', () => {
             if (point_type.options[point_type.selectedIndex].innerHTML === 'Магазин') {
+<<<<<<< HEAD
                 DelOilsItem();
         }
         })
+=======
+                oilDebt.style.display = 'none'
+                oilDebtInput.removeAttribute('required')
+                roweDebt.style.display = 'none'
+                roweDebtInput.removeAttribute('required')
+                motulDebt.style.display = 'none'
+                motulDebtInput.removeAttribute('required')
+                lukoilDebt.style.display = 'none'
+                lukoilDebtInput.removeAttribute('required')
+                vitexDebt.style.display = 'none'
+                vitexDebtInput.removeAttribute('required')
+        }
+        })
+
+>>>>>>> 085bcd5aba228142c045b84e15ed291dc237fb81
     }
 
     async function CreateApp(container) {
