@@ -2,7 +2,7 @@ import environ
 
 import requests
 import json
-from tasks.models import Worker, Basics, AuthorComments, WorkerComments, Partner, Task  # noqa
+from tasks.models import Worker, Basics, AuthorComments, WorkerComments, Partner, Task, ResultGroup  # noqa
 
 env = environ.Env()
 environ.Env.read_env('BotWebServer/.env')
@@ -26,7 +26,7 @@ def send_message_bot(request):
     sub_text = f"<b>Комментарий исполнителя:</b> \n" \
                f"{worker_comment.comment}"
 
-    if base.group.code == '000000001':  # Если "Разработка контрагента"
+    if base.group.code == ResultGroup.objects.get(name="Сенсус").code:  # Если "Разработка контрагента"
 
         author_comment_clean = author_comment.comment.split('_')[0]
         link_url = author_comment.comment.split('_')[1]

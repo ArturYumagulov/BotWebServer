@@ -133,7 +133,7 @@
         let response = await fetch(url, {
             headers: {"X-CSRFToken": csrf},
             method: "POST",
-            body: JSON.stringify({department: 'b2b'})
+            body: JSON.stringify({department: depart})
         });
         if (response.ok) {
             let json = await response.json()
@@ -181,7 +181,7 @@
             return fetch(url, {
                 headers: {"X-CSRFToken": csrf},
                 method: "POST",
-                body: JSON.stringify({department: 'b2b'})
+                body: JSON.stringify({department: depart})
             }).then((res) => res.json())
                     .then((data) => {
                         return data})
@@ -245,11 +245,20 @@
         $('#equipmentId').on('select2:select', function (e) {
             let element = e.params.data
             let category_name = this.name
-            if (element.text === "Другое"){
-                let div = createFloatDiv(element, category_name, 'Техника')
-                this.parentNode.insertAdjacentHTML("afterend", div)
-                floatFormValid(`${category_name}_${element.id}`, false, false)
+            if (element.text !== "Другое"){
+            let div = createFloatDiv(element, category_name, 'Количество')
+            this.parentNode.insertAdjacentHTML("afterend", div)
+            floatFormValid(`${category_name}_${element.id}`, false, true)
             }
+            if (element.text === "Другое") {
+                let div_name = createFloatDiv(element, `${category_name}_other_name`, 'Какая техника')
+                let div = createFloatDiv(element, `${category_name}`, 'Количество')
+                this.parentNode.insertAdjacentHTML("afterend", div)
+                this.parentNode.insertAdjacentHTML("afterend", div_name)
+                floatFormValid(`${category_name}_${element.id}`, false, true)
+                floatFormValid(`${category_name}_other_name_${element.id}`, false, false)
+            }
+
         })
 
         $('#equipmentId').on('select2:unselect', function (e) {
@@ -466,6 +475,7 @@
 
             if (valid_list.length > 0) {
                 console.log('invalid')
+                console.log(valid_list)
                 e.preventDefault()
             } else {
                 console.log('valid')

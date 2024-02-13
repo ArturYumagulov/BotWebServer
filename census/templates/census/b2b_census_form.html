@@ -27,6 +27,7 @@
 
     <script>
         let csrf="{{ csrf_token }}";
+        let depart = "{{ depart }}"
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -253,7 +254,7 @@
         </div>
         <input type="hidden" name="address_id" value="{{ address_id }}">
         <input type="hidden" name="address" value="{{ city }}, {{ street }}, {{ house }}">
-        <input type="hidden" name="depart" value="{{ depart }}">
+        <input type="hidden" name="depart" id="depart" value="{{ depart }}">
         <input type="hidden" name="name" value="{{ name }}">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         <input type="hidden" name="guid" value="{{ guid }}">

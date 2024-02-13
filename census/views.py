@@ -1,8 +1,7 @@
 import json
-from django.db.models import Q
 
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 
 from core.tasks import save_organizations
 from tasks.models import Partner, ResultData, PartnerWorker
@@ -15,6 +14,7 @@ from .services import valid_data, DataInnOnRedis
 # departments
 _b2b = 'b2b'
 _b2c = 'b2c'
+_industrial = 'industrial'
 
 
 def template_test(request):
@@ -77,6 +77,8 @@ def census(request, pk):
                 'depart': depart
             }
             return render(request, 'census/b2c_census_form.html', context)
+        else:
+            return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
 
 
 def load_data(request):
@@ -333,7 +335,7 @@ def get_inn(request):
 def get_volume_data(request):
     result = []
     if request.method == "POST":
-        volumes = models.Volume.objects.filter(is_active=True)
+        volumes = models.Volume.objects.filter(is_active=True).filter(department__name=json.loads(request.body)['department'])
         for volume in volumes:
             result.append({'id': volume.pk, 'name': volume.name})
         return JsonResponse(list(result), safe=False)

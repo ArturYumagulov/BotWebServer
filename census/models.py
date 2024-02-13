@@ -221,6 +221,17 @@ class EquipmentList(models.Model):
         verbose_name_plural = "Парк техники"
 
 
+class EquipmentItem(models.Model):
+    census = models.ForeignKey("Census", on_delete=models.CASCADE, blank=True, default=None)
+    equipment = models.ForeignKey(EquipmentList, on_delete=models.CASCADE)
+    value = models.CharField(verbose_name="Значение", max_length=500, default=None)
+    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+
+    def __str__(self):
+        return f"{self.equipment}_{self.value}"
+
+
 class PointVectorsSelectItem(models.Model):
     is_active = models.BooleanField(default=False)
     vectors = models.ForeignKey(PointVectors, on_delete=models.CASCADE)
@@ -347,7 +358,7 @@ class CompanyDatabase(models.Model):
 
 class Others(models.Model):
     census = models.ForeignKey("Census", on_delete=models.CASCADE, related_name='census_others')
-    equipment = models.CharField(max_length=2000, null=True, blank=True, default=None)
+    equipment_name = models.CharField(max_length=2000, null=True, blank=True, default=None)
     vector = models.CharField(max_length=2000, null=True, blank=True, default=None)
     access_brand = models.CharField(max_length=2000, null=True, blank=True, default=None)
     providers = models.CharField(max_length=2000, null=True, blank=True, default=None)
@@ -402,7 +413,7 @@ class Census(models.Model):
     task = models.CharField(verbose_name='Номер задачи', null=True, blank=True, max_length=1000)
     inn = models.CharField(verbose_name="ИНН", max_length=12, blank=True, null=True, default=None)
     volume = models.ManyToManyField(VolumeItem, blank=True, related_name='census_volumes')
-    equipment = models.ManyToManyField(EquipmentList, related_name='census_equipments', blank=True, default=None)
+    equipment = models.ManyToManyField(EquipmentItem, related_name='census_equipments', blank=True, default=None)
     organizations_name = models.CharField(verbose_name="Название организации", max_length=2000, blank=True, null=True)
     tender = models.BooleanField(verbose_name="Тендер", default=False)
     closing = models.BooleanField(verbose_name="Точка закрыта", default=False)

@@ -164,3 +164,8 @@ class PointVectorsItemAdmin(admin.ModelAdmin):
 @admin.register(models.PointVectorsSelectItem)
 class PointVectorsSelectItemAdmin(admin.ModelAdmin):
     pass
+
+
+# @admin.register(models.EquipmentList)
+# class EquipmentListAdmin(admin.ModelAdmin):
+#     pass

@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 _b2b = env('B2B')
 _b2c = env('B2C')
+_industrial = env('INDUSTRIAL')
 
 
 def unix_to_date(unix):
@@ -195,30 +196,39 @@ def valid_data(request):
 
         new_census.category = models.PointCategory.objects.get(pk=request.get('category'))
 
+        new_census.decision_firstname = request.get('firstname')
+        new_census.decision_lastname = request.get('lastname')
+        new_census.decision_surname = request.get('surname')
+        new_census.decision_email = request.get('decision_email')
+        new_census.decision_phone = request.get('decision_phone')
+        new_census.decision_function = request.get('decision_function')
+
+        new_census.save()
+
+        #  сохранение направления
+        for vector in models.PointVectors.objects.filter(pk__in=request.getlist('vectors')):
+
+            if request.getlist(vector.slug):
+                new_vector_item = models.PointVectorsItem.objects.create(
+                    census=new_census,
+                    vectors=vector,
+                )
+                for vector_pk in request.getlist(vector.slug):
+                    new_value = models.PointVectorsSelectItem.objects.get(pk=vector_pk)
+                    new_vector_item.value.add(new_value)
+                for new_vector in models.PointVectorsItem.objects.filter(census__pk=new_census.pk):
+                    new_census.vectors.add(new_vector)
+
         if request.get('depart') == _b2c:  # B2C
-            new_census.b2b = None
+
             new_census.nets = request.get('nets')
             new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
             new_census.other_brand = request.get('other_brand')
 
-            new_census.save()
-
             m2m_save(new_census.cars, models.CarsList.objects.filter(pk__in=request.getlist('cars')))
-            m2m_save(new_census.accessories_brands, models.AccessoriesCategoryItem.objects.filter(
-                pk__in=request.getlist('accessories_brands')
-            ))
 
             if request.get('sto_type') is not None:
                 new_census.sto_type = models.STOTypeList.objects.get(pk=request.get('sto_type'))
-            else:
-                pass
-
-            if request.get('accessories_category') is not None:
-                new_census.accessories_category = models.AccessoriesCategory.objects.get(
-                    pk=request.get('accessories_category')
-                )
-            else:
-                pass
 
             try:
                 if isinstance(int(request.get('oil_debit')), int):
@@ -245,52 +255,52 @@ def valid_data(request):
                 new_census.motul_debit = 0
 
             try:
+                if isinstance(int(request.get('vitex_debit')), int):
+                    new_census.motul_debit = request.get('vitex_debit')
+            except ValueError:
+                new_census.motul_debit = 0
+
+            try:
                 if isinstance(int(request.get('elevators_count')), int):
                     new_census.elevators_count = request.get('elevators_count')
             except ValueError:
                 new_census.elevators_count = 0
 
-        elif request.get('depart') == _b2b:  # B2B
+        elif request.get('depart') == _b2b or request.get('depart') == _industrial:  # B2B
 
             new_census.tender = request.get('tender')
-
-            new_census.save()
 
             # Others
             new_others = models.Others.objects.create(census=new_census)
             try:
                 other_eq = models.EquipmentList.objects.get(name=_other_name)
-                new_others.equipment = request.get(f"equipment_{other_eq.pk}")
+                new_others.equipment_name = request.get(f"equipment_other_name_{other_eq.pk}")
+
             except models.EquipmentList.DoesNotExist:
-                new_others.equipment = None
+                new_others.equipment_name = None
 
             try:
                 other_volume = models.Volume.objects.get(name=_other_name)
                 new_others.volume_name = request.get(f'other_volume_name_{other_volume.pk}')
                 new_others.volume_value = request.get(f'volume_{other_volume.pk}')
+
             except models.Volume.DoesNotExist:
                 new_others.volume_name = None
                 new_others.volume_value = None
 
             new_others.providers = request.get('other_providers')
             new_others.vector = request.get('other_vector')
-            new_others.save()
 
             new_census.others = new_others
+            new_others.save()
 
-            #  сохранение направления
-            for vector in models.PointVectors.objects.filter(pk__in=request.getlist('vectors')):
-
-                if request.getlist(vector.slug):
-                    new_vector_item = models.PointVectorsItem.objects.create(
-                        census=new_census,
-                        vectors=vector,
-                    )
-                    for vector_pk in request.getlist(vector.slug):
-                        new_value = models.PointVectorsSelectItem.objects.get(pk=vector_pk)
-                        new_vector_item.value.add(new_value)
-                    for new_vector in models.PointVectorsItem.objects.filter(census__pk=new_census.pk):
-                        new_census.vectors.add(new_vector)
+            for equipment in request.getlist('equipment'):
+                new_equipment_item = models.EquipmentItem.objects.create(
+                    census=new_census,
+                    equipment=models.EquipmentList.objects.get(pk=equipment),
+                    value=request.get(f'equipment_{equipment}')
+                )
+                new_census.equipment.add(new_equipment_item)
 
             #  сохранение объема
             for volume in request.getlist('volume'):
@@ -300,15 +310,6 @@ def valid_data(request):
                     value=request.get(f'volume_{volume}')
                 )
                 new_census.volume.add(new_volume_item)
-
-            m2m_save(new_census.equipment, models.EquipmentList.objects.filter(pk__in=request.getlist('equipment')))
-
-        new_census.decision_firstname = request.get('firstname')
-        new_census.decision_lastname = request.get('lastname')
-        new_census.decision_surname = request.get('surname')
-        new_census.decision_email = request.get('decision_email')
-        new_census.decision_phone = request.get('decision_phone')
-        new_census.decision_function = request.get('decision_function')
 
         # m2m
         m2m_save(new_census.providers, models.ProviderList.objects.filter(pk__in=request.getlist('providers')))

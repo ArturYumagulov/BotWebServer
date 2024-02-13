@@ -239,7 +239,16 @@ class PointVectorItemsSerializer(serializers.ModelSerializer):
 class OtherSerializer(serializers.ModelSerializer):
     class Meta:
         model = census_models.Others
-        fields = ("equipment", "volume_name", "volume_value", 'vector', 'access_brand', 'providers')
+        fields = ("equipment_name", "volume_name", "volume_value", 'vector', 'access_brand', 'providers')
+
+
+class EquipmentSerializer(serializers.ModelSerializer):
+
+    equipment = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
+    class Meta:
+        model = census_models.EquipmentItem
+        fields = ('equipment', 'value',)
 
 
 class CensusSerializer(serializers.ModelSerializer):
@@ -253,7 +262,7 @@ class CensusSerializer(serializers.ModelSerializer):
     sto_type = serializers.SlugRelatedField(slug_field='name', read_only=True)
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
     accessories_category = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    equipment = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    equipment = EquipmentSerializer(many=True)
     files = CensusFilesSerializer(many=True)
     result = ResultSerializer()
     dadata = DadataSerializer()
