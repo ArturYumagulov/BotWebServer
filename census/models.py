@@ -102,7 +102,7 @@ class OilList(models.Model):
 
 class ProviderList(models.Model):
     is_active = models.BooleanField(default=False, verbose_name="Активность")
-    name = models.CharField(verbose_name="Марка масла", max_length=500)
+    name = models.CharField(verbose_name="Название", max_length=500)
     department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='providers')
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
@@ -424,6 +424,7 @@ class Census(models.Model):
     vectors = models.ManyToManyField(PointVectorsItem, blank=True, default=None, related_name='census_vectors')
     others = models.ForeignKey("Others", on_delete=models.CASCADE, blank=True, null=True, default=None,
                                related_name='census_others')
+    basics = models.CharField(verbose_name='Номер основания', null=True, blank=True, max_length=1000)
 
     class Meta:
         verbose_name = "Сенсус"

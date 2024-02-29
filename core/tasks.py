@@ -117,3 +117,5 @@ def save_organizations(inn):
             if DataInnOnRedis().remove_data(inn):
                 logger.info(f"{inn} - {new_data.value} - удалено из Redis")
             return True
+        return True
+    return False

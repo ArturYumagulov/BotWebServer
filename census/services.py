@@ -111,7 +111,8 @@ def valid_data(request):
     new_census.task = task.number
     new_census.position = request.get('position')  # Координаты
     new_census.address_id = request.get('address_id')
-    new_census.edited = True
+    new_census.basics = task.base.number
+    # new_census.edited = True
     print(request)
 
     # new_census.save()
@@ -135,7 +136,7 @@ def valid_data(request):
         result = Result.objects.create(
             base_id=task.base.number,
             type='meet',
-            result=ResultData.objects.get(code="000000068"),
+            result=ResultData.objects.get(name="АДРЕС НЕ АКТУАЛЕН"),
             task_number=task,
             contact_person="",
             control_date=None
@@ -161,7 +162,7 @@ def valid_data(request):
         result = Result.objects.create(
             base_id=task.base.number,
             type='meet',
-            result=ResultData.objects.get(code="000000067"),
+            result=ResultData.objects.get(name="НЕТ КОНТАКТА"),
             task_number=task,
             contact_person="",
             control_date=None

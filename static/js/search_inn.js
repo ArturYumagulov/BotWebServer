@@ -12,6 +12,23 @@ function cleanSearchBlock(searchBlock) {
         searchBlock.children[i].remove()
     }
 }
+function createFloatDiv(element, category_name, text="") {
+    return `<div class="form-floating mb-3" id="${category_name}${element.id}DivId">
+            <input class="form-control" name="${category_name}_${element.id}" id="${category_name}_${element.id}" 
+            type="text" placeholder="${text} ${element.text}" aria-describedby="${category_name}IdFeedback" required>
+            <label for="${category_name}Id">${text} ${element.text}</label>
+            <div id="${category_name}IdFeedback" class="invalid-feedback">Укажите ${text} ${element.text}</div>
+            </div>`
+        }
+function LoadMultiDivData(element, url) {
+    return fetch(url, {
+        headers: {"X-CSRFToken": csrf},
+        method: "POST",
+        body: JSON.stringify({department: depart})
+    }).then((res) => res.json())
+        .then((data) => {
+            return data})
+        }
 
 function LengthValue(item, event, data) {
     let inn_value = item.value
@@ -183,9 +200,6 @@ function checkHiddenSearchObjects(check_obj_id, hidden_id, input_id=null, org_hi
     let item = document.getElementById(check_obj_id)
     let hidden_item = document.getElementById(hidden_id)
     let search_place = document.getElementById('contragentsListOptions')
-    // let innDiv = document.getElementById('innDivId')
-    // let innInput = document.getElementById('innId')
-    // let orgNameDiv = document.getElementById('organizationsNameDivId')
     let orgNameInput = document.getElementById('organizationsNameId')
     let communicate =document.getElementById('communicateCheckbox')
     let closing = document.getElementById('closeCheckbox')
@@ -249,3 +263,35 @@ function checkHiddenSearchObjects(check_obj_id, hidden_id, input_id=null, org_hi
 }
 
 checkHiddenSearchObjects('workCheckbox', 'searchClient', null, true);
+
+async function createMultiSelectOption(select, category_id, valuesList) {
+    valuesList.forEach((value) => {
+        let option = document.createElement('option')
+        option.setAttribute('value', value.id)
+        option.setAttribute('data-slug', value.slug)
+        option.innerHTML = value.name
+        select.append(option)
+    })
+}
+
+async function createSelectMulti(select_id) {
+    let select = document.getElementById(select_id)
+    let url = select.dataset.url
+    let data = await loadData(url)
+    await createMultiSelectOption(select, '', data)
+}
+
+async function loadData(url){
+
+    let response = await fetch(url, {
+        headers: {"X-CSRFToken": csrf},
+        method: "POST",
+        body: JSON.stringify({department: depart})
+    });
+    if (response.ok) {
+        let json = await response.json()
+        return json
+    } else {
+        alert("Ошибка: " + response.status);
+    }
+}

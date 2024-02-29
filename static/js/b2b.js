@@ -128,30 +128,30 @@
             item.append(option)
         })
     }
-    async function loadData(url){
+    // async function loadData(url){
+    //
+    //     let response = await fetch(url, {
+    //         headers: {"X-CSRFToken": csrf},
+    //         method: "POST",
+    //         body: JSON.stringify({department: depart})
+    //     });
+    //     if (response.ok) {
+    //         let json = await response.json()
+    //         return json
+    //     } else {
+    //         alert("Ошибка: " + response.status);
+    //     }
+    // }
 
-        let response = await fetch(url, {
-            headers: {"X-CSRFToken": csrf},
-            method: "POST",
-            body: JSON.stringify({department: depart})
-        });
-        if (response.ok) {
-            let json = await response.json()
-            return json
-        } else {
-            alert("Ошибка: " + response.status);
-        }
-    }
-
-    async function createMultiSelectOption(select, category_id, valuesList) {
-        valuesList.forEach((value) => {
-            let option = document.createElement('option')
-            option.setAttribute('value', value.id)
-            option.setAttribute('data-slug', value.slug)
-            option.innerHTML = value.name
-            select.append(option)
-        })
-    }
+    // async function createMultiSelectOption(select, category_id, valuesList) {
+    //     valuesList.forEach((value) => {
+    //         let option = document.createElement('option')
+    //         option.setAttribute('value', value.id)
+    //         option.setAttribute('data-slug', value.slug)
+    //         option.innerHTML = value.name
+    //         select.append(option)
+    //     })
+    // }
 
     async function createSelectMulti(select_id) {
         let select = document.getElementById(select_id)
@@ -169,23 +169,24 @@
     }
 
     function vectorHideBlock(){
-        function createFloatDiv(element, category_name, text="") {
-            return `<div class="form-floating mb-3" id="${category_name}${element.id}DivId">
-            <input class="form-control" name="${category_name}_${element.id}" id="${category_name}_${element.id}" 
-            type="text" placeholder="${text} ${element.text}" aria-describedby="${category_name}IdFeedback" required>
-            <label for="${category_name}Id">${text} ${element.text}</label>
-            <div id="${category_name}IdFeedback" class="invalid-feedback">Укажите ${text} ${element.text}</div>
-            </div>`
-        }
-        function LoadMultiDivData(element, url) {
-            return fetch(url, {
-                headers: {"X-CSRFToken": csrf},
-                method: "POST",
-                body: JSON.stringify({department: depart})
-            }).then((res) => res.json())
-                    .then((data) => {
-                        return data})
-        }
+
+        // function createFloatDiv(element, category_name, text="") {
+        //     return `<div class="form-floating mb-3" id="${category_name}${element.id}DivId">
+        //     <input class="form-control" name="${category_name}_${element.id}" id="${category_name}_${element.id}"
+        //     type="text" placeholder="${text} ${element.text}" aria-describedby="${category_name}IdFeedback" required>
+        //     <label for="${category_name}Id">${text} ${element.text}</label>
+        //     <div id="${category_name}IdFeedback" class="invalid-feedback">Укажите ${text} ${element.text}</div>
+        //     </div>`
+        // }
+        // function LoadMultiDivData(element, url) {
+        //     return fetch(url, {
+        //         headers: {"X-CSRFToken": csrf},
+        //         method: "POST",
+        //         body: JSON.stringify({department: depart})
+        //     }).then((res) => res.json())
+        //             .then((data) => {
+        //                 return data})
+        // }
 
         $('#vectorMulti').on('select2:select', function (e) {
             let element = e.params.data

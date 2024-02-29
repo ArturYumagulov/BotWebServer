@@ -50,7 +50,8 @@ class CensusAdmin(admin.ModelAdmin):
               'position',
               'dadata',
               'vectors',
-              'others'
+              'others',
+              'basics'
               )
 
     def get_task_worker(self, obj):

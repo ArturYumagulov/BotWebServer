@@ -276,6 +276,7 @@ class CensusSerializer(serializers.ModelSerializer):
             'department',
             'closing',
             'not_communicate',
+            'edited',
             'address_id',
             'point_name',
             'point_type',
@@ -314,5 +315,6 @@ class CensusSerializer(serializers.ModelSerializer):
             'dadata',
             'volume',
             'vectors',
-            'others'
+            'others',
+            'basics'
         ]

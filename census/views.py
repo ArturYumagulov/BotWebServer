@@ -258,7 +258,7 @@ def get_control_data(request):
 
     if request.method == 'POST':
         result = []
-        controls = ResultData.objects.filter(group__code="000000004")
+        controls = ResultData.objects.filter(group__name="Сенсус")
         for item in controls:
             data = {'id': item.pk, 'name': item.name, 'control_data': item.control_data}
             result.append(data)

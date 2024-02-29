@@ -65,8 +65,8 @@
         let response = await fetch(url, {
             headers: {"X-CSRFToken": csrf},
             method: "POST",
-            body: JSON.stringify({department: 'b2c'})
-        });
+            body: JSON.stringify({department: depart})
+            })
         if (response.ok) {
             let json = await response.json()
             return json
@@ -85,16 +85,15 @@
             alert("Ошибка: " + response.status);
         }
     }
-    async function createMultiSelectOption(select, category_id, valuesList) {
-
-        valuesList.forEach((value) => {
-            let option = document.createElement('option')
-            option.setAttribute('value', value.id)
-            option.setAttribute('data-slug', value.slug)
-            option.innerHTML = value.name
-            select.append(option)
-        })
-    }
+    // async function createMultiSelectOption(select, category_id, valuesList) {
+    //
+    //     valuesList.forEach((value) => {
+    //         let option = document.createElement('option')
+    //         option.setAttribute('value', value.id)
+    //         option.innerHTML = value.name
+    //         select.append(option)
+    //     })
+    // }
     function HideMultiSelectItem(access) {
         access.addEventListener('change', function () {
             let value = access.value
@@ -123,13 +122,12 @@
             $(`#category_${value}`).val(null).trigger('change')
             })
         }
-
-    async function createSelectMulti(select_id) {
-        let select = document.getElementById(select_id)
-        let url = select.dataset.url
-        let data = await loadData(url)
-        await createMultiSelectOption(select, '', data)
-    }
+    // async function createSelectMulti(select_id) {
+    //     let select = document.getElementById(select_id)
+    //     let url = select.dataset.url
+    //     let data = await loadData(url)
+    //     await createMultiSelectOption(select, '', data)
+    // }
     async function validSelect(select_id) {
         let select = document.getElementById(select_id)
         select.addEventListener('change', function () {
@@ -187,59 +185,38 @@
             $(`#${select_id}`).val(null).trigger('change')
         })
     }
-    let oilDebt = document.getElementById('debitId')
-    let oilDebtInput = document.getElementById('iolDebitId')
-
-    let lukoilDebt = document.getElementById('lukDebitId')
-    let lukoilDebtInput = document.getElementById('lukoilDebitId')
-
-    let roweDebt = document.getElementById('RowDebitId')
-    let roweDebtInput = document.getElementById('RoweDebitId')
-
-    let motulDebt = document.getElementById('motDebitId')
-    let motulDebtInput = document.getElementById('motulDebitId')
-
-    let vitexDebt = document.getElementById('vitDebitId')
-    let vitexDebtInput = document.getElementById('vitexDebitId')
-
-    function DelOilsItem() {
-        oilDebt.style.display = 'none'
-        oilDebtInput.removeAttribute('required')
-        roweDebt.style.display = 'none'
-        roweDebtInput.removeAttribute('required')
-        motulDebt.style.display = 'none'
-        motulDebtInput.removeAttribute('required')
-        lukoilDebt.style.display = 'none'
-        lukoilDebtInput.removeAttribute('required')
-        vitexDebt.style.display = 'none'
-        vitexDebtInput.removeAttribute('required')
-    }
     function vectorHideBlock(){
+        let oilDebt = document.getElementById('debitId')
+        let oilDebtInput = document.getElementById('iolDebitId')
 
-        function LoadMultiDivData(element, url) {
-            return fetch(url, {
-                headers: {"X-CSRFToken": csrf},
-                method: "POST",
-                body: JSON.stringify({department: 'b2с'})
-            }).then((res) => res.json())
-                    .then((data) => {
-                        console.log(data)
-                        return data
-                    })
-        }
+        let lukoilDebt = document.getElementById('lukDebitId')
+        let lukoilDebtInput = document.getElementById('lukoilDebitId')
+
+        let roweDebt = document.getElementById('RowDebitId')
+        let roweDebtInput = document.getElementById('RoweDebitId')
+
+        let motulDebt = document.getElementById('motDebitId')
+        let motulDebtInput = document.getElementById('motulDebitId')
+
+        let vitexDebt = document.getElementById('vitDebitId')
+        let vitexDebtInput = document.getElementById('vitexDebitId')
+
+        let accessDiv = document.getElementById('accessDiv')
+        let accessInput = document.getElementById('accessId')
+
+        let akbDiv = document.getElementById('akbDiv')
+        let akbInput = document.getElementById('akbId')
+
+        let otherVectorDiv = document.getElementById('otherVectorId')
+        let otherVectorInput = document.getElementById('otherVectorInputId')
+
 
         $('#vectorMulti').on('select2:select', function (e) {
+
             let element = e.params.data
             let category = e.params.data.element.dataset.slug
-            let sto_bottom = document.getElementById('pointTypeID')
-            console.log(sto_bottom.options[sto_bottom.selectedIndex].innerHTML)
 
-            if (element.text === "Другое") {
-                let other = document.getElementById('otherVectorId')
-                other.style.display = 'block'
-                other.children[0].setAttribute('required', '')
-            } else if (element.text === 'Масло'
-                && sto_bottom.options[sto_bottom.selectedIndex].innerHTML === "Автосервис") {
+            if(e.params.data.text === 'Масло') {
                 oilDebt.style.display = 'block'
                 oilDebtInput.setAttribute('required', '')
                 roweDebt.style.display = 'block'
@@ -267,10 +244,18 @@
                 });
                 select.parentNode.style.display = 'block'
                 select.setAttribute('required', '')
-            } else if (element.text !== "Другое") {
+            }
+
+            else if(e.params.data.text === 'Другое') {
+                otherVectorDiv.style.display = 'block'
+                otherVectorInput.setAttribute('required', '')
+
+            } else {
+
                 let select = document.getElementById(`${category}_load`).children[1]
                 let url = select.dataset.url
                 let data = LoadMultiDivData(element, url)
+                console.log(category)
 
                 data.then((result)=> {
                     result.forEach((item) => {
@@ -288,28 +273,12 @@
         })
 
         $('#vectorMulti').on('select2:unselect', function (e) {
-            let element = e.params.data
             let category = e.params.data.element.dataset.slug
 
-            if (element.text === "Другое") {
-                let other = document.getElementById('otherVectorId')
-                other.children[0].removeAttribute('required')
-                other.children[0].value = ""
-                other.style.display = 'none'
-            } else if (element.text === "Масло") {
-<<<<<<< HEAD
-                DelOilsItem()
-
-                try {
-                    document.getElementById('maslo_load').style.display = 'none';
-                    let select = document.getElementById(`maslo_load`).children[1]
-                    for (let i = select.options.length - 1; i >= 0; i--) {
-                        select.options[i].remove()
-                    }
-                } catch (TypeError) {}
-
-            } else if (element.text !== "Другое") {
-=======
+            if(e.params.data.text === 'Масло') {
+                let element = document.getElementById(`maslo_load`)
+                element.style.display = 'none'
+                element.removeAttribute('required')
                 oilDebt.style.display = 'none'
                 oilDebtInput.removeAttribute('required')
                 roweDebt.style.display = 'none'
@@ -320,25 +289,31 @@
                 lukoilDebtInput.removeAttribute('required')
                 vitexDebt.style.display = 'none'
                 vitexDebtInput.removeAttribute('required')
-                try {
-                    document.getElementById('maslo_load').style.display = 'none';
-                    let select = document.getElementById(`maslo_load`).children[1]
-                    for (let i = select.options.length - 1; i >= 0; i--) {
-                        console.log(select.options[i])
-                        select.options[i].remove()
-                    }
-                } catch (TypeError) {}
 
-            } else if (element.text !== "Другое") {
-                console.log(element.text)
->>>>>>> 085bcd5aba228142c045b84e15ed291dc237fb81
-                let select = document.getElementById(`${category}_load`).children[1]
-                select.parentNode.style.display = 'block'
-                for (let i = select.options.length - 1; i >= 0; i--) {
-                    select.options[i].remove()
+
+                let select = document.getElementById(`${category}_load`)
+                let options = select.children[1].options
+                for (let i = options.length - 1; i >= 0; i--) {
+                    options[i].remove()
                 }
+                select.style.display = 'none'
                 select.removeAttribute('required')
-                select.parentNode.style.display = 'none'
+            }
+
+            else if(e.params.data.text === 'Другое') {
+                otherVectorDiv.style.display = 'none'
+                otherVectorInput.removeAttribute('required')
+                otherVectorInput.value = ''
+                otherVectorInput.classList.remove('is-valid', 'is-invalid')
+
+            } else {
+                let select = document.getElementById(`${category}_load`)
+                let options = select.children[1].options
+                for (let i = options.length - 1; i >= 0; i--) {
+                    options[i].remove()
+                }
+                select.style.display = 'none'
+                select.removeAttribute('required')
             }
         })
     }
@@ -428,32 +403,8 @@
         })
     }
 
-    function DeleteST0Items() {
-        let point_type = document.getElementById('pointTypeID')
-        point_type.addEventListener('change', () => {
-            if (point_type.options[point_type.selectedIndex].innerHTML === 'Магазин') {
-<<<<<<< HEAD
-                DelOilsItem();
-        }
-        })
-=======
-                oilDebt.style.display = 'none'
-                oilDebtInput.removeAttribute('required')
-                roweDebt.style.display = 'none'
-                roweDebtInput.removeAttribute('required')
-                motulDebt.style.display = 'none'
-                motulDebtInput.removeAttribute('required')
-                lukoilDebt.style.display = 'none'
-                lukoilDebtInput.removeAttribute('required')
-                vitexDebt.style.display = 'none'
-                vitexDebtInput.removeAttribute('required')
-        }
-        })
-
->>>>>>> 085bcd5aba228142c045b84e15ed291dc237fb81
-    }
-
     async function CreateApp(container) {
+        checkHiddenSearchObjects('workCheckbox', 'searchClient', null, true);
         floatFormValid('boardId', 'signboardId', 'signboardId', true)
         await createOption('pointTypeID')
         await createOption('shopCategoryId')
@@ -482,18 +433,26 @@
         floatFormValid('lukDebitId', 'lukoilDebitId', 'lukoilDebitIdFeedback', false, true)
         floatFormValid('RowDebitId', 'RoweDebitId', 'RoweDebitIdFeedback', false, true)
         floatFormValid('motDebitId', 'motulDebitId', 'motulDebitIdFeedback', false, true)
-        floatFormValid('vitDebitId', 'vitexDebitId', 'vitexDebitIdFeedback', false, true)
         floatFormValid('otherDivId', 'otherId', 'otherIdFeedback', false)
+        floatFormValid('vitDebitId', 'vitexDebitId', 'vitexDebitIdFeedback', false, true)
         floatFormValid('otherProvDivId', 'otherProvId', 'otherProvIdFeedback', false)
-        // floatFormValid('otherVectorId', 'otherVectorInputId', 'otherVectorFeedback', false)
+        floatFormValid('otherVectorId', 'otherVectorInputId', 'otherVectorFeedback', false)
         floatFormValid('resultCommentDivId', 'resultCommentId', 'resultCommentFeedback', false)
-        // floatFormValid('innDivId', 'innId', 'innIdFeedback', false)
         // Автосервис
         await hideChangeFloatElem('pointTypeID', 'elevatorId', 'elevatorCountId','Автосервис')
         await hideChangeSelectElem('pointTypeID', 'stoTypeDiv', 'stoTypeId', 'Автосервис')
         await hideSelectMultiElement('pointTypeID', 'carsDiv', 'cars', 'Автосервис')
-        DeleteST0Items();
 
+        let access_items = document.querySelectorAll('.access')
+
+        for (let i = 1; i < access_items.length + 1; i++) {
+            let div = document.getElementById('category_' + i + '_div')
+            let item = document.getElementById('category_' + i)
+            let item_id = item.getAttribute('id').split('_')[1]
+            let data = await loadDataCategory(item, item_id)
+            await createMultiSelectOption(item, item_id, data)
+            div.style.display = 'none'
+        }
 
         let control = document.getElementById('controlId')
         let date = document.getElementById('dateDiv')
@@ -517,26 +476,6 @@
         otherProviders();
         delAddReqCheckbox();
         FilesFormValid('formFileMultiple')
-
-
-        let form = document.getElementsByTagName('form')[0]
-        form.addEventListener('submit', function (e) {
-            let inputs = document.getElementsByTagName('input')
-            let valid_list = []
-            for (let i = 0; i < inputs.length; i++) {
-                if (Array.prototype.slice.call(inputs[i].classList).includes('is-invalid')) {
-                    valid_list.push(inputs[i])
-                }
-            }
-
-            if (valid_list.length > 0) {
-                console.log('invalid')
-                e.preventDefault()
-            } else {
-                console.log('valid')
-                form.submit()
-            }
-        })
     }
     window.CreateApp = CreateApp;
 })();
