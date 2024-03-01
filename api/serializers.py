@@ -254,14 +254,10 @@ class EquipmentSerializer(serializers.ModelSerializer):
 class CensusSerializer(serializers.ModelSerializer):
     department = serializers.SlugRelatedField(slug_field='name', read_only=True)
     cars = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
-    oils = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
     providers = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
-    filters = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
-    accessories_brands = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
     point_type = serializers.SlugRelatedField(slug_field='name', read_only=True)
     sto_type = serializers.SlugRelatedField(slug_field='name', read_only=True)
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    accessories_category = serializers.SlugRelatedField(slug_field='name', read_only=True)
     equipment = EquipmentSerializer(many=True)
     files = CensusFilesSerializer(many=True)
     result = ResultSerializer()
@@ -282,16 +278,7 @@ class CensusSerializer(serializers.ModelSerializer):
             'point_type',
             'sto_type',
             'cars',
-            'oils',
-            'filters',
-            'accessories_category',
-            'accessories_brands',
             'elevators_count',
-            'oil_debit',
-            'lukoil_debit',
-            'rowe_debit',
-            'motul_debit',
-            'vitex_debit',
             'decision_firstname',
             'decision_lastname',
             'decision_surname',
@@ -301,12 +288,10 @@ class CensusSerializer(serializers.ModelSerializer):
             'akb_specify',
             'working',
             'task',
+            'basics',
             'id',
-            'accessories_brands',
-            'accessories_category',
             'category',
             'equipment',
-            'filters',
             'point_type',
             'sto_type',
             'files',
@@ -316,5 +301,4 @@ class CensusSerializer(serializers.ModelSerializer):
             'volume',
             'vectors',
             'others',
-            'basics'
         ]

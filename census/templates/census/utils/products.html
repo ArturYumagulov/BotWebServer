@@ -1,0 +1,27 @@
+        <div class="mb-3 multi_res was-validated" id="vectorMultiDiv">
+            <select class="form-select multiple mb-3" name="vectors" id="vectorMulti" required data-placeholder="{% if depart == 'b2b'%}Направления точки
+{% elif depart == 'b2c' %}Используемые продукты{% endif %}?" multiple data-url="{% url 'point_vectors' %}">
+            </select>
+        </div>
+
+{#    hide products----------------- #}
+        {% if products %}
+            {% for product in products %}
+                {% if product.name != "Другое" %}
+            <div class="mb-3 multi_res was-validated" id="{{ product.slug }}_load" style="display: none">
+                <label class="form-label" for="{{ product.slug }}">{{ product.name }}</label>
+                <select class="form-select multiple mb-3" name="{{ product.slug }}" id="{{ product.slug }}"
+                        data-placeholder="Какие {{ product.name }}?"
+                        multiple data-url="{% url 'get_vectors_items' product.slug %}">
+                </select>
+            </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="form-floating mb-3" id="otherVectorId" style="display: none;">
+            <input class="form-control" name="other_vector" id="otherVectorInputId" type="text"
+                   placeholder="Другие продукты" aria-describedby="otherVectorFeedback">
+            <label for="otherVectorInputId">Какие другие продукты?</label>
+            <div id="otherVectorFeedback" class="invalid-feedback">Выберите другие продукты торговой точки</div>
+        </div>

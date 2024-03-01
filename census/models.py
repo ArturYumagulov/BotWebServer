@@ -364,6 +364,7 @@ class Others(models.Model):
     providers = models.CharField(max_length=2000, null=True, blank=True, default=None)
     volume_name = models.CharField(max_length=2000, null=True, blank=True, default=None)
     volume_value = models.CharField(max_length=2000, null=True, blank=True, default=None)
+    products = models.CharField(max_length=2000, null=True, blank=True, default=None)
 
 
 class Census(models.Model):
@@ -376,26 +377,14 @@ class Census(models.Model):
                                   default=None)
     point_type = models.ForeignKey(PointTypes, on_delete=models.PROTECT, verbose_name="Тип", blank=True, null=True,
                                    default=None)
-    # vector = models.ManyToManyField(PointVectors, verbose_name="Направленность", blank=True, default=None)
     nets = models.BooleanField(verbose_name="Сетевой", default=False)
     sto_type = models.ForeignKey(STOTypeList, on_delete=models.PROTECT, verbose_name="Тип СТО", blank=True, null=True)
     category = models.ForeignKey(PointCategory, on_delete=models.PROTECT, verbose_name="Категория", blank=True, null=True,
                                  default=None)
     cars = models.ManyToManyField(CarsList, verbose_name="Автомобили обслуживают", blank=True, default=None)
-    oils = models.ManyToManyField(OilList, verbose_name="Масла используют", blank=True, default=None)
     providers = models.ManyToManyField(ProviderList, verbose_name="Основные поставщики", blank=True, default=None)
-    filters = models.ManyToManyField(FilterList, verbose_name="Фильтры используют", blank=True, default=None)
-    accessories_category = models.ForeignKey(AccessoriesCategory, verbose_name="Категории аксессуаров",
-                                             on_delete=models.PROTECT, blank=True, default=None, null=True)
-    accessories_brands = models.ManyToManyField(AccessoriesCategoryItem, verbose_name="Бренды аксессуаров", blank=True,
-                                                default=None)
     elevators_count = models.PositiveIntegerField(verbose_name="Количество подъемников", default=0, null=True,
                                                   blank=True)
-    oil_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
-    lukoil_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
-    rowe_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
-    motul_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
-    vitex_debit = models.PositiveIntegerField(default=None, null=True, blank=True)
     decision_firstname = models.CharField(max_length=2000, verbose_name="Фамилия", null=True, blank=True)
     decision_lastname = models.CharField(max_length=2000, verbose_name="Имя", null=True, blank=True)
     decision_surname = models.CharField(max_length=2000, verbose_name="Отчество", null=True, blank=True)

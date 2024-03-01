@@ -105,33 +105,34 @@
             </div>
         </div>
     {#        Используемые продукты? -----------------------#}
-        <div class="mb-3 multi_res was-validated" id="vectorMultiDiv">
-            <select class="form-select multiple mb-3" name="vectors" id="vectorMulti"
-                    required data-placeholder="Используемые продукты?" multiple data-url="{% url 'point_vectors' %}">
-            </select>
-        </div>
+{#        <div class="mb-3 multi_res was-validated" id="vectorMultiDiv">#}
+{#            <select class="form-select multiple mb-3" name="vectors" id="vectorMulti"#}
+{#                    required data-placeholder="Используемые продукты?" multiple data-url="{% url 'point_vectors' %}">#}
+{#            </select>#}
+{#        </div>#}
 {#    hide products----------------- #}
-        {% if products %}
-            {% for product in products %}
-                {% if product.name != "Другое" %}
-            <div class="mb-3 multi_res was-validated" id="{{ product.slug }}_load" style="display: none">
-                <label class="form-label" for="{{ product.slug }}">{{ product.name }}</label>
-                <select class="form-select multiple mb-3" name="{{ product.slug }}" id="{{ product.slug }}"
-                        data-placeholder="Какие {{ product.name }}?"
-                        multiple data-url="{% url 'get_vectors_items' product.slug %}">
-                </select>
-            </div>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-
+{#        {% if products %}#}
+{#            {% for product in products %}#}
+{#                {% if product.name != "Другое" %}#}
+{#            <div class="mb-3 multi_res was-validated" id="{{ product.slug }}_load" style="display: none">#}
+{#                <label class="form-label" for="{{ product.slug }}">{{ product.name }}</label>#}
+{#                <select class="form-select multiple mb-3" name="{{ product.slug }}" id="{{ product.slug }}"#}
+{#                        data-placeholder="Какие {{ product.name }}?"#}
+{#                        multiple data-url="{% url 'get_vectors_items' product.slug %}">#}
+{#                </select>#}
+{#            </div>#}
+{#                {% endif %}#}
+{#            {% endfor %}#}
+{#        {% endif %}#}
+{##}
         {#        Другие Используемые продукты?? -----------------------#}
-        <div class="form-floating mb-3" id="otherVectorId" style="display: none;">
-            <input class="form-control" name="other_vector" id="otherVectorInputId" type="text"
-                   placeholder="Другие продукты" aria-describedby="otherVectorFeedback">
-            <label for="otherVectorInputId">Какие другие продукты?</label>
-            <div id="otherVectorFeedback" class="invalid-feedback">Выберите другие продукты торговой точки</div>
-        </div>
+{#        <div class="form-floating mb-3" id="otherVectorId" style="display: none;">#}
+{#            <input class="form-control" name="other_vector" id="otherVectorInputId" type="text"#}
+{#                   placeholder="Другие продукты" aria-describedby="otherVectorFeedback">#}
+{#            <label for="otherVectorInputId">Какие другие продукты?</label>#}
+{#            <div id="otherVectorFeedback" class="invalid-feedback">Выберите другие продукты торговой точки</div>#}
+{#        </div>#}
+            {% include 'census/utils/products.html' %}
 
 {#        Парк техники? -----------------------#}
         <div class="mb-3 multi_res was-validated" id="equipmentIdDiv">
@@ -157,58 +158,8 @@
             <label for="otherId">Какие другие поставщики?</label>
             <div id="otherProvIdFeedback" class="invalid-feedback">Напишите других поставщиков торговой точки</div>
         </div>
-{#Контактное лицо?------------------------------------------#}
-        <p class="text-start">Контактное лицо?</p>
-        <div class="form-floating mb-3" id="firstnameId">
-            <input class="form-control" name="firstname" id="firstnameMakerId" type="text" placeholder="Фамилия контактного лица"
-                   aria-describedby="firstnameIdFeedback" required>
-            <label for="firstnameMakerId">Фамилия контактного лица</label>
-            <div id="firstnameIdFeedback" class="invalid-feedback">
-                Укажите фамилию контактного лица
-            </div>
-        </div>
 
-            <div class="form-floating mb-3" id="lastnameId">
-            <input class="form-control" name="lastname" id="lastnameMakerId" type="text" placeholder="Имя контактного лица"
-                   aria-describedby="lastnameIdFeedback" required>
-            <label for="lastnameMakerId">Имя контактного лица</label>
-            <div id="lastnameIdFeedback" class="invalid-feedback">
-                Укажите имя контактного лица
-            </div>
-        </div>
-
-            <div class="form-floating mb-3" id="surnameId">
-            <input class="form-control" name="surname" id="surnameMakerId" type="text" placeholder="Отчество контактного лица"
-                   aria-describedby="surnameIdFeedback">
-            <label for="surnameMakerId">Отчество контактного лица</label>
-            <div id="surnameIdFeedback" class="invalid-feedback">
-                Укажите отчество контактного лица
-            </div>
-        </div>
-{#    Email#}
-        <div class="form-floating mb-3" id="emailId">
-            <input class="form-control" name="decision_email" id="decisionMakerEmailId" type="email" placeholder="Email"
-            aria-describedby="decisionMakerEmailIdFeedback" required>
-            <label for="decisionMakerEmailId">Email</label>
-            <div id="decisionMakerEmailIdFeedback" class="invalid-feedback">
-                Укажите электронную почту контактного лица
-            </div>
-        </div>
-{#    Телефон#}
-        <div class="form-floating mb-3" id="phoneId">
-            <input class="form-control" name="decision_phone" id="decisionMakerPhoneId" type="phone" placeholder="Телефон"
-            aria-describedby="decisionMakerPhoneIdFeedback" required>
-            <label for="decisionMakerPhoneId">Телефон</label>
-            <div id="decisionMakerPhoneIdFeedback" class="invalid-feedback">
-                Укажите телефон контактного лица
-            </div>
-        </div>
-{#    Должность #}
-        <div class="form-floating mb-3" id="functionId">
-            <input class="form-control" name="decision_function" id="decisionMakerFunctionId" type="text" placeholder="Должность" aria-describedby="functionIdFeedback" required>
-            <label for="decisionMakerFunctionId">Должность</label>
-            <div id="functionIdFeedback" class="invalid-feedback">Укажите должность контактного лица</div>
-        </div>
+    {% include 'census/utils/contact_person.html' %}
 
         <div class="mb-3" id="tenderDiv">
             <label for="tenderId" class="form-label">Работает по тендеру?</label>
@@ -221,44 +172,12 @@
             <div id="tenderFeedback" class="invalid-feedback">Работает по тендеру?</div>
         </div>
 
-        <div class="mb-3" id="controlDiv" style="display: block">
-            <label for="controlId" class="form-label">Результат встречи</label>
-            <select class="form-select mb-3" selected id="controlId" name="result"
-                    aria-describedby="controlIdFeedbackk" data-url="{% url 'controls_list' %}" required>
-                <option selected disabled value="">Выберите результат...</option>
-            </select>
-            <div id="controlIdFeedback" class="invalid-feedback">Выберите результат встречи</div>
-        </div>
-        <div class="row mb-3" id="dateDiv" style="display: none">
-            <label for="date" class="col-form-label">Контрольная дата</label>
-            <div class="col-6">
-                <div class="input-group date" id="datepicker">
-                    <input type="text" name="control_date" class="form-control was-validated" id="date"/>
-                    <span class="input-group-append" style="cursor: pointer">
-                        <span class="input-group-text bg-light d-block">
-                            <i class="fa fa-calendar"></i>
-                        </span>
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="form-floating mb-3" id="resultCommentDivId" style="display: block;">
-            <input class="form-control" id="resultCommentId" type="text" name="result_comment" placeholder="Комментарий к задаче?"
-            aria-describedby="resultCommentFeedback" required>
-            <label for="otherId">Комментарий к задаче</label>
-            <div id="resultCommentFeedback" class="invalid-feedback">Напишите комментарий к задаче</div>
-        </div>
+    {% include 'census/utils/control.html' %}
 
         <div class="d-grid gap-2 mt-5">
             <button class="btn btn-danger" type="submit">Отправить</button>
         </div>
-        <input type="hidden" name="address_id" value="{{ address_id }}">
-        <input type="hidden" name="address" value="{{ city }}, {{ street }}, {{ house }}">
-        <input type="hidden" name="depart" id="depart" value="{{ depart }}">
-        <input type="hidden" name="name" value="{{ name }}">
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        <input type="hidden" name="guid" value="{{ guid }}">
-        <input type="hidden" name="position" id="position" value="">
+    {% include 'census/utils/hiddens.html' %}
     </form>
 </div>
 

@@ -1,0 +1,52 @@
+{#Контактное лицо?------------------------------------------#}
+        <p class="text-start">Контактное лицо?</p>
+        <div class="form-floating mb-3" id="firstnameId">
+            <input class="form-control" name="firstname" id="firstnameMakerId" type="text" placeholder="Фамилия контактного лица"
+                   aria-describedby="firstnameIdFeedback" required>
+            <label for="firstnameMakerId">Фамилия контактного лица</label>
+            <div id="firstnameIdFeedback" class="invalid-feedback">
+                Укажите фамилию контактного лица
+            </div>
+        </div>
+
+            <div class="form-floating mb-3" id="lastnameId">
+            <input class="form-control" name="lastname" id="lastnameMakerId" type="text" placeholder="Имя контактного лица"
+                   aria-describedby="lastnameIdFeedback" required>
+            <label for="lastnameMakerId">Имя контактного лица</label>
+            <div id="lastnameIdFeedback" class="invalid-feedback">
+                Укажите имя контактного лица
+            </div>
+        </div>
+
+            <div class="form-floating mb-3" id="surnameId">
+            <input class="form-control" name="surname" id="surnameMakerId" type="text" placeholder="Отчество контактного лица"
+                   aria-describedby="surnameIdFeedback">
+            <label for="surnameMakerId">Отчество контактного лица</label>
+            <div id="surnameIdFeedback" class="invalid-feedback">
+                Укажите отчество контактного лица
+            </div>
+        </div>
+{#    Email#}
+        <div class="form-floating mb-3" id="emailId">
+            <input class="form-control" name="decision_email" id="decisionMakerEmailId" type="email" placeholder="Email"
+            aria-describedby="decisionMakerEmailIdFeedback" required>
+            <label for="decisionMakerEmailId">Email</label>
+            <div id="decisionMakerEmailIdFeedback" class="invalid-feedback">
+                Укажите электронную почту контактного лица
+            </div>
+        </div>
+{#    Телефон#}
+        <div class="form-floating mb-3" id="phoneId">
+            <input class="form-control" name="decision_phone" id="decisionMakerPhoneId" type="phone" placeholder="Телефон"
+            aria-describedby="decisionMakerPhoneIdFeedback" required>
+            <label for="decisionMakerPhoneId">Телефон</label>
+            <div id="decisionMakerPhoneIdFeedback" class="invalid-feedback">
+                Укажите телефон контактного лица
+            </div>
+        </div>
+{#    Должность #}
+        <div class="form-floating mb-3" id="functionId">
+            <input class="form-control" name="decision_function" id="decisionMakerFunctionId" type="text" placeholder="Должность" aria-describedby="functionIdFeedback" required>
+            <label for="decisionMakerFunctionId">Должность</label>
+            <div id="functionIdFeedback" class="invalid-feedback">Укажите должность контактного лица</div>
+        </div>

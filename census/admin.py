@@ -10,7 +10,8 @@ from .models import Census
 
 @admin.register(models.Census)
 class CensusAdmin(admin.ModelAdmin):
-    list_display = ('address_id', 'address', 'name', 'closing', 'created_date', 'edit_date', 'get_task_worker')
+    list_filter = ('department',)
+    list_display = ('address_id', 'address', 'name', 'closing', 'created_date', 'edit_date', 'get_task_worker', 'department')
     readonly_fields = ('created_date', 'edit_date')
     fields = ('closing',
               'not_communicate',
@@ -25,15 +26,7 @@ class CensusAdmin(admin.ModelAdmin):
               'nets',
               'sto_type',
               'cars',
-              'oils',
-              'filters',
-              'accessories_category',
-              'accessories_brands',
               'elevators_count',
-              'oil_debit',
-              'lukoil_debit',
-              'rowe_debit',
-              'motul_debit',
               'decision_firstname',
               'decision_lastname',
               'decision_surname',
@@ -44,6 +37,7 @@ class CensusAdmin(admin.ModelAdmin):
               'working',
               'result',
               'task',
+              'basics',
               'volume',
               'equipment',
               'tender',
@@ -51,7 +45,6 @@ class CensusAdmin(admin.ModelAdmin):
               'dadata',
               'vectors',
               'others',
-              'basics'
               )
 
     def get_task_worker(self, obj):

@@ -65,6 +65,8 @@ def census(request, pk):
                 .filter(department__name=_b2c)\
                 .exclude(name="Другое")
 
+            volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
+
             context = {
                 'name': name,
                 'city': city,
@@ -74,6 +76,7 @@ def census(request, pk):
                 'guid': guid,
                 'products': products,
                 'categories': categories,
+                'volumes': volumes,
                 'depart': depart
             }
             return render(request, 'census/b2c_census_form.html', context)

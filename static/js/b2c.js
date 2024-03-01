@@ -6,11 +6,8 @@
             return true;
         }
     }
-    function floatFormValid(div_id, input_id, label_id, hidden=true, is_integer=false) {
-        let div = document.getElementById(div_id)
+    function floatFormValid(input_id, hidden=true, is_integer=false, is_string=true) {
         let input = document.getElementById(input_id)
-        let label = document.getElementById(label_id)
-
 
 
         input.addEventListener('keyup', function (e) {
@@ -27,8 +24,15 @@
                         input.classList.remove('is-valid')
                         input.classList.add('is-invalid')
                     }
-
-            }
+                } else if (is_string) {
+                    if(isInteger(e.target.value)) {
+                        input.classList.remove('is-valid')
+                        input.classList.add('is-invalid')
+                    } else if (typeof e.target.value === 'string') {
+                        input.classList.remove('is-invalid')
+                        input.classList.add('is-valid')
+                    }
+                }
             }
         })
     }
@@ -186,23 +190,9 @@
         })
     }
     function vectorHideBlock(){
-        let oilDebt = document.getElementById('debitId')
-        let oilDebtInput = document.getElementById('iolDebitId')
 
-        let lukoilDebt = document.getElementById('lukDebitId')
-        let lukoilDebtInput = document.getElementById('lukoilDebitId')
-
-        let roweDebt = document.getElementById('RowDebitId')
-        let roweDebtInput = document.getElementById('RoweDebitId')
-
-        let motulDebt = document.getElementById('motDebitId')
-        let motulDebtInput = document.getElementById('motulDebitId')
-
-        let vitexDebt = document.getElementById('vitDebitId')
-        let vitexDebtInput = document.getElementById('vitexDebitId')
-
-        let accessDiv = document.getElementById('accessDiv')
-        let accessInput = document.getElementById('accessId')
+        let debits = document.querySelectorAll('.volume')
+        let elevator = document.getElementById('elevatorId')
 
         let akbDiv = document.getElementById('akbDiv')
         let akbInput = document.getElementById('akbId')
@@ -217,16 +207,16 @@
             let category = e.params.data.element.dataset.slug
 
             if(e.params.data.text === 'Масло') {
-                oilDebt.style.display = 'block'
-                oilDebtInput.setAttribute('required', '')
-                roweDebt.style.display = 'block'
-                roweDebtInput.setAttribute('required', '')
-                motulDebt.style.display = 'block'
-                motulDebtInput.setAttribute('required', '')
-                lukoilDebt.style.display = 'block'
-                lukoilDebtInput.setAttribute('required', '')
-                vitexDebt.style.display = 'block'
-                vitexDebtInput.setAttribute('required', '')
+
+                elevator.style.display = 'block'
+                elevator.setAttribute('required', '')
+                floatFormValid(elevator.children[0].id, true, true)
+
+                debits.forEach((debit) => {
+                    debit.style.display = 'block';
+                    debit.children[0].setAttribute('required', '')
+                    floatFormValid(debit.children[0].id, true, true)
+                })
 
                 let select = document.getElementById(`${category}_load`).children[1]
                 let url = select.dataset.url
@@ -249,13 +239,33 @@
             else if(e.params.data.text === 'Другое') {
                 otherVectorDiv.style.display = 'block'
                 otherVectorInput.setAttribute('required', '')
+            }
+            else if (e.params.data.text === 'АКБ'){
+                akbDiv.style.display = 'block'
+                akbInput.setAttribute('required', '')
+
+                let select = document.getElementById(`${category}_load`).children[1]
+                let url = select.dataset.url
+                let data = LoadMultiDivData(element, url)
+
+                data.then((result)=> {
+                    result.forEach((item) => {
+
+                        let option = document.createElement('option')
+                        option.setAttribute('value', item.id)
+                        option.innerHTML = item.name
+                        select.append(option)
+
+                    })
+                });
+                select.parentNode.style.display = 'block'
+                select.setAttribute('required', '')
 
             } else {
 
                 let select = document.getElementById(`${category}_load`).children[1]
                 let url = select.dataset.url
                 let data = LoadMultiDivData(element, url)
-                console.log(category)
 
                 data.then((result)=> {
                     result.forEach((item) => {
@@ -279,17 +289,29 @@
                 let element = document.getElementById(`maslo_load`)
                 element.style.display = 'none'
                 element.removeAttribute('required')
-                oilDebt.style.display = 'none'
-                oilDebtInput.removeAttribute('required')
-                roweDebt.style.display = 'none'
-                roweDebtInput.removeAttribute('required')
-                motulDebt.style.display = 'none'
-                motulDebtInput.removeAttribute('required')
-                lukoilDebt.style.display = 'none'
-                lukoilDebtInput.removeAttribute('required')
-                vitexDebt.style.display = 'none'
-                vitexDebtInput.removeAttribute('required')
 
+                elevator.style.display = 'none'
+                elevator.removeAttribute('required')
+                elevator.classList.remove('is-invalid')
+
+                debits.forEach((debit) => {
+                    debit.style.display = 'none';
+                    debit.children[0].removeAttribute('required')
+                    debit.children[0].classList.remove('is-invalid')
+                })
+
+                let select = document.getElementById(`${category}_load`)
+                let options = select.children[1].options
+
+                for (let i = options.length - 1; i >= 0; i--) {
+                    options[i].remove()
+                }
+                select.style.display = 'none'
+                select.removeAttribute('required')
+            }
+            else if (e.params.data.text === 'АКБ'){
+                akbDiv.style.display = 'none'
+                akbInput.removeAttribute('required')
 
                 let select = document.getElementById(`${category}_load`)
                 let options = select.children[1].options
@@ -405,12 +427,9 @@
 
     async function CreateApp(container) {
         checkHiddenSearchObjects('workCheckbox', 'searchClient', null, true);
-        floatFormValid('boardId', 'signboardId', 'signboardId', true)
         await createOption('pointTypeID')
         await createOption('shopCategoryId')
         await createOption('stoTypeId')
-        await createOption('accessId')
-        HideMultiSelectItem(document.getElementById('accessId'))
         await createSelectMulti('cars')
         await createControlOption('controlId')
         await createSelectMulti('providers')
@@ -419,25 +438,20 @@
         await validSelect('shopCategoryId')
         await validSelect('pointTypeID')
         await validSelect('stoTypeId')
-        await validSelect('accessId')
         await validSelect('controlId')
         await validSelect('akbId')
 
-        floatFormValid('fioId', 'decisionMakerId', 'fioIdFeedback', false)
-        floatFormValid('emailId', 'decisionMakerEmailId', 'decisionMakerEmailIdFeedback', false)
-        floatFormValid('phoneId', 'decisionMakerPhoneId', 'decisionMakerPhoneIdFeedback', false)
-        floatFormValid('functionId', 'decisionMakerFunctionId', 'functionIdFeedback', false)
-        floatFormValid('elevatorId', 'elevatorCountId', 'elevatorCountIdFeedback', false,
-            true)
-        floatFormValid('debitId', 'iolDebitId', 'iolDebitIdFeedback', false, true)
-        floatFormValid('lukDebitId', 'lukoilDebitId', 'lukoilDebitIdFeedback', false, true)
-        floatFormValid('RowDebitId', 'RoweDebitId', 'RoweDebitIdFeedback', false, true)
-        floatFormValid('motDebitId', 'motulDebitId', 'motulDebitIdFeedback', false, true)
-        floatFormValid('otherDivId', 'otherId', 'otherIdFeedback', false)
-        floatFormValid('vitDebitId', 'vitexDebitId', 'vitexDebitIdFeedback', false, true)
-        floatFormValid('otherProvDivId', 'otherProvId', 'otherProvIdFeedback', false)
-        floatFormValid('otherVectorId', 'otherVectorInputId', 'otherVectorFeedback', false)
-        floatFormValid('resultCommentDivId', 'resultCommentId', 'resultCommentFeedback', false)
+        floatFormValid('lastnameMakerId', false, false, true)
+        floatFormValid('firstnameMakerId', false, false, true)
+        floatFormValid('surnameMakerId', false, false, true)
+        floatFormValid( 'decisionMakerEmailId',  false)
+        floatFormValid('decisionMakerPhoneId',  false, true, false)
+        floatFormValid('decisionMakerFunctionId', false)
+
+        floatFormValid('otherProvId', true, false)
+        floatFormValid('otherVectorInputId', true, false)
+        floatFormValid('resultCommentId', true, false)
+
         // Автосервис
         await hideChangeFloatElem('pointTypeID', 'elevatorId', 'elevatorCountId','Автосервис')
         await hideChangeSelectElem('pointTypeID', 'stoTypeDiv', 'stoTypeId', 'Автосервис')

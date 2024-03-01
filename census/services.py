@@ -227,54 +227,53 @@ def valid_data(request):
             new_census.nets = request.get('nets')
             new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
             new_census.other_brand = request.get('other_brand')
+            new_census.elevators_count = int(request.get('elevators_count'))
 
             m2m_save(new_census.cars, models.CarsList.objects.filter(pk__in=request.getlist('cars')))
+            m2m_save(new_census.providers, models.ProviderList.objects.filter(pk__in=request.getlist('providers')))
 
-            if request.get('sto_type') is not None:
-                new_census.sto_type = models.STOTypeList.objects.get(pk=request.get('sto_type'))
+            # if request.get('sto_type') is not None:
+            new_census.sto_type = models.STOTypeList.objects.get(pk=request.get('sto_type'))
+            new_census.akb_specify = int(request.get('akb_specify'))
 
-            if request.get('accessories_category') is not None:
-                new_census.accessories_category = models.AccessoriesCategory.objects.get(
-                    pk=request.get('accessories_category')
-                )
-            else:
-                pass
+            new_others = models.Others.objects.create(census=new_census)
+            new_others.vector = request.get('other_vector')
+            new_others.providers = request.get('other_providers')
+            new_others.save()
 
-            try:
-                if isinstance(int(request.get('oil_debit')), int):
-                    new_census.oil_debit = request.get('oil_debit')
-            except ValueError:
-                new_census.oil_debit = 0
+            new_census.others = new_others
 
-            try:
-                if isinstance(int(request.get('lukoil_debit')), int):
-                    new_census.lukoil_debit = request.get('lukoil_debit')
-            except ValueError:
-                new_census.lukoil_debit = 0
+            new_census.save()
 
-            try:
-                if isinstance(int(request.get('rowe_debit')), int):
-                    new_census.rowe_debit = request.get('rowe_debit')
-            except ValueError:
-                new_census.rowe_debit = 0
+            #  сохранение объема
+            oil = models.PointVectors.objects.get(name="Масло")
+            debit_items = models.Volume.objects.filter(is_active=True).filter(department__name=_b2c)
+            if str(oil.pk) in request.get('vectors'):
+                for volume in debit_items:
+                    new_volume_item = models.VolumeItem.objects.create(
+                        census=new_census,
+                        volume=models.Volume.objects.get(pk=volume.pk),
+                        value=request.get(f'volume_{volume.pk}')
+                    )
+                    new_census.volume.add(new_volume_item)
 
-            try:
-                if isinstance(int(request.get('motul_debit')), int):
-                    new_census.motul_debit = request.get('motul_debit')
-            except ValueError:
-                new_census.motul_debit = 0
+            if request_files:
+                for file in request_files.getlist('file'):
+                    census_files = models.CensusFiles()
+                    census_files.census = new_census
+                    census_files.file = file
+                    census_files.save()
 
-            try:
-                if isinstance(int(request.get('vitex_debit')), int):
-                    new_census.motul_debit = request.get('vitex_debit')
-            except ValueError:
-                new_census.motul_debit = 0
+            Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
+                                                   worker_comment=worker_comment)
 
-            try:
-                if isinstance(int(request.get('elevators_count')), int):
-                    new_census.elevators_count = request.get('elevators_count')
-            except ValueError:
-                new_census.elevators_count = 0
+            return True
+
+            # try:
+            #     if isinstance(int(request.get('elevators_count')), int):
+            #         new_census.elevators_count = request.get('elevators_count')
+            # except ValueError:
+            #     new_census.elevators_count = 0
 
         elif request.get('depart') == _b2b or request.get('depart') == _industrial:  # B2B
 
@@ -323,8 +322,6 @@ def valid_data(request):
 
         # m2m
         m2m_save(new_census.providers, models.ProviderList.objects.filter(pk__in=request.getlist('providers')))
-        m2m_save(new_census.oils, models.OilList.objects.filter(pk__in=request.getlist('oils')))
-        m2m_save(new_census.filters, models.FilterList.objects.filter(pk__in=request.getlist('filters')))
         m2m_save(new_census.vectors, models.PointVectorsItem.objects.filter(pk__in=request.getlist('vectors')))
 
         new_census.save()

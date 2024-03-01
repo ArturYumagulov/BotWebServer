@@ -1,0 +1,14 @@
+{#        Вывеска -----------------------#}
+        <div class="form-floating mb-3" id="boardId">
+            <input class="form-control" name="point_name" id="signboardId" type="text" placeholder="Вывеска" aria-describedby="signboardIdFeedback" required>
+            <label for="signboardId">Вывеска</label>
+            <div id="signboardIdFeedback" class="invalid-feedback">
+                Укажите вывеску торговой точки
+            </div>
+        </div>
+{#    ФОТО #}
+        <div class="mb-3">
+          <label for="formFileMultiple" class="form-label">Фотографии точки</label>
+          <input class="form-control" name="file" type="file" id="formFileMultiple" multiple required>
+            <div class="invalid-feedback">Пожалуйста, загрузите фотографии точки</div>
+        </div>

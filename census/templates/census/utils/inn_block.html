@@ -1,0 +1,22 @@
+        <input class="form-control mb-3" name="working" list="contragentsListOptions" placeholder="Контрагент в 1С" id="searchClient"
+               style="display: none;">
+        <ul class="list-group mb-3" id="contragentsListOptions" style="display: none;"></ul>
+
+{#        ИНН #}
+        <div class="form-floating mb-3" id="innDivId" style="display: block;">
+            <input class="form-control" id="innId" type="text" name="inn" placeholder="ИНН?"
+            aria-describedby="innIdFeedback" data-url="{% url 'get_inn' %}" required>
+            <label for="otherId">ИНН</label>
+            <div id="innIdFeedback" class="invalid-feedback">Напишите ИНН точки</div>
+        </div>
+
+        <ul class="list-group list-group-flush mb-3" style="display: none" id="innSearchUl">
+            <li class="list-group-item out" style="color: red;" disabled></li>
+        </ul>
+{#НАЗВАНИЕ ОРГАНИЗАЦИИ#}
+        <div class="form-floating mb-3" id="organizationsNameDivId" style="display: block;">
+            <input class="form-control" id="organizationsNameId" type="text" name="organizations_name" placeholder="Название организации?"
+            aria-describedby="organizationsNameIdFeedback" required>
+            <label for="otherId">Название организации</label>
+            <div id="organizationsNameIdFeedback" class="invalid-feedback">Напишите название организации</div>
+        </div>
