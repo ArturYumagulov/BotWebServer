@@ -115,7 +115,14 @@ def valid_data(request):
     # new_census.edited = True
     print(request)
 
-    # new_census.save()
+    new_census.save()
+
+    if request_files:
+        for file in request_files.getlist('file'):
+            census_files = models.CensusFiles()
+            census_files.census = new_census
+            census_files.file = file
+            census_files.save()
 
     try:
         dadata = models.CompanyDatabase.objects.get(inn=request.get('inn'))
@@ -141,17 +148,11 @@ def valid_data(request):
             contact_person="",
             control_date=None
         )
+
         new_census.result = result
         new_census.closing = True
         new_census.not_communicate = False
         new_census.save()
-
-        if request_files:
-            for file in request_files.getlist('file'):
-                census_files = models.CensusFiles()
-                census_files.census = new_census
-                census_files.file = file
-                census_files.save()
 
         Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
                                                worker_comment=worker_comment)
@@ -167,6 +168,8 @@ def valid_data(request):
             contact_person="",
             control_date=None
         )
+
+        # new_census.result.objects.update(result=ResultData.objects.get(name="НЕТ КОНТАКТА"))
 
         new_census.not_communicate = True
         new_census.result = result
@@ -195,16 +198,22 @@ def valid_data(request):
         )
         new_census.result = result
 
-        new_census.category = models.PointCategory.objects.get(pk=request.get('category'))
-
-        new_census.decision_firstname = request.get('firstname')
-        new_census.decision_lastname = request.get('lastname')
-        new_census.decision_surname = request.get('surname')
-        new_census.decision_email = request.get('decision_email')
-        new_census.decision_phone = request.get('decision_phone')
-        new_census.decision_function = request.get('decision_function')
-
         new_census.save()
+
+        new_decisions = models.Decision.objects.create(
+            census=new_census,
+            firstname=request.get('firstname'),
+            lastname=request.get('lastname'),
+            surname=request.get('surname'),
+            email=request.get('decision_email'),
+            phone=request.get('decision_phone'),
+            function=request.get('decision_function'),
+        )
+
+        new_decisions.save()
+        new_census.decision = new_decisions
+
+        new_census.category = models.PointCategory.objects.get(pk=request.get('category'))
 
         #  сохранение направления
         for vector in models.PointVectors.objects.filter(pk__in=request.getlist('vectors')):
@@ -232,9 +241,10 @@ def valid_data(request):
             m2m_save(new_census.cars, models.CarsList.objects.filter(pk__in=request.getlist('cars')))
             m2m_save(new_census.providers, models.ProviderList.objects.filter(pk__in=request.getlist('providers')))
 
-            # if request.get('sto_type') is not None:
             new_census.sto_type = models.STOTypeList.objects.get(pk=request.get('sto_type'))
-            new_census.akb_specify = int(request.get('akb_specify'))
+
+            if request.get('akb_specify'):
+                new_census.akb_specify = int(request.get('akb_specify'))
 
             new_others = models.Others.objects.create(census=new_census)
             new_others.vector = request.get('other_vector')
@@ -257,23 +267,10 @@ def valid_data(request):
                     )
                     new_census.volume.add(new_volume_item)
 
-            if request_files:
-                for file in request_files.getlist('file'):
-                    census_files = models.CensusFiles()
-                    census_files.census = new_census
-                    census_files.file = file
-                    census_files.save()
-
             Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
                                                    worker_comment=worker_comment)
 
             return True
-
-            # try:
-            #     if isinstance(int(request.get('elevators_count')), int):
-            #         new_census.elevators_count = request.get('elevators_count')
-            # except ValueError:
-            #     new_census.elevators_count = 0
 
         elif request.get('depart') == _b2b or request.get('depart') == _industrial:  # B2B
 
@@ -325,13 +322,6 @@ def valid_data(request):
         m2m_save(new_census.vectors, models.PointVectorsItem.objects.filter(pk__in=request.getlist('vectors')))
 
         new_census.save()
-
-        if request_files:
-            for file in request_files.getlist('file'):
-                census_files = models.CensusFiles()
-                census_files.census = new_census
-                census_files.file = file
-                census_files.save()
 
         Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
                                                worker_comment=worker_comment)

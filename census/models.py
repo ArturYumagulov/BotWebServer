@@ -1,4 +1,3 @@
-import django
 from django.db import models
 from tasks.models import Partner, Result, Task
 
@@ -367,6 +366,16 @@ class Others(models.Model):
     products = models.CharField(max_length=2000, null=True, blank=True, default=None)
 
 
+class Decision(models.Model):
+    census = models.ForeignKey('Census', on_delete=models.CASCADE, related_name='census_decisions')
+    firstname = models.CharField(max_length=2000, verbose_name="Фамилия", null=True, blank=True)
+    lastname = models.CharField(max_length=2000, verbose_name="Имя", null=True, blank=True)
+    surname = models.CharField(max_length=2000, verbose_name="Отчество", null=True, blank=True)
+    email = models.EmailField(verbose_name="ЛПР_email", null=True, blank=True)
+    phone = models.CharField(verbose_name="Телефон", max_length=20, null=True, blank=True)
+    function = models.CharField(verbose_name="Должность", max_length=300, null=True, blank=True)
+
+
 class Census(models.Model):
 
     address_id = models.PositiveBigIntegerField(verbose_name="ID адреса в 1С")
@@ -385,12 +394,8 @@ class Census(models.Model):
     providers = models.ManyToManyField(ProviderList, verbose_name="Основные поставщики", blank=True, default=None)
     elevators_count = models.PositiveIntegerField(verbose_name="Количество подъемников", default=0, null=True,
                                                   blank=True)
-    decision_firstname = models.CharField(max_length=2000, verbose_name="Фамилия", null=True, blank=True)
-    decision_lastname = models.CharField(max_length=2000, verbose_name="Имя", null=True, blank=True)
-    decision_surname = models.CharField(max_length=2000, verbose_name="Отчество", null=True, blank=True)
-    decision_email = models.EmailField(verbose_name="ЛПР_email", null=True, blank=True)
-    decision_phone = models.CharField(verbose_name="Телефон", max_length=20, null=True, blank=True)
-    decision_function = models.CharField(verbose_name="Должность", max_length=300, null=True, blank=True)
+    decision = models.ForeignKey(Decision, on_delete=models.SET_NULL, verbose_name="Контактное лицо", null=True,
+                                 blank=True, default=None, related_name="decision")
     akb_specify = models.BooleanField(default=False, verbose_name="Специализированная точка по АКБ?")
     working = models.ForeignKey(Partner, on_delete=models.PROTECT, verbose_name="Контрагент в 1С", blank=True,
                                 null=True)

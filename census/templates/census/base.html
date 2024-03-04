@@ -25,7 +25,7 @@
     <script defer src="{% static 'js/search_inn.js' %}"></script>
     {% if depart == 'b2c' %}
     <script defer src="{% static 'js/b2c.js' %}"></script>
-    {% else %}
+    {% elif depart == 'b2b' %}
     <script defer src="{% static 'js/b2b.js' %}"></script>
     {% endif %}
     <script>

@@ -242,6 +242,12 @@ class OtherSerializer(serializers.ModelSerializer):
         fields = ("equipment_name", "volume_name", "volume_value", 'vector', 'access_brand', 'providers')
 
 
+class DecisionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = census_models.Decision
+        fields = ('firstname', 'lastname', 'surname', 'email', 'phone', 'function')
+
+
 class EquipmentSerializer(serializers.ModelSerializer):
 
     equipment = serializers.SlugRelatedField(slug_field='name', read_only=True)
@@ -265,40 +271,35 @@ class CensusSerializer(serializers.ModelSerializer):
     volume = VolumeItemSerializer(many=True)
     vectors = PointVectorItemsSerializer(many=True)
     others = OtherSerializer()
+    decision = DecisionSerializer()
 
     class Meta:
         model = census_models.Census
         fields = [
+            'address_id',
             'department',
             'closing',
             'not_communicate',
             'edited',
-            'address_id',
             'point_name',
             'point_type',
             'sto_type',
-            'cars',
             'elevators_count',
-            'decision_firstname',
-            'decision_lastname',
-            'decision_surname',
-            'decision_email',
-            'decision_phone',
-            'decision_function',
             'akb_specify',
             'working',
             'task',
             'basics',
-            'id',
             'category',
+            'decision',
+            'cars',
             'equipment',
             'point_type',
             'sto_type',
             'files',
             'providers',
             'result',
-            'dadata',
             'volume',
             'vectors',
             'others',
+            'dadata',
         ]

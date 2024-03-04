@@ -52,7 +52,7 @@ def census(request, pk):
                 'products': products,
                 'depart': depart
             }
-            return render(request, 'census/b2b_census_form.html', context)
+            return render(request, 'census/b2b.html', context)
 
         elif depart == _b2c:
 
@@ -79,7 +79,7 @@ def census(request, pk):
                 'volumes': volumes,
                 'depart': depart
             }
-            return render(request, 'census/b2c_census_form.html', context)
+            return render(request, 'census/b2c.html', context)
         else:
             return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
 

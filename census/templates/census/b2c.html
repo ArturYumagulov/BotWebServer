@@ -91,12 +91,8 @@
             </select>
             <div id="akbFeedback" class="invalid-feedback">Выберите специализацию торговой точки по АКБ</div>
         </div>
-    {#        Поставщик         #}
-        <div class="was-validated mb-3" id="providersDiv">
-            <select class="form-select multiple" name="providers" data-placeholder="Поставщик" id="providers"
-                    data-url="{% url 'providers' %}" multiple required>
-            </select>
-        </div>
+
+    {% include 'census/utils/providers.html' %}
 
     {% include 'census/utils/other_provider.html' %}
 
