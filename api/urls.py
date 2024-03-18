@@ -24,6 +24,7 @@ router.register('result', views.ResultListView, basename='result_list')
 router.register('result-group', views.ResultGroupListView, basename='result_group_list')
 router.register('result-data', views.ResultDataListView, basename='result_data_list')
 router.register('census', views.CensusView, basename='census')
+router.register('census-update', views.CensusUpdate, basename='census_update')
 
 
 # Фильтры

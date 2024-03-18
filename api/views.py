@@ -1,4 +1,6 @@
 import logging
+import requests as web_requests
+import environ
 
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
@@ -8,13 +10,15 @@ from rest_framework import status
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 
-from census.models import Census, VolumeItem
+from census.models import Census
 from .services import send_message_bot
-from tasks.models import Task, Basics, Partner, Worker, AuthorComments, WorkerComments, PartnerWorker, Result, \
-    ResultGroup, ResultData, Supervisor  # noqa
+from tasks import models
 from . import serializers
 
 logger = logging.getLogger(__name__)
+
+env = environ.Env()
+environ.Env.read_env('BotWebServer/.env')
 
 
 class TaskViewSet(ModelViewSet):
@@ -43,9 +47,9 @@ class TaskViewSet(ModelViewSet):
     \n
     """
 
-    model = Task
+    model = models.Task
     serializer_class = serializers.TaskSerializer
-    queryset = Task.objects.all()
+    queryset = models.Task.objects.all()
     pagination_class = PageNumberPagination
 
     def list(self, request, *args, **kwargs):
@@ -93,10 +97,30 @@ class TaskViewSet(ModelViewSet):
                 if serializer.data['status'] == "Новая":
                     if send_message_bot(data):
                         logger.info(f"Сообщение {data} отправлено")
+                        return Response(serializer.data, status=status.HTTP_201_CREATED)
                     else:
                         logger.error(f"Сообщение {data} не отправлено")
+                elif serializer.data['status'] == "Выполнено":
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                elif serializer.data['status'] == "ОтклоненоСистемой":
+                    task = self.queryset.get(number=data['number'])
+                    chat_id = task.worker.chat_id
+                    message_id = task.message_id
+                    message_del_url = f'https://api.telegram.org/bot{env.str("BOT_TOKEN")}/deleteMessage?' \
+                                      f'chat_id={chat_id}&message_id={message_id}'
+
+                    r = web_requests.get(message_del_url)
+
+                    if r.json()['ok']:
+                        task.message_id = "Удалено"
+                        task.save()
+                        logger.info(f"Сообщение {task.number} из чата {task.worker.name} удалено")
+                        return Response(serializer.data, status=status.HTTP_200_OK)
+                    else:
+                        logger.error(f"Сообщение {task.number} из чата {task.worker.name} не удалено - {r.json()['description']}")
+                        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+
             logger.error(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - не сохранено - "
                          f"serializer_error:{serializer.errors} - {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
             return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -119,9 +143,9 @@ class BaseViewSet(ModelViewSet):
     <b><em>date</em></b> - Дата \n
     """
 
-    model = Basics
+    model = models.Basics
     serializer_class = serializers.BasicSerializer
-    queryset = Basics.objects.all()
+    queryset = models.Basics.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
@@ -194,7 +218,7 @@ class PartnersViewSet(ModelViewSet):
     """
 
     serializer_class = serializers.PartnerSerializer
-    queryset = Partner.objects.all()
+    queryset = models.Partner.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
@@ -243,9 +267,9 @@ class PartnersViewSet(ModelViewSet):
 
 class PartnersWorkerViewSet(ModelViewSet):
 
-    model = PartnerWorker
+    model = models.PartnerWorker
     serializer_class = serializers.PartnerWorkerSerializer
-    queryset = PartnerWorker.objects.all()
+    queryset = models.PartnerWorker.objects.all()
 
     def list(self, request):  # noqa
         queryset = self.queryset.all()
@@ -274,7 +298,7 @@ class PartnersWorkerViewSet(ModelViewSet):
 class WorkerViewSet(ModelViewSet):
 
     serializer_class = serializers.WorkerSerializer
-    queryset = Worker.objects.all()
+    queryset = models.Worker.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
@@ -328,7 +352,7 @@ class WorkerViewSet(ModelViewSet):
 class SupervisorViewSet(ModelViewSet):
 
     serializer_class = serializers.SupervisorSerializer
-    queryset = Supervisor.objects.all()
+    queryset = models.Supervisor.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
@@ -380,7 +404,7 @@ class SupervisorViewSet(ModelViewSet):
 class AuthorCommentsViews(ModelViewSet):
 
     serializer_class = serializers.AuthorCommentsSerializer
-    queryset = AuthorComments.objects.all()
+    queryset = models.AuthorComments.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
@@ -409,7 +433,7 @@ class AuthorCommentsViews(ModelViewSet):
 class WorkerCommentsViews(ModelViewSet):
 
     serializer_class = serializers.WorkerCommentsSerializer
-    queryset = WorkerComments.objects.all()
+    queryset = models.WorkerComments.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
@@ -438,7 +462,7 @@ class WorkerCommentsViews(ModelViewSet):
 class TaskViewListSet(ModelViewSet):
 
     serializer_class = serializers.TaskListSerializer
-    queryset = Task.objects.all()
+    queryset = models.Task.objects.all()
 
     def list(self, request, *args, **kwargs):
         """Вывод всех услуг"""
@@ -447,12 +471,26 @@ class TaskViewListSet(ModelViewSet):
         serializer = self.serializer_class(queryset, many=True)
         logger.info(f"{request.method} - {request.path} - {request.META['REMOTE_ADDR']} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
+#
+#
+# class AllTaskViewListSet(ModelViewSet):
+#
+#     serializer_class = serializers.TaskListSerializer
+#     queryset = models.Task.objects.all()
+#
+#     def list(self, request, *args, **kwargs):
+#         """Вывод всех услуг"""
+#
+#         queryset = self.queryset.all()
+#         serializer = self.serializer_class(queryset, many=True)
+#         logger.info(f"{request.method} - {request.path} - {request.META['REMOTE_ADDR']} - {status.HTTP_200_OK}")
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ResultListView(ModelViewSet):
 
     serializer_class = serializers.ResultSerializer
-    queryset = Result.objects.all()
+    queryset = models.Result.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
@@ -481,7 +519,7 @@ class ResultListView(ModelViewSet):
 
         data = request.data
         serializer = self.serializer_class(data=data,
-                                           instance=WorkerComments.objects.get(pk=data.pk))
+                                           instance=models.WorkerComments.objects.get(pk=data.pk))
 
         if serializer.is_valid():
             serializer.save()
@@ -497,7 +535,7 @@ class ResultListView(ModelViewSet):
 class ResultGroupListView(ModelViewSet):
 
     serializer_class = serializers.ResultGroupSerializer
-    queryset = ResultGroup.objects.all()
+    queryset = models.ResultGroup.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
@@ -542,7 +580,7 @@ class ResultGroupListView(ModelViewSet):
 class ResultDataListView(ModelViewSet):
 
     serializer_class = serializers.ResultDataSerializer
-    queryset = ResultData.objects.all()
+    queryset = models.ResultData.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
@@ -586,7 +624,7 @@ class ResultDataListView(ModelViewSet):
 
 class AllTasksUpdateView(ModelViewSet):
     """Вывод только измененных задач"""
-    queryset = Task.objects.filter(edited=True).exclude(status="Загружено")
+    queryset = models.Task.objects.filter(edited=True).exclude(status="Загружено")
     serializer_class = serializers.AllTaskListSerializer
 
     def create(self, request):  # noqa
@@ -631,7 +669,7 @@ class WorkerForwardViewSet(ModelViewSet):
     """
 
     serializer_class = serializers.WorkerSerializer
-    queryset = Worker.objects.all()
+    queryset = models.Worker.objects.all()
 
     def list(self, request, code):  # noqa
         queryset = self.queryset.filter(chat_id__isnull=False).exclude(code=code)
@@ -641,31 +679,24 @@ class WorkerForwardViewSet(ModelViewSet):
 
 
 class TasksFilterViews(generics.ListAPIView):
-    queryset = Task.objects.all()
+    queryset = models.Task.objects.all()
     serializer_class = serializers.TaskListSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['worker', 'edited', 'status']
 
 
 class WorkerFilterViews(generics.ListAPIView):
-    queryset = Worker.objects.all()
+    queryset = models.Worker.objects.all()
     serializer_class = serializers.WorkerSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['chat_id', 'phone', 'controller', 'code']
 
 
 class PartnerWorkerFilterViews(generics.ListAPIView):
-    queryset = PartnerWorker.objects.all()
+    queryset = models.PartnerWorker.objects.all()
     serializer_class = serializers.PartnerWorkerSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['partner', 'id', 'code']
-
-
-# class VolumeFilterViews(generics.ListAPIView):
-#     queryset = VolumeItem.objects.all()
-#     serializer_class = VolumeItemSerializer
-#     filter_backends = [DjangoFilterBackend]
-#     filterset_fields = ['census']
 
 
 class ResultDataFilterViews(generics.ListAPIView):
@@ -673,9 +704,9 @@ class ResultDataFilterViews(generics.ListAPIView):
     serializer_class = serializers.ResultDataSerializer
 
     def get_queryset(self):
-        queryset = ResultData.objects.all()
+        queryset = models.ResultData.objects.all()
         group_code = self.request.query_params.get('group')
-        group = get_object_or_404(ResultGroup, code=group_code)
+        group = get_object_or_404(models.ResultGroup, code=group_code)
         if group is not None:
             queryset = queryset.filter(group=group)
         return queryset
@@ -697,4 +728,27 @@ class CensusFilterViews(generics.ListAPIView):
     serializer_class = serializers.CensusSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['task']
+
+
+class CensusUpdate(ModelViewSet):
+    serializer_class = serializers.CensusUpdateSerializer
+    queryset = Census.objects.all()
+
+    def put(self, request):  # noqa
+        """Изменение существующей задачи"""
+
+        data = request.data
+
+        serializer = self.serializer_class(data=data, instance=self.queryset.get(pk=data['pk']))
+        logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - data_have - "
+                    f"{status.HTTP_200_OK}")
+        if serializer.is_valid():
+            serializer.save()
+            logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - saving data - "
+                        f"{status.HTTP_201_CREATED}")
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        logger.error(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - не сохранено - "
+                     f"serializer_error:{serializer.errors} - {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
+        return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 

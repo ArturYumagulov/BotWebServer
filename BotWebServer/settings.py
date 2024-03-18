@@ -101,7 +101,7 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 #         "NAME": BASE_DIR / "test_db.sqlite3",
 #     }
 # }
-
+#
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -199,13 +199,13 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'formatter': 'file',
-            'filename': 'logs/info.log'
+            'filename': 'logs/info.txt'
         },
         'error_file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'formatter': 'file',
-            'filename': 'logs/error.log'
+            'filename': 'logs/error.txt'
         }
     },
     'loggers': {

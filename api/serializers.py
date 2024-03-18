@@ -25,13 +25,6 @@ class WorkerCommentsSerializer(serializers.ModelSerializer):
         return self.Meta.model.objects.create(**validated_data)
 
 
-class WorkerSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = task_models.Worker
-        fields = "__all__"
-
-
 class SupervisorSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -49,6 +42,13 @@ class SupervisorSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class WorkerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = task_models.Worker
+        fields = "__all__"
 
 
 class PartnerSerializer(serializers.ModelSerializer):
@@ -189,13 +189,6 @@ class AllTaskListSerializer(serializers.ModelSerializer):
         return instance
 
 
-class AccessoriesCategoryItemSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = census_models.AccessoriesCategoryItem
-        fields = ('name',)
-
-
 class PointVectorsSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -276,16 +269,19 @@ class CensusSerializer(serializers.ModelSerializer):
     class Meta:
         model = census_models.Census
         fields = [
+            'id',
             'address_id',
             'department',
             'closing',
             'not_communicate',
             'edited',
+            'inn',
             'point_name',
             'point_type',
             'sto_type',
             'elevators_count',
             'akb_specify',
+            'tender',
             'working',
             'task',
             'basics',
@@ -303,3 +299,16 @@ class CensusSerializer(serializers.ModelSerializer):
             'others',
             'dadata',
         ]
+
+
+class CensusUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = census_models.Census
+        fields = ('edited',)
+
+    def update(self, instance, validated_data):
+        instance.edited = validated_data.get('edited', instance.edited)
+        instance.save()
+
+        return instance

@@ -24,8 +24,8 @@ class PointTypes(models.Model):
     department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='types')
 
     class Meta:
-        verbose_name = "Тип"
-        verbose_name_plural = "Типы"
+        verbose_name = "Тип точки"
+        verbose_name_plural = "Типы точек"
         ordering = ['-created_date']
 
     def __str__(self):
@@ -74,25 +74,8 @@ class CarsList(models.Model):
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
 
     class Meta:
-        verbose_name = "Список автомобилей торговой точки"
-        verbose_name_plural = "Списки автомобилей торговой точки"
-        ordering = ['-created_date']
-
-    def __str__(self):
-        return self.name
-
-
-class OilList(models.Model):
-    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='oils')
-    is_active = models.BooleanField(default=False, verbose_name="Активность")
-    name = models.CharField(verbose_name="Марка масла", max_length=500)
-    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
-    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
-    slug = models.SlugField(blank=True, null=True, default=None)
-
-    class Meta:
-        verbose_name = "Список масел торговой точки"
-        verbose_name_plural = "Списки масел торговой точки"
+        verbose_name = "Автомобиль"
+        verbose_name_plural = "Автомобили"
         ordering = ['-created_date']
 
     def __str__(self):
@@ -107,24 +90,8 @@ class ProviderList(models.Model):
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
 
     class Meta:
-        verbose_name = "Список поставщиков торговой точки"
-        verbose_name_plural = "Списки поставщиков торговой точки"
-        ordering = ['-created_date']
-
-    def __str__(self):
-        return self.name
-
-
-class FilterList(models.Model):
-    is_active = models.BooleanField(default=False, verbose_name="Активность")
-    name = models.CharField(verbose_name="Марка фильтра", max_length=500)
-    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='filters')
-    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
-    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
-
-    class Meta:
-        verbose_name = "Список фильтров торговой точки"
-        verbose_name_plural = "Списки фильтров торговой точки"
+        verbose_name = "Поставщик"
+        verbose_name_plural = "Поставщики"
         ordering = ['-created_date']
 
     def __str__(self):
@@ -139,40 +106,8 @@ class STOTypeList(models.Model):
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
 
     class Meta:
-        verbose_name = "Список типов СТО торговой точки"
-        verbose_name_plural = "Списки типов СТО торговой точки"
-        ordering = ['-created_date']
-
-    def __str__(self):
-        return self.name
-
-
-class AccessoriesCategory(models.Model):
-    is_active = models.BooleanField(default=False, verbose_name="Активность")
-    name = models.CharField(verbose_name="Категория аксессуаров", max_length=1000)
-    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
-    department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='accessories_category')
-    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
-
-    class Meta:
-        verbose_name = "Список категорий аксессуаров"
-        verbose_name_plural = "Списки категорий аксессуаров"
-        ordering = ['-created_date']
-
-    def __str__(self):
-        return self.name
-
-
-class AccessoriesCategoryItem(models.Model):
-    is_active = models.BooleanField(default=False, verbose_name="Активность")
-    name = models.CharField(verbose_name="Марка", max_length=500)
-    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
-    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
-    category = models.ForeignKey(AccessoriesCategory, on_delete=models.CASCADE, verbose_name='Категория')
-
-    class Meta:
-        verbose_name = "Список брендов в категории аксессуаров"
-        verbose_name_plural = "Списки брендов в категории аксессуаров"
+        verbose_name = "Типы СТО торговой точки"
+        verbose_name_plural = "Типы СТО торговой точки"
         ordering = ['-created_date']
 
     def __str__(self):
@@ -238,6 +173,11 @@ class PointVectorsSelectItem(models.Model):
     department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='point_vectors')
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+
+    class Meta:
+        verbose_name = "Выбираемый объем"
+        verbose_name_plural = "Выбираемые объемы"
+        ordering = ['-created_date']
 
     def __str__(self):
         return f"{self.name}"

@@ -163,30 +163,13 @@
         let select = document.getElementById(select_id)
         select.addEventListener('change', function () {
             if (select.selectedIndex !== 0) {
-            select.classList.add('is-valid')
+            select.classList.add('is-valid');
+            select.style.color = 'black'
             }
         })
     }
 
     function vectorHideBlock(){
-
-        // function createFloatDiv(element, category_name, text="") {
-        //     return `<div class="form-floating mb-3" id="${category_name}${element.id}DivId">
-        //     <input class="form-control" name="${category_name}_${element.id}" id="${category_name}_${element.id}"
-        //     type="text" placeholder="${text} ${element.text}" aria-describedby="${category_name}IdFeedback" required>
-        //     <label for="${category_name}Id">${text} ${element.text}</label>
-        //     <div id="${category_name}IdFeedback" class="invalid-feedback">Укажите ${text} ${element.text}</div>
-        //     </div>`
-        // }
-        // function LoadMultiDivData(element, url) {
-        //     return fetch(url, {
-        //         headers: {"X-CSRFToken": csrf},
-        //         method: "POST",
-        //         body: JSON.stringify({department: depart})
-        //     }).then((res) => res.json())
-        //             .then((data) => {
-        //                 return data})
-        // }
 
         $('#vectorMulti').on('select2:select', function (e) {
             let element = e.params.data
@@ -198,7 +181,6 @@
                 other.children[0].setAttribute('required', '')
                 other.children[0].classList.remove('is-valid')
                 other.children[0].classList.add('is-invalid')
-                console.log('test')
             } else if (element.text !== "Другое") {
                 let select = document.getElementById(`${category}_load`).children[1]
                 select.setAttribute('required', '')

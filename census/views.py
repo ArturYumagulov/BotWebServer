@@ -36,7 +36,7 @@ def census(request, pk):
 
     except models.Census.DoesNotExist:
 
-        if depart == _b2b:
+        if depart == _b2b or depart == _industrial:
 
             products = models.PointVectors.objects\
                 .filter(is_active=True)\
@@ -60,11 +60,6 @@ def census(request, pk):
                 .filter(is_active=True)\
                 .filter(department__name=_b2c)
 
-            categories = models.AccessoriesCategory.objects\
-                .filter(is_active=True)\
-                .filter(department__name=_b2c)\
-                .exclude(name="Другое")
-
             volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
 
             context = {
@@ -75,7 +70,6 @@ def census(request, pk):
                 'address_id': pk,
                 'guid': guid,
                 'products': products,
-                'categories': categories,
                 'volumes': volumes,
                 'depart': depart
             }
@@ -140,12 +134,7 @@ def get_point_category(request):
 
     if request.method == 'POST':
         result = []
-        if json.loads(request.body)['department'] == _b2b:
-            categories = models.PointCategory.objects.filter(department__name=_b2b).filter(is_active=True)
-        elif json.loads(request.body)['department'] == _b2c:
-            categories = models.PointCategory.objects.filter(department__name=_b2c).filter(is_active=True)
-        else:
-            categories = models.PointCategory.objects.filter(is_active=True)
+        categories = models.PointCategory.objects.filter(department__name=json.loads(request.body)['department']).filter(is_active=True)
         for item in categories:
             data = {'id': item.pk, 'name': item.name}
             result.append(data)
@@ -172,13 +161,7 @@ def get_point_vector(request):
     """Категория точки"""
     if request.method == 'POST':
         result = []
-        if json.loads(request.body)['department'] == _b2b:
-            point_vectors = models.PointVectors.objects.filter(department__name=_b2b).filter(is_active=True)
-        elif json.loads(request.body)['department'] == _b2c:
-            point_vectors = models.PointVectors.objects.filter(department__name=_b2c).filter(is_active=True)
-        else:
-            point_vectors = models.PointVectors.objects.filter(is_active=True)
-
+        point_vectors = models.PointVectors.objects.filter(department__name=json.loads(request.body)['department']).filter(is_active=True)
         for item in point_vectors:
             data = {'id': item.pk, 'name': item.name, 'slug': item.slug}
             result.append(data)
@@ -275,12 +258,8 @@ def get_providers(request):
 
     if request.method == 'POST':
         result = []
-        if json.loads(request.body)['department'] == _b2b:
-            providers = models.ProviderList.objects.filter(department__name=_b2b).filter(is_active=True)
-        elif json.loads(request.body)['department'] == _b2c:
-            providers = models.ProviderList.objects.filter(department__name=_b2c).filter(is_active=True)
-        else:
-            providers = models.ProviderList.objects.filter(is_active=True)
+        providers = models.ProviderList.objects.filter(department__name=json.loads(request.body)['department'])\
+            .filter(is_active=True)
         for item in providers:
             data = {'id': item.pk, 'name': item.name}
             result.append(data)
@@ -358,12 +337,8 @@ def get_equipment_park(request):
 def get_vectors_items(request, slug):
     result = []
     if request.method == "POST":
-        if json.loads(request.body)['department'] == _b2b:
-            vectors_item = models.PointVectorsSelectItem.objects.filter(vectors__slug=slug).filter(is_active=True).filter(department__name=_b2b)
-        elif json.loads(request.body)['department'] == _b2c:
-            vectors_item = models.PointVectorsSelectItem.objects.filter(vectors__slug=slug).filter(department__name=_b2c)
-        else:
-            vectors_item = models.PointVectorsSelectItem.objects.filter(vectors__slug=slug)
+        vectors_item = models.PointVectorsSelectItem.objects.\
+            filter(department__name=json.loads(request.body)['department']).filter(vectors__slug=slug)
 
         for item in vectors_item:
             data = {

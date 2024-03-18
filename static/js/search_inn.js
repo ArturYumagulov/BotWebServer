@@ -126,6 +126,7 @@ function LoadInnSearchBlock(url, event) {
                                 // HideSearchBlock(true)
                                 let orgName = document.getElementById('organizationsNameId')
                                 orgName.value = item.getAttribute('data-name')
+                                orgName.classList.add('is-valid')
                                 inn.value = item.getAttribute('data-inn')
                                 HideSearchBlock(searchBlock)
                             })

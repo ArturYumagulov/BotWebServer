@@ -136,7 +136,8 @@
         let select = document.getElementById(select_id)
         select.addEventListener('change', function () {
             if (select.selectedIndex !== 0) {
-            select.classList.add('is-valid')
+            select.classList.add('is-valid');
+            select.style.color = 'black'
             }
         })
     }
@@ -427,6 +428,7 @@
 
     async function CreateApp(container) {
         checkHiddenSearchObjects('workCheckbox', 'searchClient', null, true);
+        floatFormValid('signboardId', true)
         await createOption('pointTypeID')
         await createOption('shopCategoryId')
         await createOption('stoTypeId')
@@ -451,6 +453,7 @@
         floatFormValid('otherProvId', true, false)
         floatFormValid('otherVectorInputId', true, false)
         floatFormValid('resultCommentId', true, false)
+        floatFormValid('elevatorCountId', true, true, false)
 
         // Автосервис
         await hideChangeFloatElem('pointTypeID', 'elevatorId', 'elevatorCountId','Автосервис')
