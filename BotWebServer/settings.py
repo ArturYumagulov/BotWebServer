@@ -188,6 +188,10 @@ LOGGING = {
         },
         'file': {
             'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+        },
+        'telegram': {
+            'format': 'BotWebServer - %(filename)s:%(lineno)d - <b>%(levelname)-8s</b> - '
+                      '<i> [%(asctime)s]</i> - %(message)s'
         }
     },
     'handlers': {
@@ -206,12 +210,17 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'formatter': 'file',
             'filename': 'logs/error.txt'
+        },
+        'telegram': {
+            'level': 'ERROR',
+            'class': 'BotWebServer.log_handler.TelegramLogsHandler',
+            'formatter': 'telegram'
         }
     },
     'loggers': {
         '': {
             'level': 'DEBUG',
-            'handlers': ['console', 'info_file', 'error_file']
+            'handlers': ['console', 'info_file', 'error_file', 'telegram']
         }
     }
 }

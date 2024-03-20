@@ -108,7 +108,7 @@ def del_ready_task(request, task):
                     f"- удалено сообщение - 201")
         return True
     else:
-        logger.error(f"{task.number} - {request.path} - {r.json()['result']}"
+        logger.error(f"{task.number} - {r.json()['description']}"
                      f"- не удалено - 400")
         return False
 
@@ -128,7 +128,6 @@ def valid_data(request):
     new_census.basics = task.base.number
     new_census.inn = request.get('inn')
     # new_census.edited = True
-    print(request)
 
     new_census.save()
 

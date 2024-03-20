@@ -100,7 +100,7 @@ class TaskViewSet(ModelViewSet):
                         return Response(serializer.data, status=status.HTTP_201_CREATED)
                     else:
                         logger.error(f"Сообщение {data} не отправлено")
-                elif serializer.data['status'] == "Выполнено":
+                elif serializer.data['status'] == "Выполнено" or serializer.data['status'] == "Переадресована":
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
                 elif serializer.data['status'] == "ОтклоненоСистемой":
@@ -465,7 +465,7 @@ class TaskViewListSet(ModelViewSet):
     queryset = models.Task.objects.all()
 
     def list(self, request, *args, **kwargs):
-        """Вывод всех услуг"""
+        """Вывод всех задач"""
 
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)

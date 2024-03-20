@@ -427,6 +427,7 @@
     }
 
     async function CreateApp(container) {
+        loadValidPartners();
         checkHiddenSearchObjects('workCheckbox', 'searchClient', null, true);
         floatFormValid('signboardId', true)
         await createOption('pointTypeID')

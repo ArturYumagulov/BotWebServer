@@ -25,11 +25,19 @@ class WorkerCommentsSerializer(serializers.ModelSerializer):
         return self.Meta.model.objects.create(**validated_data)
 
 
+class HeadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = task_models.Head
+        fields = "__all__"
+
+
 class SupervisorSerializer(serializers.ModelSerializer):
+
+    head = HeadSerializer()
 
     class Meta:
         model = task_models.Supervisor
-        fields = "__all__"
+        fields = ('code', 'name', 'chat_id', 'phone', 'head')
 
     def create(self, validated_data):
         return task_models.Supervisor.objects.create(**validated_data)
@@ -44,6 +52,15 @@ class SupervisorSerializer(serializers.ModelSerializer):
         return instance
 
 
+class AllWorkerSerializer(serializers.ModelSerializer):
+
+    supervisor = SupervisorSerializer()
+
+    class Meta:
+        model = task_models.Worker
+        fields = ('code', 'name', 'chat_id', 'phone', 'controller', 'partner', 'supervisor')
+
+
 class WorkerSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -51,11 +68,23 @@ class WorkerSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class PartnerWorkerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = task_models.PartnerWorker
+        fields = "__all__"
+
+    def create(self, validated_data):
+        return task_models.PartnerWorker.objects.create(**validated_data)
+
+
 class PartnerSerializer(serializers.ModelSerializer):
+
+    workers = PartnerWorkerSerializer(many=True, read_only=True)
 
     class Meta:
         model = task_models.Partner
-        fields = ('code', 'name', 'inn')
+        fields = ('code', 'name', 'inn', 'workers')
 
     def create(self, validated_data):
         return task_models.Partner.objects.create(**validated_data)
@@ -67,16 +96,6 @@ class PartnerSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-
-
-class PartnerWorkerSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = task_models.PartnerWorker
-        fields = "__all__"
-
-    def create(self, validated_data):
-        return task_models.PartnerWorker.objects.create(**validated_data)
 
 
 class BasicSerializer(serializers.ModelSerializer):
@@ -160,8 +179,8 @@ class TaskListSerializer(serializers.ModelSerializer):
 
     base = BasicSerializer()
     partner = PartnerSerializer()
-    worker = WorkerSerializer()
-    author = WorkerSerializer()
+    worker = AllWorkerSerializer()
+    author = AllWorkerSerializer()
     worker_comment = WorkerCommentsSerializer()
     author_comment = AuthorCommentsSerializer()
     result = ResultSerializer()
