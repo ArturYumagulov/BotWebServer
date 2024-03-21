@@ -145,7 +145,7 @@ def valid_data(request):
         new_census.dadata = None
 
     if request.get('working'):
-        new_census.working = Partner.objects.get(name=request.get('working'))
+        new_census.working = Partner.objects.get(inn=str(request.get('working')).split(' - ')[1])
     else:
         pass
 

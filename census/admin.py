@@ -33,13 +33,9 @@ class CensusAdmin(admin.ModelAdmin):
               'result',
               'task',
               'basics',
-              'volume',
-              'equipment',
               'tender',
               'position',
               'dadata',
-              'vectors',
-              'others',
               )
 
     def get_task_worker(self, obj):
