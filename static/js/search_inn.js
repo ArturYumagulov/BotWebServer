@@ -126,6 +126,7 @@ function LoadInnSearchBlock(url, event) {
                                 // HideSearchBlock(true)
                                 let orgName = document.getElementById('organizationsNameId')
                                 orgName.value = item.getAttribute('data-name')
+                                orgName.classList.add('is-valid')
                                 inn.value = item.getAttribute('data-inn')
                                 HideSearchBlock(searchBlock)
                             })
@@ -165,7 +166,7 @@ function loadValidPartners() {
                             item.setAttribute('id', 'result')
                             item.classList.add('list-group-item')
                             item.style.cursor = 'pointer'
-                            item.innerHTML = i.name
+                            item.innerHTML = i.name + ' - ' + i.inn
                             dataList.append(item)
                         })
                         let find_item = document.querySelectorAll('#result')

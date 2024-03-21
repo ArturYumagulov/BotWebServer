@@ -15,6 +15,7 @@ class CensusAdmin(admin.ModelAdmin):
     readonly_fields = ('created_date', 'edit_date')
     fields = ('closing',
               'not_communicate',
+              'inn',
               'department',
               'address_id',
               'created_date',
@@ -52,53 +53,40 @@ class CensusAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.PointTypes)
-class CensusAdmin(admin.ModelAdmin):
-    pass
+class PointTypesAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active',)
+    list_filter = ('department',)
 
 
 @admin.register(models.PointVectors)
 class PointVectorsAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active',)
+    list_filter = ('department',)
     prepopulated_fields = {"slug": ('name',)}
 
 
 @admin.register(models.PointCategory)
-class CensusAdmin(admin.ModelAdmin):
-    pass
+class PointCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active',)
+    list_filter = ('department',)
 
 
 @admin.register(models.CarsList)
-class CensusAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(models.OilList)
-class CensusAdmin(admin.ModelAdmin):
-    pass
+class CarsListAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active',)
+    list_filter = ('department',)
 
 
 @admin.register(models.ProviderList)
 class ProviderAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(models.FilterList)
-class FilterListAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'is_active',)
+    list_filter = ('department',)
 
 
 @admin.register(models.STOTypeList)
 class STOTypeListAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(models.AccessoriesCategory)
-class AccessoriesCategoryAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(models.AccessoriesCategoryItem)
-class AccessoriesCategoryItemAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'is_active',)
+    list_filter = ('department',)
 
 
 @admin.register(models.CensusFiles)
@@ -121,39 +109,25 @@ class CompanyDatabaseAdmin(admin.ModelAdmin):
 
 @admin.register(models.Volume)
 class VolumeAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(models.VolumeItem)
-class VolumeItemAdmin(admin.ModelAdmin):
-    pass
-
-
-# @admin.register(models.VolumeItemValue)
-# class VolumeItemValueAdmin(admin.ModelAdmin):
-#     pass
+    list_display = ('name', 'is_active',)
+    list_filter = ('department',)
 
 
 @admin.register(models.EquipmentList)
 class EquipmentListItemValueAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'is_active',)
+    list_filter = ('department',)
 
 
 @admin.register(models.Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'is_active',)
+    list_filter = ('is_active',)
 
 
-@admin.register(models.PointVectorsItem)
-class PointVectorsItemAdmin(admin.ModelAdmin):
-    pass
-
+# PointVectorsSelectItem
 
 @admin.register(models.PointVectorsSelectItem)
 class PointVectorsSelectItemAdmin(admin.ModelAdmin):
-    pass
-
-
-# @admin.register(models.EquipmentList)
-# class EquipmentListAdmin(admin.ModelAdmin):
-#     pass
+    list_display = ('name', 'is_active',)
+    list_filter = ('is_active',)

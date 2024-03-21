@@ -13,7 +13,30 @@ from census import models
 from tasks import models as task_models
 
 
-class B2BSeleniumTests(StaticLiveServerTestCase):
+class Utils:
+
+    def __init__(self):
+        self.selenium = WebDriver()
+
+    def scroll(self, obj_id):
+        self.selenium.execute_script("arguments[0].scrollIntoView(true);",
+                                     self.selenium.find_element(By.ID, obj_id))
+        time.sleep(3)
+
+    def select2multi(self, eid, items, typing="Div"):
+        elem_1 = self.selenium.find_element(By.CSS_SELECTOR, f'#{eid} > option:nth-child(2)')
+        ActionChains(self.selenium).key_up(Keys.CONTROL).click(elem_1).perform()
+
+        for item in items:
+            elem = self.selenium.find_element(By.XPATH,
+                                              f'//*[@id="{eid}{typing}"]/span[2]/span/span/ul/li[contains(text(), "{item.name}")]')
+            elem.click()
+
+        ActionChains(self.selenium).key_up(Keys.CONTROL).click(elem_1).perform()
+        # ActionChains(self.selenium).key_up(Keys.CONTROL).click(elem_1).perform()
+
+
+class B2BSeleniumTests(StaticLiveServerTestCase, Utils):
     fixtures = ['data.json']
 
     @classmethod
@@ -37,18 +60,6 @@ class B2BSeleniumTests(StaticLiveServerTestCase):
         cls.selenium.quit()
         super().tearDownClass()
 
-    def select2multi(self, eid, items, typing="Div"):
-        elem_1 = self.selenium.find_element(By.CSS_SELECTOR, f'#{eid} > option:nth-child(2)')
-        ActionChains(self.selenium).key_up(Keys.CONTROL).click(elem_1).perform()
-
-        for item in items:
-            elem = self.selenium.find_element(By.XPATH,
-                                              f'//*[@id="{eid}{typing}"]/span[2]/span/span/ul/li[contains(text(), "{item.name}")]')
-            elem.click()
-
-        ActionChains(self.selenium).key_up(Keys.CONTROL).click(elem_1).perform()
-        ActionChains(self.selenium).key_up(Keys.CONTROL).click(elem_1).perform()
-
     def float_valid(self, objects, string=True):
         if string:
             objects.send_keys(self.test_digit_comment)
@@ -62,11 +73,6 @@ class B2BSeleniumTests(StaticLiveServerTestCase):
             objects.clear()
             objects.send_keys(self.test_digit_comment)
             self.assertEqual(self.valid_class in objects.get_attribute('class').split(' '), True)
-
-    def scroll(self, obj_id):
-        self.selenium.execute_script("arguments[0].scrollIntoView(true);",
-                                     self.selenium.find_element(By.ID, obj_id))
-        time.sleep(3)
 
     def all_components(self):
         #  Вывеска
@@ -212,7 +218,6 @@ class B2BSeleniumTests(StaticLiveServerTestCase):
         self.float_valid(surnameMakerId)
         self.float_valid(decisionMakerFunctionId)
         self.float_valid(decisionMakerPhoneId, string=False)
-        self.float_valid(resultCommentId)
 
         time.sleep(3)
 
@@ -232,7 +237,7 @@ class B2BSeleniumTests(StaticLiveServerTestCase):
                 self.valid_class in self.selenium.find_element(
                     By.ID, 'controlId').get_attribute('class').split(' '), True
             )
-
+        self.float_valid(resultCommentId)
         self.selenium.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(3)
         button = self.selenium.find_element(By.TAG_NAME, 'button')
@@ -321,3 +326,271 @@ class B2BSeleniumTests(StaticLiveServerTestCase):
         self.assertEqual(org_name.get_attribute('value'), self.not_inn_name)
 
         self.all_components()
+
+
+class B2CSeleniumTests(StaticLiveServerTestCase, Utils):
+    fixtures = ['data.json']
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.selenium = WebDriver()
+        cls.exists_census = f"{cls.live_server_url}/census/f/22?city=Казань&street=Калинина&house=15к1&guid=00000000001&name=Под%20мостом&depart=b2c"
+        cls.new_census = f"{cls.live_server_url}/census/f/50?city=Казань&street=Калинина&house=15к1&guid=00000000001&name=Под%20мостом&depart=b2c"
+        cls.load = f"{cls.live_server_url}/census/load/"
+        cls.valid_class = 'is-valid'
+        cls.invalid_class = 'is-invalid'
+        cls.has_inn = '1313131313'
+        cls.has_inn_name = "Ленин Владимир Ильич ИП"
+        cls.test_string_comment = "Тестовый комментарий"
+        cls.test_digit_comment = "123"
+        cls.not_inn = "7723032222"
+        cls.not_inn_name = 'ЖСК "НАЛЬЧИК"'
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium.quit()
+        super().tearDownClass()
+
+    def float_valid(self, objects, string=True):
+        if string:
+            objects.send_keys(self.test_digit_comment)
+            self.assertEqual(self.invalid_class in objects.get_attribute('class').split(' '), True)
+            objects.clear()
+            objects.send_keys(self.test_string_comment)
+            self.assertEqual(self.valid_class in objects.get_attribute('class').split(' '), True)
+        else:
+            objects.send_keys(self.test_string_comment)
+            self.assertEqual(self.invalid_class in objects.get_attribute('class').split(' '), True)
+            objects.clear()
+            objects.send_keys(self.test_digit_comment)
+            self.assertEqual(self.valid_class in objects.get_attribute('class').split(' '), True)
+
+    def test_b2c_not_working(self):
+        # адрес не актуален
+        self.selenium.get(self.new_census)
+        self.assertEqual(self.selenium.title, 'Сенсус Казань, Калинина, 15к1')
+        self.selenium.find_element(By.ID, 'closeCheckbox').click()
+        self.selenium.find_element(By.ID, 'formFileMultiple').send_keys(finders.find('images/logo.jpg'))
+        self.selenium.find_element(By.ID, 'resultCommentId').send_keys(self.test_string_comment)
+        self.selenium.find_element(By.ID, 'formFileMultiple').submit()
+        self.selenium.implicitly_wait(10)
+        text = self.selenium.find_element(By.TAG_NAME, 'h1')
+        self.assertEqual(text.text, 'Сенсус успешно записан, задача выполнена. Спасибо')
+
+    def test_b2c_org_have_in_1C(self):
+        self.selenium.get(self.exists_census)
+        self.assertEqual(self.selenium.title, 'Сенсус данной точки уже проведен')
+        self.selenium.get(self.new_census)
+        self.assertEqual(self.selenium.title, 'Сенсус Казань, Калинина, 15к1')
+        inn = self.selenium.find_element(By.ID, 'innId')
+        inn.send_keys(self.has_inn)
+        inn.send_keys(Keys.ENTER)
+        time.sleep(1)
+        self.assertEqual(self.selenium.find_element(By.CSS_SELECTOR, '#innSearchUl > li.list-group-item.out').text, "Данный ИНН существует в 1С")
+        find_inn = self.selenium.find_element(By.CSS_SELECTOR, '#innSearchUl > li.list-group-item.result-inn')
+        self.assertEqual(find_inn.text, self.has_inn_name)
+        find_inn.click()
+        search_client_input = self.selenium.find_element(By.ID, 'searchClient')
+        self.assertEqual(search_client_input.get_attribute('value'), 'Ленин Владимир Ильич ИП')
+        self.assertEqual(self.valid_class in search_client_input.get_attribute('class').split(' '), True)
+
+        #  Уже работаем с точкой
+        work_checkbox = self.selenium.find_element(By.CSS_SELECTOR, '#workCheckbox')
+
+        self.assertEqual(work_checkbox.is_selected(), True)
+
+        #  Вывеска
+        point_name_input = self.selenium.find_element(By.ID, 'signboardId')
+        point_name_input.send_keys(Keys.ENTER)
+        self.assertEqual(self.invalid_class in point_name_input.get_attribute('class').split(' '), True)
+        self.assertEqual(self.selenium.find_element(By.ID, 'signboardIdFeedback').text, 'Укажите вывеску торговой точки')
+
+        point_name_input.send_keys('Название точки')
+
+        self.assertEqual(self.valid_class in point_name_input.get_attribute('class').split(' '), True)
+
+        #  Фотографии точки
+        time.sleep(1)
+        files = self.selenium.find_element(By.ID, 'formFileMultiple')
+
+        self.assertEqual(self.invalid_class in files.get_attribute('class').split(' '), True)
+        self.assertEqual(self.selenium.find_element(By.XPATH, '//*[@id="todo-app"]/form/div[5]/div').text,
+                         'Пожалуйста, загрузите фотографии точки')
+        files.send_keys(finders.find('images/logo.jpg'))
+
+        self.assertEqual(self.valid_class in files.get_attribute('class').split(' '), True)
+
+        nets = Select(self.selenium.find_element(By.ID, 'typeId'))
+        nets.select_by_visible_text("Да")
+        self.assertEqual(
+            self.valid_class in self.selenium.find_element(By.ID, 'typeId').get_attribute('class').split(' '), True)
+        nets.select_by_visible_text("Нет")
+        self.assertEqual(
+            self.valid_class in self.selenium.find_element(By.ID, 'typeId').get_attribute('class').split(' '), True)
+
+        point_category = Select(self.selenium.find_element(By.ID, 'shopCategoryId'))
+        point_categories = models.PointCategory.objects.filter(is_active=True).filter(department__name='b2c')
+        for category in point_categories:
+            point_category.select_by_visible_text(category.name)
+            self.assertEqual(
+                self.valid_class in self.selenium.find_element(
+                    By.ID, 'shopCategoryId').get_attribute('class').split(' '), True)
+
+        point_type = Select(self.selenium.find_element(By.ID, 'pointTypeID'))
+        sto_type_div = self.selenium.find_element(By.ID, 'stoTypeDiv')
+        elevator_div = self.selenium.find_element(By.ID, 'elevatorId')
+        self.assertEqual('none' in sto_type_div.get_attribute('style'), True)
+        self.assertEqual('none' in elevator_div.get_attribute('style'), True)
+
+        auto = models.PointTypes.objects.get(name="Автосервис")
+        point_type.select_by_visible_text(auto.name)
+        self.assertEqual('block' in sto_type_div.get_attribute('style'), True)
+        self.assertEqual('block' in elevator_div.get_attribute('style'), True)
+        elevator_input = self.selenium.find_element(By.ID, 'elevatorCountId')
+        elevator_input.send_keys(Keys.SPACE)
+        time.sleep(3)
+        self.assertEqual(self.invalid_class in elevator_input.get_attribute('class').split(' '), True)
+
+        elevator_input.clear()
+        elevator_input.send_keys(self.test_digit_comment)
+        self.assertEqual(self.valid_class in elevator_input.get_attribute('class').split(' '), True)
+
+        shop = models.PointTypes.objects.get(name="Магазин")
+        point_type.select_by_visible_text(shop.name)
+        self.assertEqual('none' in sto_type_div.get_attribute('style'), True)
+
+        auto = models.PointTypes.objects.get(name="Автосервис")
+        point_type.select_by_visible_text(auto.name)
+        self.assertEqual('block' in sto_type_div.get_attribute('style'), True)
+        self.assertEqual('block' in elevator_div.get_attribute('style'), True)
+        elevator_input = self.selenium.find_element(By.ID, 'elevatorCountId')
+        elevator_input.send_keys(Keys.SPACE)
+        self.assertEqual(self.invalid_class in elevator_input.get_attribute('class').split(' '), True)
+        elevator_input.clear()
+        elevator_input.send_keys(self.test_digit_comment)
+        self.assertEqual(self.valid_class in elevator_input.get_attribute('class').split(' '), True)
+
+        point_type.select_by_visible_text(auto.name)
+
+        sto_types = models.STOTypeList.objects.filter(is_active=True).filter(department__name='b2c')
+        sto_type_select = Select(self.selenium.find_element(By.ID, 'stoTypeId'))
+
+        for sto_typ in sto_types:
+            sto_type_select.select_by_visible_text(sto_typ.name)
+            self.assertEqual(
+                self.valid_class in self.selenium.find_element(
+                    By.ID, 'stoTypeId').get_attribute('class').split(' '), True)
+
+        self.scroll('shopCategoryId')
+
+        vector_id = 'vectorMulti'
+        vectors = models.PointVectors.objects.filter(is_active=True).filter(department__name='b2c')
+        self.select2multi(vector_id, vectors)
+        self.assertEqual('was-validated' in self.selenium.find_element(By.ID, f"{vector_id}Div").get_attribute('class').split(' '), True)
+
+        volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c') \
+            .exclude(name="Другое")
+
+        for vector in vectors:
+            if vector.name == "АКБ":
+                akb = self.selenium.find_element(By.ID, 'akbId')
+                akb_vector = Select(akb)
+                akb_vector.select_by_visible_text('Да')
+                self.assertEqual(self.valid_class in akb.get_attribute('class').split(' '), True)
+                akb_vector.select_by_visible_text('Нет')
+                self.assertEqual(self.valid_class in akb.get_attribute('class').split(' '), True)
+                self.scroll('vectorMulti')
+
+                select_input = self.selenium.find_element(By.ID, f'{vector.slug}_load')
+                self.assertEqual('was-validated' in select_input.get_attribute('class').split(' '), True)
+                vector_items = models.PointVectorsSelectItem.objects.filter(vectors=vector)
+                self.selenium.implicitly_wait(10)
+                self.select2multi(vector.slug, vector_items, '_load')
+
+            if vector.name == "Масло":
+                select_input = self.selenium.find_element(By.ID, f'{vector.slug}_load')
+                self.assertEqual('was-validated' in select_input.get_attribute('class').split(' '), True)
+                vector_items = models.PointVectorsSelectItem.objects.filter(vectors=vector)
+                self.selenium.implicitly_wait(10)
+                self.select2multi(vector.slug, vector_items, '_load')
+
+                for volume in volumes:
+                    volume_item = self.selenium.find_element(By.ID, f'volume_{volume.pk}_input')
+                    volume_item.send_keys(self.test_string_comment)
+                    self.assertEqual(self.invalid_class in volume_item.get_attribute('class').split(' '), True)
+                    self.assertEqual(self.selenium.find_element(By.ID, f'volume_{volume.pk}_feedback').text,
+                                     f'Укажите пролив масла {volume.name} в месяц')
+                    volume_item.clear()
+                    volume_item.send_keys(self.test_digit_comment)
+                    self.assertEqual(self.valid_class in volume_item.get_attribute('class').split(' '), True)
+
+            elif vector.name == "Другое":
+                other_vector_input = self.selenium.find_element(By.ID, 'otherVectorInputId')
+                other_vector_input.send_keys(self.test_digit_comment)
+                self.assertEqual(self.invalid_class in other_vector_input.get_attribute('class').split(' '), True)
+                self.assertEqual(self.selenium.find_element(By.ID, 'otherVectorFeedback').text,
+                                 'Выберите другие продукты торговой точки')
+                other_vector_input.clear()
+                other_vector_input.send_keys(self.test_string_comment)
+                self.assertEqual(self.valid_class in other_vector_input.get_attribute('class').split(' '), True)
+                self.scroll('vectorMulti')
+
+        self.scroll('contact_person')
+
+        firstnameMakerId = self.selenium.find_element(By.ID, 'firstnameMakerId')
+        lastnameMakerId = self.selenium.find_element(By.ID, 'lastnameMakerId')
+        surnameMakerId = self.selenium.find_element(By.ID, 'surnameMakerId')
+        decisionMakerEmailId = self.selenium.find_element(By.ID, 'decisionMakerEmailId')
+        decisionMakerFunctionId = self.selenium.find_element(By.ID, 'decisionMakerFunctionId')
+        decisionMakerPhoneId = self.selenium.find_element(By.ID, 'decisionMakerPhoneId')
+        resultCommentId = self.selenium.find_element(By.ID, 'resultCommentId')
+
+        decisionMakerEmailId.send_keys('test@test.ru')
+        self.assertEqual(self.valid_class in decisionMakerEmailId.get_attribute('class').split(' '), True)
+
+        self.float_valid(firstnameMakerId)
+        self.float_valid(lastnameMakerId)
+        self.float_valid(surnameMakerId)
+        self.float_valid(decisionMakerFunctionId)
+        self.float_valid(decisionMakerPhoneId, string=False)
+        self.float_valid(resultCommentId)
+
+        time.sleep(3)
+
+        cars = models.CarsList.objects.filter(is_active=True).filter(department__name='b2c')
+        self.select2multi('cars', cars)
+
+        self.selenium.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(3)
+
+        providers = models.ProviderList.objects.filter(is_active=True).filter(department__name='b2c')
+        self.select2multi('providers', providers)
+
+        if "Другое" in [x.name for x in providers]:
+            other_prov = self.selenium.find_element(By.ID, 'otherProvId')
+            other_prov.send_keys(self.test_digit_comment)
+            self.assertEqual(self.invalid_class in other_prov.get_attribute('class').split(' '), True)
+            other_prov.clear()
+            other_prov.send_keys(self.test_string_comment)
+            self.assertEqual(self.valid_class in other_prov.get_attribute('class').split(' '), True)
+
+        self.selenium.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(3)
+
+        results = task_models.ResultData.objects.filter(group__name="Сенсус")
+        result_s = Select(self.selenium.find_element(By.ID, 'controlId'))
+
+        for result in results:
+            result_s.select_by_visible_text(result.name)
+            self.assertEqual(
+                self.valid_class in self.selenium.find_element(
+                    By.ID, 'controlId').get_attribute('class').split(' '), True
+            )
+
+        button = self.selenium.find_element(By.TAG_NAME, 'button')
+        button.click()
+        self.selenium.implicitly_wait(10)
+        text = self.selenium.find_element(By.TAG_NAME, 'h1')
+        self.assertEqual(text.text, 'Сенсус успешно записан, задача выполнена. Спасибо')
+

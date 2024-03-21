@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 _b2b = env('B2B')
 _b2c = env('B2C')
 _industrial = env('INDUSTRIAL')
+token = env.str("BOT_TOKEN")
 
 
 def unix_to_date(unix):
@@ -99,6 +100,19 @@ def get_integer_valid(item, data_item, value):
     return data_item.value
 
 
+def del_ready_task(request, task):
+    r = requests.get(
+        f'https://api.telegram.org/bot{token}/deleteMessage?chat_id={task.worker.chat_id}&message_id={task.message_id}')
+    if r.json()['ok']:
+        logger.info(f"{task.number}- {r.json()['result']} - "
+                    f"- удалено сообщение - 201")
+        return True
+    else:
+        logger.error(f"{task.number} - {r.json()['description']}"
+                     f"- не удалено - 400")
+        return False
+
+
 def valid_data(request):
     _other_name = "Другое"
     request_files = request.FILES
@@ -112,8 +126,8 @@ def valid_data(request):
     new_census.position = request.get('position')  # Координаты
     new_census.address_id = request.get('address_id')
     new_census.basics = task.base.number
+    new_census.inn = request.get('inn')
     # new_census.edited = True
-    print(request)
 
     new_census.save()
 
@@ -156,6 +170,9 @@ def valid_data(request):
 
         Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
                                                worker_comment=worker_comment)
+
+        del_ready_task(request, task)
+
         return True
 
     elif request.get('not_communicate'):   # Если нет коммуникации
@@ -178,6 +195,8 @@ def valid_data(request):
 
         Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
                                                worker_comment=worker_comment)
+
+        del_ready_task(request, task)
 
         return True
 
@@ -236,12 +255,19 @@ def valid_data(request):
             new_census.nets = request.get('nets')
             new_census.point_type = models.PointTypes.objects.get(pk=request.get('point_type'))
             new_census.other_brand = request.get('other_brand')
-            new_census.elevators_count = int(request.get('elevators_count'))
+
+            if request.get('elevators_count'):
+                new_census.elevators_count = int(request.get('elevators_count'))
+            else:
+                new_census.elevators_count = 0
 
             m2m_save(new_census.cars, models.CarsList.objects.filter(pk__in=request.getlist('cars')))
             m2m_save(new_census.providers, models.ProviderList.objects.filter(pk__in=request.getlist('providers')))
 
-            new_census.sto_type = models.STOTypeList.objects.get(pk=request.get('sto_type'))
+            if request.get('sto_type'):
+                new_census.sto_type = models.STOTypeList.objects.get(pk=request.get('sto_type'))
+            else:
+                new_census.sto_type = None
 
             if request.get('akb_specify'):
                 new_census.akb_specify = int(request.get('akb_specify'))
@@ -253,12 +279,10 @@ def valid_data(request):
 
             new_census.others = new_others
 
-            new_census.save()
-
             #  сохранение объема
             oil = models.PointVectors.objects.get(name="Масло")
             debit_items = models.Volume.objects.filter(is_active=True).filter(department__name=_b2c)
-            if str(oil.pk) in request.get('vectors'):
+            if str(oil.pk) in request.getlist('vectors'):
                 for volume in debit_items:
                     new_volume_item = models.VolumeItem.objects.create(
                         census=new_census,
@@ -267,8 +291,11 @@ def valid_data(request):
                     )
                     new_census.volume.add(new_volume_item)
 
+            new_census.save()
+
             Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
                                                    worker_comment=worker_comment)
+            del_ready_task(request, task)
 
             return True
 
@@ -325,5 +352,7 @@ def valid_data(request):
 
         Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
                                                worker_comment=worker_comment)
+
+        del_ready_task(request, task)
 
         return True

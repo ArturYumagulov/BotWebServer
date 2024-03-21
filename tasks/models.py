@@ -83,13 +83,13 @@ class Partner(models.Model):
 
 
 class PartnerWorker(models.Model):
-    partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name="partner_workers")
+    partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name="workers")
     name = models.CharField(max_length=1000)
     positions = models.CharField(max_length=1000)
     code = models.CharField(max_length=11, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.code}: {self.name}"
 
     class Meta:
         verbose_name = "04. Сотрудники контрагента"
@@ -115,7 +115,7 @@ class Worker(models.Model):
         ordering = ['name']
 
 
-class Supervisor(models.Model):
+class Head(models.Model):
     name = models.CharField(verbose_name="Имя", max_length=1000)
     code = models.CharField(verbose_name="Код 1С", primary_key=True, max_length=11)
     chat_id = models.IntegerField(unique=True, blank=True, null=True)
@@ -127,6 +127,23 @@ class Supervisor(models.Model):
     class Meta:
         verbose_name = "06. Руководитель"
         verbose_name_plural = "06. Руководители"
+        ordering = ['name']
+
+
+class Supervisor(models.Model):
+    head = models.ForeignKey(Head, related_name='supervisors', on_delete=models.PROTECT, verbose_name="РОП",
+                             blank=True, null=True, default=None)
+    name = models.CharField(verbose_name="Имя", max_length=1000)
+    code = models.CharField(verbose_name="Код 1С", primary_key=True, max_length=11)
+    chat_id = models.IntegerField(unique=True, blank=True, null=True)
+    phone = models.CharField(verbose_name="Телефон", max_length=15, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "06. Супервайзер"
+        verbose_name_plural = "06. Супервайзеры"
         ordering = ['name']
 
 

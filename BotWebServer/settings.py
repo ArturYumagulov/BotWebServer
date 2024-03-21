@@ -101,7 +101,7 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 #         "NAME": BASE_DIR / "test_db.sqlite3",
 #     }
 # }
-
+#
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -188,6 +188,10 @@ LOGGING = {
         },
         'file': {
             'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+        },
+        'telegram': {
+            'format': 'BotWebServer - %(filename)s:%(lineno)d - <b>%(levelname)-8s</b> - '
+                      '<i> [%(asctime)s]</i> - %(message)s'
         }
     },
     'handlers': {
@@ -199,19 +203,24 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'formatter': 'file',
-            'filename': 'logs/info.log'
+            'filename': 'logs/info.txt'
         },
         'error_file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'formatter': 'file',
-            'filename': 'logs/error.log'
+            'filename': 'logs/error.txt'
+        },
+        'telegram': {
+            'level': 'ERROR',
+            'class': 'BotWebServer.log_handler.TelegramLogsHandler',
+            'formatter': 'telegram'
         }
     },
     'loggers': {
         '': {
             'level': 'DEBUG',
-            'handlers': ['console', 'info_file', 'error_file']
+            'handlers': ['console', 'info_file', 'error_file', 'telegram']
         }
     }
 }

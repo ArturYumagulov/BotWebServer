@@ -8,42 +8,48 @@
 
     {% include 'census/utils/board.html' %}
 
+    <p class="text-center" style="margin-top: 41px ">Сведения о торговой точке</p>
+
+
             <div class="mb-3">
-        <label for="shopCategoryId" class="form-label">Категория точки?</label>
-            <select class="form-select mb-3" name="category" id="shopCategoryId" data-url="{% url 'point_category' %}"
+{#        <label for="shopCategoryId" class="form-label">Категория точки?</label>#}
+            <select class="form-select mb-3" name="category" style="color: #6c757d" id="shopCategoryId" data-url="{% url 'point_category' %}"
                     aria-describedby="pointCategoryIDFeedback" required>
-                <option selected disabled value="">Выберите категорию...</option>
+                <option selected disabled value="">Выберите категорию точки...</option>
             </select>
             <div id="pointCategoryIDFeedback" class="invalid-feedback">
                 Выберите нужную категорию торговой точки
             </div>
         </div>
 
-            {% include 'census/utils/products.html' %}
-
 {#        Парк техники? -----------------------#}
         <div class="mb-3 multi_res was-validated" id="equipmentIdDiv">
             <select class="form-select multiple mb-3" name="equipment" id="equipmentId"
-                    required data-placeholder="Парк техники?" multiple data-url="{% url 'get_equipment_park' %}">
+                    required data-placeholder="Укажите парк техники?" multiple data-url="{% url 'get_equipment_park' %}">
             </select>
         </div>
 
-        {% include 'census/utils/providers.html' %}
+        <p class="text-center" style="margin-top: 41px ">Сведения о потребляемых продуктах</p>
+
+        {% include 'census/utils/products.html' %}
 
         <div class="mb-3 multi_res was-validated" id="volumeIdDiv">
             <select class="form-select multiple mb-3" name="volume" id="volumeId" required data-placeholder="Объем потребления?" multiple data-url="{% url 'get_volume_data' %}">
             </select>
         </div>
 
+        {% include 'census/utils/providers.html' %}
         {% include 'census/utils/other_provider.html' %}
 
         {% include 'census/utils/contact_person.html' %}
 
+        <p class="text-center" style="margin-top: 41px ">Дополнительные сведения</p>
+
         <div class="mb-3" id="tenderDiv">
-            <label for="tenderId" class="form-label">Работает по тендеру?</label>
+{#            <label for="tenderId" class="form-label">Работает по тендеру?</label>#}
             <select class="form-select mb-3" selected="" name="tender" id="tenderId" style="display: block;"
                     aria-describedby="tenderFeedback" required>
-                <option selected disabled value="">Выберите...</option>
+                <option selected disabled value="">Укажите, работает ли через тендер?</option>
                 <option value="1">Да</option>
                 <option value="0">Нет</option>
             </select>

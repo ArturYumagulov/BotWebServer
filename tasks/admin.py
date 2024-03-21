@@ -151,4 +151,11 @@ class AuthorCommentsAdmin(admin.ModelAdmin):
 
 admin.site.register(models.Result)
 admin.site.register(models.ResultGroup)
-admin.site.register(models.Supervisor)
+# admin.site.register(models.Supervisor)
+admin.site.register(models.Head)
+
+
+@admin.register(models.Supervisor)
+class SupervisorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'chat_id', 'code')
+    list_filter = ('name',)

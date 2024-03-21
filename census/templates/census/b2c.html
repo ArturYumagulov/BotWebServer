@@ -1,96 +1,105 @@
 {% extends 'census/base.html' %}
 
 {% block content %}
-
     {% include 'census/utils/checkbox.html' %}
 
     {% include 'census/utils/inn_block.html' %}
 
     {% include 'census/utils/board.html' %}
 
+    <p class="text-center" style="margin-top: 41px ">Сведения о торговой точке</p>
+
     {#        Точка является сетью? -----------------------#}
-        <div class="mb-3">
-            <label for="typeId" class="form-label">Точка является сетью?</label>
-            <select class="form-select mb-3" name="nets" id="typeId" aria-describedby="typeIdFeedback" required>
-                <option selected disabled value="">Выберите вид...</option>
-                <option value="1">Да</option>
-                <option value="0">Нет</option>
-            </select>
-            <div id="typeIdFeedback" class="invalid-feedback">
-                Выберите корректный вид торговой точки.
-            </div>
+    <div class="mb-3">
+{#        <label for="typeId" class="form-label">Укажите, является ли торговая точка сетью?</label>#}
+        <select class="form-select mb-3" style="color: grey" name="nets" id="typeId" aria-describedby="typeIdFeedback" required>
+            <option selected disabled value="">Укажите, является ли торговая точка сетью?...</option>
+            <option value="1">Да</option>
+            <option value="0">Нет</option>
+        </select>
+        <div id="typeIdFeedback" class="invalid-feedback">
+            Выберите корректный вид торговой точки.
         </div>
+    </div>
     {#        Категория точки? -----------------------#}
-        <div class="mb-3">
-        <label for="shopCategoryId" class="form-label">Категория точки?</label>
-            <select class="form-select mb-3" name="category" id="shopCategoryId" data-url="{% url 'point_category' %}"
-                    aria-describedby="pointCategoryIDFeedback" required>
-                <option selected disabled value="">Выберите категорию...</option>
-            </select>
-            <div id="pointCategoryIDFeedback" class="invalid-feedback">
-                Выберите нужную категорию торговой точки
-            </div>
+    <div class="mb-3">
+{#        <label for="shopCategoryId" class="form-label">Категория точки?</label>#}
+        <select class="form-select mb-3" style="color: grey" name="category" id="shopCategoryId" data-url="{% url 'point_category' %}"
+                aria-describedby="pointCategoryIDFeedback" required>
+            <option selected disabled value="">Выберите категорию точки...</option>
+        </select>
+        <div id="pointCategoryIDFeedback" class="invalid-feedback">
+            Выберите нужную категорию торговой точки
         </div>
+    </div>
     {#        Тип торговой точки? -----------------------#}
-        <div class="mb-3">
-            <label for="pointTypeID" class="form-label">Тип торговой точки?</label>
-            <select class="form-select mb-3" name="point_type" selected="" id="pointTypeID" data-url="{% url 'point_names' %}"
-                    aria-describedby="pointTypeIDFeedback" required>>
-                <option selected disabled value="">Выберите тип...</option>
-            </select>
-            <div id="pointTypeIDFeedback" class="invalid-feedback">Выберите тип торговой точки</div>
-        </div>
+    <div class="mb-3">
+{#        <label for="pointTypeID" class="form-label">Тип торговой точки?</label>#}
+        <select class="form-select mb-3" style="color: grey" name="point_type" selected="" id="pointTypeID"
+                data-url="{% url 'point_names' %}"
+                aria-describedby="pointTypeIDFeedback" required>>
+            <option selected disabled value="">Выберите тип торговой точки ...</option>
+        </select>
+        <div id="pointTypeIDFeedback" class="invalid-feedback">Выберите тип торговой точки</div>
+    </div>
     {#        Тип СТО? -----------------------#}
-        <div class="mb-3" id="stoTypeDiv" style="display: none;">
-            <label for="stoTypeId" class="form-label">Тип СТО?</label>
-            <select class="form-select mb-3" name="sto_type" selected="" id="stoTypeId"
-                    aria-describedby="stoTypeIdFeedback" data-url="{% url 'sto_types' %}">
-                <option selected disabled value="">Выберите тип СТО...</option>
-            </select>
-            <div id="stoTypeIdFeedback" class="invalid-feedback">Выберите тип СТО</div>
-        </div>
+    <div class="mb-3" id="stoTypeDiv" style="display: none;">
+        <label for="stoTypeId" class="form-label">Тип СТО?</label>
+        <select class="form-select mb-3" style="color: grey" name="sto_type" selected="" id="stoTypeId"
+                aria-describedby="stoTypeIdFeedback" data-url="{% url 'sto_types' %}">
+            <option selected disabled value="">Выберите тип СТО...</option>
+        </select>
+        <div id="stoTypeIdFeedback" class="invalid-feedback">Выберите тип СТО</div>
+    </div>
+
+        {#    Количество подъемников#}
+    <div class="form-floating mb-3" id="elevatorId" style="display: none;">
+        <input class="form-control" id="elevatorCountId"  name="elevators_count" type="text"
+               placeholder="Количество подъемников"
+               aria-describedby="elevatorCountIdFeedback">
+        <label for="elevatorCountId">Количество подъемников</label>
+        <div type="number" id="elevatorCountIdFeedback" class="invalid-feedback">Укажите количество подъемников</div>
+    </div>
+
+    <p class="text-center" style="margin-top: 41px ">Сведения о потребляемых продуктах</p>
 
     {% include 'census/utils/products.html' %}
 
-    {#    Количество подъемников#}
-        <div class="form-floating mb-3" id="elevatorId" style="display: none;">
-            <input class="form-control" id="elevatorCountId" name="elevators_count" type="text" placeholder="Количество подъемников"
-            aria-describedby="elevatorCountIdFeedback">
-            <label for="elevatorCountId">Количество подъемников</label>
-            <div type="number" id="elevatorCountIdFeedback" class="invalid-feedback">Укажите количество подъемников</div>
-        </div>
-
     {% for volume in volumes %}
-
-        <div class="form-floating mb-3 volume" id="volume_{{ volume.pk }}_div" style="display: none;">
-            <input class="form-control" id="volume_{{ volume.pk }}_input" name="volume_{{ volume.pk }}" type="text"
-                   placeholder="пролив масла {{ volume.name }} в месяц"
-                   aria-describedby="volume_{{ volume.pk }}_feedback">
-            <label for="volume_{{ volume.pk }}_input">пролив масла {{ volume.name }} в месяц</label>
-            <div type="number" id="volume_{{ volume.pk }}_feedback" class="invalid-feedback">Укажите пролив масла {{ volume.name }} в месяц
+        {% if volume.name != "Другое" %}
+            <div class="form-floating mb-3 volume" id="volume_{{ volume.pk }}_div" style="display: none;">
+                <input class="form-control" id="volume_{{ volume.pk }}_input" name="volume_{{ volume.pk }}" type="text"
+                       placeholder="пролив масла {{ volume.name }} в месяц"
+                       aria-describedby="volume_{{ volume.pk }}_feedback">
+                <label for="volume_{{ volume.pk }}_input">пролив масла {{ volume.name }} в месяц</label>
+                <div type="number" id="volume_{{ volume.pk }}_feedback" class="invalid-feedback">Укажите пролив
+                    масла {{ volume.name }} в месяц
+                </div>
             </div>
-        </div>
-
+        {% endif %}
     {% endfor %}
+
+    {#    АКБ#}
+
+    <div class="mb-3" id="akbDiv" style="display: none">
+        <label for="akbId" class="form-label">Специализированная точка по АКБ?</label>
+        <select class="form-select mb-3" selected="" name="akb_specify" id="akbId" style="display: block;"
+                aria-describedby="akbFeedback">
+            <option selected disabled value="">Выберите...</option>
+            <option value="1">Да</option>
+            <option value="0">Нет</option>
+        </select>
+        <div id="akbFeedback" class="invalid-feedback">Выберите специализацию торговой точки по АКБ</div>
+    </div>
 
     {% include 'census/utils/contact_person.html' %}
 
     {#      Какие авто обслуживают?#}
-        <div class="mb-3 multi" id="carsDiv">
-            <select class="form-select multiple mb-3" name="cars" id="cars" data-placeholder="Какие авто обслуживают?" multiple data-url="{% url 'cars_list' %}">
-            </select>
-        </div>
-
-        <div class="mb-3" id="akbDiv" style="display: none">
-            <label for="akbId" class="form-label">Специализированная точка по АКБ?</label>
-            <select class="form-select mb-3" selected="" name="akb_specify" id="akbId" style="display: block;"
-                    aria-describedby="akbFeedback">
-                <option selected disabled value="">Выберите...</option>
-                <option value="1">Да</option>
-                <option value="0">Нет</option>
-            </select>
-            <div id="akbFeedback" class="invalid-feedback">Выберите специализацию торговой точки по АКБ</div>
-        </div>
+    <div class="mb-3 multi" id="carsDiv">
+        <select class="form-select multiple mb-3" name="cars" id="cars" data-placeholder="Какие авто обслуживают?"
+                multiple data-url="{% url 'cars_list' %}">
+        </select>
+    </div>
 
     {% include 'census/utils/providers.html' %}
 

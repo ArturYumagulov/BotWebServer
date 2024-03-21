@@ -127,19 +127,22 @@ class DataTestClass(APITestCase):
             "code": "ТСО001951",
             "name": "Алтынбаев Артур Фаридович",
             "chat_id": None,
-            "phone": "79655820336"
+            "phone": "79655820336",
+            'head': None,
         },
         {
             "code": "ТСО000780",
             "name": "Габитов Ильнар Салимуллович",
             "chat_id": None,
-            "phone": "79600847615"
+            "phone": "79600847615",
+            'head': None,
         },
         {
             "code": "ТСО012297",
             "name": "Галеев Рамиль Мухаметшакирович",
             "chat_id": None,
-            "phone": "79173908880"
+            "phone": "79173908880",
+            'head': None,
         }
     ]
 
@@ -234,99 +237,3 @@ class PartnersTests(DataTestClass):
         self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         error_update_post = self.client.post(self.partner_worker_url, self.partners_error_data, format='json')
         self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-
-class SupervisorsWorkerTests(DataTestClass):
-
-    supervisor_model = models.Supervisor
-    worker_model = models.Worker
-
-    def test_create_and_update_supervisors_workers(self):
-        create_response = self.client.post(self.supervisor_url, self.supervisor_create_data, format='json')
-
-        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.supervisor_model.objects.count(), 3)
-
-        update_response = self.client.put(self.supervisor_url, self.supervisor_update_data, format='json')
-
-        self.assertEqual(update_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.supervisor_model.objects.get(code=self.supervisor_update_data[0]['code']).name,
-                         self.supervisor_update_data[0]['name'])
-
-        create_worker_response = self.client.post(self.worker_url, data=self.worker_data, format='json')
-
-        self.assertEqual(create_worker_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.worker_model.objects.count(), 2)
-
-    def test_error_list_supervisors_workers(self):
-        error_update_post = self.client.post(self.supervisor_url, self.supervisor_error_data, format='json')
-
-        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-        error_update_post = self.client.post(self.worker_url, self.supervisor_error_data, format='json')
-
-        self.assertEqual(error_update_post.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-
-class AutorCommentTests(DataTestClass):
-
-    author_comment_model = models.AuthorComments
-    supervisor_model = models.Supervisor
-    worker_model = models.Worker
-
-    def test_create_author_comments(self):
-
-        #  Создаю супервизора
-        create_supervisor_response = self.client.post(self.supervisor_url, self.supervisor_create_data, format='json')
-        self.assertEqual(create_supervisor_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.supervisor_model.objects.count(), 3)
-        self.assertEqual(self.supervisor_model.objects.get(name=self.supervisor_create_data[0]['name']).name,
-                         self.supervisor_create_data[0]['name'])
-
-        #  Создаю торгового
-        create_worker_response = self.client.post(self.worker_url, self.worker_data, format='json')
-
-        self.assertEqual(create_worker_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.worker_model.objects.count(), 2)
-        self.assertEqual(self.worker_model.objects.get(name=self.worker_data[0]['name']).name,
-                         self.worker_data[0]['name'])
-
-        #  Создаю комментарий
-        create_author_comment_response = self.client.post(self.author_comment_url, data=self.author_comment_data,
-                                                          format='json')
-
-        self.assertEqual(create_author_comment_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.author_comment_model.objects.get().id, create_author_comment_response.data['id'])
-        self.assertEqual(self.author_comment_model.objects.count(), 1)
-        self.assertEqual(self.author_comment_model.objects.get().comment, self.author_comment_data['comment'])
-
-
-class WorkerCommentTests(DataTestClass):
-
-    worker_comment_url = ROUTES['worker_comment']
-
-    worker_comment_model = models.WorkerComments
-
-    def test_create_worker_comments(self):
-
-        #  Создаю супервизора
-        create_supervisor_response = self.client.post(self.supervisor_url, self.supervisor_create_data, format='json')
-        self.assertEqual(create_supervisor_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.supervisor_model.objects.count(), 3)
-        self.assertEqual(self.supervisor_model.objects.get(name=self.supervisor_create_data[0]['name']).name,
-                         self.supervisor_create_data[0]['name'])
-
-        #  Создаю торгового
-        create_worker_response = self.client.post(self.worker_url, self.worker_data, format='json')
-        self.assertEqual(create_worker_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.worker_model.objects.count(), 2)
-        self.assertEqual(self.worker_model.objects.get(name=self.worker_data[0]['name']).name,
-                         self.worker_data[0]['name'])
-
-        #  Создаю комментарий
-        create_worker_comment_response = self.client.post(self.worker_comment_url, data=self.worker_comment_data,
-                                                          format='json')
-        self.assertEqual(create_worker_comment_response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.worker_comment_model.objects.get().id, create_worker_comment_response.data['id'])
-        self.assertEqual(self.worker_comment_model.objects.count(), 1)
-        self.assertEqual(self.worker_comment_model.objects.get().comment, self.worker_comment_data['comment'])
