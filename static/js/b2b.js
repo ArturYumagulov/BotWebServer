@@ -249,6 +249,11 @@
             let category_name = this.name
             let item = document.getElementById(`${category_name}${element.id}DivId`)
             item.remove()
+            //
+            if (element.text === "Другое") {
+                let other_name = document.getElementById(`${category_name}_other_name${element.id}DivId`)
+                other_name.remove()
+            }
         })
 
         $('#volumeIdDiv').on('select2:select', function (e) {
