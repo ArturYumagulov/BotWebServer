@@ -220,6 +220,7 @@ function checkHiddenSearchObjects(check_obj_id, hidden_id, input_id=null, org_hi
                 innDiv.style.display = 'none'
                 orgNameDiv.style.display = 'none'
                 inn.removeAttribute('required')
+                inn.classList.remove('is-invalid')
                 orgNameInput.removeAttribute('required')
             }
             inn.classList.remove('is-valid')
