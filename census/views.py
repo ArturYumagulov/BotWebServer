@@ -1,5 +1,5 @@
 import json
-
+from django.db.models.functions import Lower
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 
@@ -134,11 +134,12 @@ def get_point_category(request):
 
     if request.method == 'POST':
         result = []
-        categories = models.PointCategory.objects.filter(department__name=json.loads(request.body)['department']).filter(is_active=True)
+        categories = models.PointCategory.objects.order_by(Lower('name')).\
+            filter(department__name=json.loads(request.body)['department']).filter(is_active=True)
         for item in categories:
             data = {'id': item.pk, 'name': item.name}
             result.append(data)
-        return JsonResponse(list(result), safe=False)
+        return JsonResponse(result, safe=False)
 
     return JsonResponse([{'detail': 'point_category not found'}], safe=False)
 
@@ -158,10 +159,11 @@ def get_sto_type(request):
 
 
 def get_point_vector(request):
-    """Категория точки"""
+    """Направление точки"""
     if request.method == 'POST':
         result = []
-        point_vectors = models.PointVectors.objects.filter(department__name=json.loads(request.body)['department']).filter(is_active=True)
+        point_vectors = models.PointVectors.objects.order_by(Lower('name')).\
+            filter(department__name=json.loads(request.body)['department']).filter(is_active=True)
         for item in point_vectors:
             data = {'id': item.pk, 'name': item.name, 'slug': item.slug}
             result.append(data)
@@ -198,11 +200,11 @@ def get_accessories_category_item(request, category_id):
 
 
 def get_cars(request):
-    """Категория точки"""
+    """Автомобили"""
 
     if request.method == 'POST':
         result = []
-        cars = models.CarsList.objects.filter(is_active=True)
+        cars = models.CarsList.objects.order_by(Lower('name')).filter(is_active=True)
         for item in cars:
             data = {'id': item.pk, 'name': item.name}
             result.append(data)
@@ -327,7 +329,7 @@ def get_volume_data(request):
 def get_equipment_park(request):
     result = []
     if request.method == "POST":
-        equipments = models.EquipmentList.objects.filter(is_active=True)
+        equipments = models.EquipmentList.objects.order_by(Lower('name')).filter(is_active=True)
         for equipment in equipments:
             result.append({'id': equipment.pk, 'name': equipment.name})
         return JsonResponse(list(result), safe=False)
@@ -337,7 +339,7 @@ def get_equipment_park(request):
 def get_vectors_items(request, slug):
     result = []
     if request.method == "POST":
-        vectors_item = models.PointVectorsSelectItem.objects.\
+        vectors_item = models.PointVectorsSelectItem.objects.order_by(Lower('name')).\
             filter(department__name=json.loads(request.body)['department']).filter(vectors__slug=slug)
 
         for item in vectors_item:
