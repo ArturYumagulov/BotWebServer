@@ -262,7 +262,7 @@ class PartnersViewSet(ModelViewSet):
                          f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
             return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
-        return Response({'detail': f"Данные - обновлены"}, status=status.HTTP_201_CREATED)
+        return Response({'result': True, 'detail': f"data updated"}, status=status.HTTP_201_CREATED)
 
 
 class PartnersWorkerViewSet(ModelViewSet):

@@ -72,29 +72,33 @@ class PartnerWorkerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = task_models.PartnerWorker
-        fields = "__all__"
-
-    def create(self, validated_data):
-        return task_models.PartnerWorker.objects.create(**validated_data)
+        fields = ('name', 'positions', 'code')
 
 
 class PartnerSerializer(serializers.ModelSerializer):
 
-    workers = PartnerWorkerSerializer(many=True, read_only=True)
+    workers = PartnerWorkerSerializer(many=True)
 
     class Meta:
         model = task_models.Partner
         fields = ('code', 'name', 'inn', 'workers')
 
     def create(self, validated_data):
-        return task_models.Partner.objects.create(**validated_data)
+        workers_data = validated_data.pop('workers')
+        partner = task_models.Partner.objects.create(**validated_data)
+        for worker_data in workers_data:
+            task_models.PartnerWorker.objects.create(partner=partner, **worker_data)
+        return partner
 
     def update(self, instance, validated_data):
+        workers_data = validated_data.pop('workers')
         instance.code = validated_data.get('code', instance.code)
         instance.name = validated_data.get('name', instance.name)
         instance.inn = validated_data.get('inn', instance.name)
-        instance.save()
 
+        for worker in workers_data:
+            task_models.PartnerWorker.objects.update(partner=instance, **worker)
+        instance.save()
         return instance
 
 
