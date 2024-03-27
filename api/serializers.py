@@ -335,3 +335,16 @@ class CensusUpdateSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class TaskMessageUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = task_models.Task
+        fields = ('number', 'message_id')
+
+    def update(self, instance, validated_data):
+        instance.message_id = validated_data.get('message_id', instance.message_id)
+        instance.save()
+
+        return instance

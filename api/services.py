@@ -84,9 +84,9 @@ def send_message_bot(request):
     if r.json()['ok']:
         task.message_id = r.json()['result']['message_id']
         task.save()
-        return True
+        return {'result': True, 'description': r.json()}
     else:
-        return False
+        return {'result': False, 'description': r.json()}
 
 
 if __name__ == '__main__':

@@ -71,10 +71,11 @@ class TaskViewSet(ModelViewSet):
             serializer.save()
             logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - saving data - "
                         f"{status.HTTP_201_CREATED}")
-            if send_message_bot(data):
-                logger.info(f"Сообщение {data} отправлено")
+            send_message = send_message_bot(data)
+            if send_message['result']:
+                logger.info(f"Сообщение {data} отправлено - {send_message['description']}")
             else:
-                logger.error(f"Сообщение {data} не отправлено")
+                logger.error(f"Сообщение {data} не отправлено - {send_message['description']}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         logger.error(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - не сохранено - "
                      f"serializer_error:{serializer.errors} {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
@@ -752,3 +753,18 @@ class CensusUpdate(ModelViewSet):
                      f"serializer_error:{serializer.errors} - {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+
+class TaskMessageUpdateView(ModelViewSet):
+
+    serializer_class = serializers.TaskMessageUpdateSerializer
+    queryset = models.Task.objects.all()
+
+    def put(self, request, *args, **kwargs):
+
+        data = request.data
+
+        serializer = self.serializer_class(data=data, instance=self.queryset.get(number=data['number']))
+        if serializer.is_valid():
+            serializer.save()
+        logger.info(f"{request.method} - {request.path} - {request.META['REMOTE_ADDR']} - {status.HTTP_200_OK}")
+        return Response(serializer.data, status=status.HTTP_200_OK)

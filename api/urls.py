@@ -25,6 +25,7 @@ router.register('result-group', views.ResultGroupListView, basename='result_grou
 router.register('result-data', views.ResultDataListView, basename='result_data_list')
 router.register('census', views.CensusView, basename='census')
 router.register('census-update', views.CensusUpdate, basename='census_update')
+router.register('task-message-update', views.TaskMessageUpdateView, basename='task_message_update')
 
 
 # Фильтры
