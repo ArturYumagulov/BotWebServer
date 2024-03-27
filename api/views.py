@@ -90,17 +90,20 @@ class TaskViewSet(ModelViewSet):
             serializer = self.serializer_class(data=data, instance=self.queryset.get(number=data['number']))
             logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - data_have - "
                         f"{status.HTTP_200_OK}")
+
             if serializer.is_valid():
                 serializer.save()
                 logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - saving data - "
                             f"{status.HTTP_201_CREATED}")
 
                 if serializer.data['status'] == "Новая":
-                    if send_message_bot(data):
-                        logger.info(f"Сообщение {data} отправлено")
-                        return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    send_message = send_message_bot(data)
+                    if send_message['result']:
+                        logger.info(f"Сообщение {data} отправлено - {send_message['description']}")
                     else:
-                        logger.error(f"Сообщение {data} не отправлено")
+                        logger.error(f"Сообщение {data} не отправлено - {send_message['description']}")
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
                 elif serializer.data['status'] == "Выполнено" or serializer.data['status'] == "Переадресована":
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
 

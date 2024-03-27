@@ -68,7 +68,7 @@ def send_message_bot(request):
                   f"<b>Комментарий автора:</b>\n" \
                   f"{author_comment.comment}\n"
 
-        if worker_comment.id != 77:
+        if worker_comment.id != 1:
             message += sub_text
 
         reply_markup = {"inline_keyboard": [
