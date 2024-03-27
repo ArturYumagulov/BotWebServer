@@ -45,7 +45,7 @@ def send_message_bot(request):
                   f"<b>Комментарий автора:</b>\n" \
                   f"{author_comment_clean}\n"
 
-        if worker_comment.id != 77:
+        if worker_comment.id != 1:
             message += sub_text
 
         reply_markup = {"inline_keyboard": [
@@ -86,7 +86,7 @@ def send_message_bot(request):
         task.save()
         return {'result': True, 'description': r.json()}
     else:
-        return {'result': False, 'description': r.json()}
+        return {'result': False, 'description': {'chat_id': worker.chat_id, 'description': r.json()}}
 
 
 if __name__ == '__main__':
