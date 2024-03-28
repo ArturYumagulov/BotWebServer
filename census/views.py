@@ -329,7 +329,7 @@ def get_volume_data(request):
 def get_equipment_park(request):
     result = []
     if request.method == "POST":
-        equipments = models.EquipmentList.objects.order_by(Lower('name')).filter(is_active=True)
+        equipments = models.EquipmentList.objects.order_by(Lower('name')).filter(is_active=True).filter(department__name=json.loads(request.body)['department'])
         for equipment in equipments:
             result.append({'id': equipment.pk, 'name': equipment.name})
         return JsonResponse(list(result), safe=False)
