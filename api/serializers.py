@@ -300,6 +300,7 @@ class CensusSerializer(serializers.ModelSerializer):
             'edited',
             'inn',
             'point_name',
+            'position',
             'point_type',
             'sto_type',
             'elevators_count',
