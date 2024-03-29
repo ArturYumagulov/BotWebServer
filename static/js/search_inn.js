@@ -102,7 +102,7 @@ function LoadInnSearchBlock(url, event) {
                                     item.remove()
                                 })
                                 contragent.style.display = 'block'
-                                contragent.value = item.getAttribute('data-name')
+                                contragent.value = item.getAttribute('data-inn')
                                 contragent.classList.add('is-valid')
                                 contragent.setAttribute('required', '')
                                 inn.value = ''
@@ -164,6 +164,7 @@ function loadValidPartners() {
                         data.forEach((i) => {
                             let item = document.createElement('li')
                             item.setAttribute('id', 'result')
+                            item.setAttribute('data-inn', i.inn)
                             item.classList.add('list-group-item')
                             item.style.cursor = 'pointer'
                             item.innerHTML = i.name + ' - ' + i.inn
@@ -173,7 +174,7 @@ function loadValidPartners() {
                         find_item.forEach((ii) => {
                             ii.addEventListener('click', function (){
                                 ii.classList.add('bg-secondary')
-                                search.value = ii.innerHTML
+                                search.value = ii.dataset.inn
                                 if (search.value.length > 0) {
                                     search.classList.remove('is-invalid')
                                     search.classList.add('is-valid')
