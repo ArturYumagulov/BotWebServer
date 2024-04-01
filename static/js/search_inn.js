@@ -12,11 +12,11 @@ function cleanSearchBlock(searchBlock) {
         searchBlock.children[i].remove()
     }
 }
-function createFloatDiv(element, category_name, text="") {
+function createFloatDiv(element, category_name, text="", sub_text="") {
     return `<div class="form-floating mb-3" id="${category_name}${element.id}DivId">
             <input class="form-control" name="${category_name}_${element.id}" id="${category_name}_${element.id}" 
-            type="text" placeholder="${text} ${element.text}" aria-describedby="${category_name}IdFeedback" required>
-            <label for="${category_name}Id">${text} ${element.text}</label>
+            type="text" placeholder="${text} ${element.text} ${sub_text}" aria-describedby="${category_name}IdFeedback" required>
+            <label for="${category_name}Id">${text} ${element.text} ${sub_text}</label>
             <div id="${category_name}IdFeedback" class="invalid-feedback">Укажите ${text} ${element.text}</div>
             </div>`
         }

@@ -49,21 +49,21 @@
             item.append(option)
         })
     }
-    async function createControlOption(item_id) {
-
-        let item = document.getElementById(item_id)
-        let url = item.dataset.url
-        let data = await loadData(url)
-
-
-        data.forEach((i) => {
-            let option = document.createElement("option")
-            option.setAttribute('value', i.id)
-            option.dataset.control = i.control_data
-            option.innerHTML = i.name
-            item.append(option)
-        })
-    }
+    // async function createControlOption(item_id) {
+    //
+    //     let item = document.getElementById(item_id)
+    //     let url = item.dataset.url
+    //     let data = await loadData(url)
+    //
+    //
+    //     data.forEach((i) => {
+    //         let option = document.createElement("option")
+    //         option.setAttribute('value', i.id)
+    //         option.dataset.control = i.control_data
+    //         option.innerHTML = i.name
+    //         item.append(option)
+    //     })
+    // }
     async function loadData(url){
 
         let response = await fetch(url, {
@@ -434,14 +434,14 @@
         await createOption('shopCategoryId')
         await createOption('stoTypeId')
         await createSelectMulti('cars')
-        await createControlOption('controlId')
+        // await createControlOption('controlId')
         await createSelectMulti('providers')
         await createSelectMulti('vectorMulti')
         await validSelect('typeId')
         await validSelect('shopCategoryId')
         await validSelect('pointTypeID')
         await validSelect('stoTypeId')
-        await validSelect('controlId')
+        // await validSelect('controlId')
         await validSelect('akbId')
 
         floatFormValid('lastnameMakerId', false, false, true)
@@ -472,18 +472,18 @@
             div.style.display = 'none'
         }
 
-        let control = document.getElementById('controlId')
-        let date = document.getElementById('dateDiv')
-        let date_input = document.getElementById('date')
-        control.addEventListener('change', function () {
-            if (control.options[control.selectedIndex].dataset.control === 'true') {
-                date.style.display = 'block'
-                date_input.setAttribute('required', '')
-            } else {
-                date.style.display = 'none'
-                date_input.removeAttribute('required')
-            }
-        })
+        // let control = document.getElementById('controlId')
+        // let date = document.getElementById('dateDiv')
+        // let date_input = document.getElementById('date')
+        // control.addEventListener('change', function () {
+        //     if (control.options[control.selectedIndex].dataset.control === 'true') {
+        //         date.style.display = 'block'
+        //         date_input.setAttribute('required', '')
+        //     } else {
+        //         date.style.display = 'none'
+        //         date_input.removeAttribute('required')
+        //     }
+        // })
 
         let other_multi_selects = document.querySelectorAll('.multi')
         other_multi_selects.forEach((item) => {

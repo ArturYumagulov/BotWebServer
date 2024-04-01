@@ -202,18 +202,18 @@ def valid_data(request):
 
     else:
 
-        control_date = None
-
-        if len(request.get('control_date')) > 0:
-            control_date = datetime.strptime(request.get('control_date'), '%d-%m-%Y')  # Если есть контрольная дата
+        # control_date = None
+        #
+        # if len(request.get('control_date')) > 0:
+        #     control_date = datetime.strptime(request.get('control_date'), '%d-%m-%Y')  # Если есть контрольная дата
 
         result = Result.objects.create(
             base_id=task.base.number,
             type='meet',
-            result=ResultData.objects.get(code=request.get('result')),
+            result=ResultData.objects.get(name="ДАННЫЕ АКТУАЛИЗИРОВАНЫ"),
             task_number=task,
             contact_person="",
-            control_date=control_date
+            control_date=None
         )
         new_census.result = result
 
