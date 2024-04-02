@@ -273,8 +273,15 @@ class EquipmentSerializer(serializers.ModelSerializer):
         fields = ('equipment', 'value',)
 
 
+class PartnerShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = census_models.Partner
+        fields = ('code', 'name', 'inn')
+
+
 class CensusSerializer(serializers.ModelSerializer):
     department = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    working = PartnerShortSerializer(read_only=True)
     cars = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
     providers = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
     point_type = serializers.SlugRelatedField(slug_field='name', read_only=True)
