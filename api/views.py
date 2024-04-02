@@ -731,7 +731,7 @@ class CensusFilterViews(generics.ListAPIView):
     queryset = Census.objects.all()
     serializer_class = serializers.CensusSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['task', 'address_id']
+    filterset_fields = ['task', 'address_id', 'loaded']
 
 
 class CensusUpdate(ModelViewSet):

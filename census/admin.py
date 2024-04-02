@@ -11,10 +11,11 @@ from .models import Census
 @admin.register(models.Census)
 class CensusAdmin(admin.ModelAdmin):
     list_filter = ('department',)
-    list_display = ('address_id', 'address', 'name', 'closing', 'created_date', 'edit_date', 'get_task_worker', 'department')
+    list_display = ('address_id', 'address', 'name', 'created_date', 'edit_date', 'get_task_worker', 'department', 'loaded')
     readonly_fields = ('created_date', 'edit_date')
     fields = ('closing',
               'not_communicate',
+              'loaded',
               'inn',
               'department',
               'address_id',
