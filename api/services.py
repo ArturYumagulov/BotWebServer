@@ -33,7 +33,7 @@ def send_message_bot(request):
 
         message = f"{task_header['text']} от " \
                   f"{date}\n\n" \
-                  f"'{group_name}'\n\n" \
+                  f"Cенсус по адресу: '{task.name}'\n\n" \
                   f"<b>Исполнить до:</b>\n" \
                   f"{deadline}\n" \
                   f"<b>Автор:</b>\n" \
