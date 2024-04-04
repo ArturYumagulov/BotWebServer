@@ -53,7 +53,8 @@ def send_message_bot(request):
                     [{"text": "Переадресовать ↪️", "callback_data": f"first_forward_{request['number']}"}]
         ]}
 
-    else:
+    elif base.group.code == ResultGroup.objects.get(name="Кредитный Контроль").code:  # Если "Кредитный Контроль"
+
         message = f"{task_header['text']} от " \
                   f"{date}\n\n" \
                   f"'{group_name}'\n\n" \
@@ -71,10 +72,15 @@ def send_message_bot(request):
         if worker_comment.id != 1:
             message += sub_text
 
-        reply_markup = {"inline_keyboard": [
-            [{"text": "Выполнена", "callback_data": f"ok_{request['number']}"}],  # ✅
-            [{"text": "Переадресовать", "callback_data": f"first_forward_{request['number']}"}]  # ↪️
-        ]}
+        if author.code == "HardCollect":
+            reply_markup = {"inline_keyboard": [
+                [{"text": "Выполнена", "callback_data": f"ok_{request['number']}"}],  # ✅
+            ]}
+        else:
+            reply_markup = {"inline_keyboard": [
+                [{"text": "Выполнена", "callback_data": f"ok_{request['number']}"}],  # ✅
+                [{"text": "Переадресовать", "callback_data": f"first_forward_{request['number']}"}]  # ↪️
+            ]}
 
     data = {'chat_id': worker.chat_id, 'text': message, 'reply_markup': json.dumps(reply_markup),
             'parse_mode': "HTML"}
