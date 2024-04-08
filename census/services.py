@@ -180,7 +180,7 @@ def valid_data(request):
         result = Result.objects.create(
             base_id=task.base.number,
             type='meet',
-            result=ResultData.objects.get(name="НЕТ КОНТАКТА"),
+            result=ResultData.objects.get(code="000000067"),
             task_number=task,
             contact_person="",
             control_date=None
