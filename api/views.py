@@ -743,7 +743,7 @@ class CensusUpdate(ModelViewSet):
 
         data = request.data
 
-        serializer = self.serializer_class(data=data, instance=self.queryset.get(pk=data['pk']))
+        serializer = self.serializer_class(data=data, instance=self.queryset.get(pk=data['census_id']))
         logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - data_have - "
                     f"{status.HTTP_200_OK}")
         if serializer.is_valid():
