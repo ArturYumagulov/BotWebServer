@@ -41,7 +41,7 @@ urlpatterns = [
          name='partner-worker_filter'),
     path('result-data_f/', views.ResultDataFilterViews.as_view(), name='result_filter'),
     path('census-task/', views.CensusFilterViews.as_view(), name='census_filter'),
-    path('partner_f/', views.PartnerFilterViews.as_view(), name='census_filter'),
+    path('partner_f/', views.PartnerFilterViews.as_view(), name='partner_filter'),
 ]
 
 

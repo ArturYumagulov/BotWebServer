@@ -359,7 +359,7 @@ class Census(models.Model):
     others = models.ForeignKey("Others", on_delete=models.CASCADE, blank=True, null=True, default=None,
                                related_name='census_others')
     basics = models.CharField(verbose_name='Номер основания', null=True, blank=True, max_length=1000)
-    loaded = models.BooleanField(default=False)
+    loaded = models.BooleanField('Загружено', default=False)
 
     class Meta:
         verbose_name = "Сенсус"

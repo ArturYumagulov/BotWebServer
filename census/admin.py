@@ -10,6 +10,9 @@ from .models import Census
 
 @admin.register(models.Census)
 class CensusAdmin(admin.ModelAdmin):
+
+    actions = ["make_load", "make_unload"]
+
     list_filter = ('department',)
     list_display = ('address_id', 'address', 'name', 'created_date', 'edit_date', 'get_task_worker', 'department', 'loaded')
     readonly_fields = ('created_date', 'edit_date')
@@ -38,6 +41,14 @@ class CensusAdmin(admin.ModelAdmin):
               'position',
               'dadata',
               )
+
+    @admin.action(description="Отменить загрузку Сенсуса")
+    def make_load(self, request, queryset):
+        queryset.update(loaded='False')
+
+    @admin.action(description="Активировать загрузку Сенсуса")
+    def make_unload(self, request, queryset):
+        queryset.update(loaded='True')
 
     def get_task_worker(self, obj):
         try:
