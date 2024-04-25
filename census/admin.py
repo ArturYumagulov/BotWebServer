@@ -14,7 +14,7 @@ class CensusAdmin(admin.ModelAdmin):
     actions = ["make_load", "make_unload"]
 
     list_filter = ('department',)
-    list_display = ('address_id', 'address', 'name', 'created_date', 'edit_date', 'get_task_worker', 'department', 'loaded')
+    list_display = ('address_id', 'address', 'name', 'created_date', 'edit_date', 'department', 'loaded')
     readonly_fields = ('created_date', 'edit_date')
     fields = ('closing',
               'not_communicate',
@@ -49,15 +49,6 @@ class CensusAdmin(admin.ModelAdmin):
     @admin.action(description="Активировать загрузку Сенсуса")
     def make_unload(self, request, queryset):
         queryset.update(loaded='True')
-
-    def get_task_worker(self, obj):
-        try:
-            task = Task.objects.get(number=obj.task)
-            return f"{task.worker}"
-        except AttributeError:
-            return "Удален"
-
-    get_task_worker.short_description = "Исполнитель"
 
 
 @admin.register(models.PointTypes)

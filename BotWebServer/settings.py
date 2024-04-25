@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'tasks',
     'api',
     'census',
-    'core'
+    'core',
+    'analytics'
 ]
 
 MIDDLEWARE = [
@@ -220,7 +221,7 @@ LOGGING = {
     'loggers': {
         '': {
             'level': 'DEBUG',
-            'handlers': ['console', 'info_file', 'error_file', 'telegram']
+            'handlers': ['console', 'info_file', 'error_file']
         }
     }
 }

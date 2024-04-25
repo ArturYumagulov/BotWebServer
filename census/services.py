@@ -127,6 +127,8 @@ def valid_data(request):
     new_census.address_id = request.get('address_id')
     new_census.basics = task.base.number
     new_census.inn = request.get('inn')
+    new_census.task_author = task.author
+    new_census.worker = task.worker
     # new_census.edited = True
 
     new_census.save()
