@@ -127,8 +127,8 @@ def valid_data(request):
     new_census.address_id = request.get('address_id')
     new_census.basics = task.base.number
     new_census.inn = request.get('inn')
-    new_census.task_author = task.author
-    new_census.worker = task.worker
+    new_census.task_author = task.author.name
+    new_census.worker = task.worker.name
     # new_census.edited = True
 
     new_census.save()
@@ -168,6 +168,7 @@ def valid_data(request):
         new_census.result = result
         new_census.closing = True
         new_census.not_communicate = False
+        new_census.task_result = result.result.name
         new_census.save()
 
         Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
@@ -192,6 +193,7 @@ def valid_data(request):
 
         new_census.not_communicate = True
         new_census.result = result
+        new_census.task_result = result.result.name
         new_census.closing = False
         new_census.save()
 
@@ -218,6 +220,7 @@ def valid_data(request):
             control_date=None
         )
         new_census.result = result
+        new_census.task_result = result.result.name
 
         new_census.save()
 

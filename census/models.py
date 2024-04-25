@@ -322,7 +322,7 @@ class Census(models.Model):
     department = models.ForeignKey(Department, verbose_name="Подразделение", on_delete=models.PROTECT, default=None)
     task_author = models.CharField(verbose_name="Автор", max_length=300, blank=True, null=True)
     worker = models.CharField(verbose_name="Исполнитель", max_length=300, blank=True, null=True)
-    result = models.CharField(verbose_name="Исполнитель", max_length=300, blank=True, null=True)
+    task_result = models.CharField(verbose_name="Результат", max_length=300, blank=True, null=True)
     address = models.CharField(verbose_name="Адрес", max_length=2000, blank=True, null=True)
     name = models.CharField(verbose_name="Название", max_length=1000, blank=True, null=True)
     point_name = models.CharField(max_length=1000, verbose_name="Вывеска", blank=True, null=True,
@@ -331,7 +331,7 @@ class Census(models.Model):
                                    default=None)
     nets = models.BooleanField(verbose_name="Сетевой", default=False)
     sto_type = models.ForeignKey(STOTypeList, on_delete=models.PROTECT, verbose_name="Тип СТО", blank=True, null=True)
-    category = models.ForeignKey(PointCategory, on_delete=models.PROTECT, verbose_name="Категория")
+    category = models.ForeignKey(PointCategory, on_delete=models.PROTECT, verbose_name="Категория", blank=True, null=True)
     cars = models.ManyToManyField(CarsList, verbose_name="Автомобили обслуживают", blank=True, default=None)
     providers = models.ManyToManyField(ProviderList, verbose_name="Основные поставщики", blank=True, default=None)
     elevators_count = models.PositiveIntegerField(verbose_name="Количество подъемников", default=0, null=True,

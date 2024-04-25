@@ -2,6 +2,32 @@ from census.models import Census
 from tasks.models import Task
 
 
+def create_equipment_list(model):
+    if model is not None:
+        result = []
+        for eq in model:
+            item = dict()
+            item['equipments'] = eq.equipment.name
+            item['value'] = eq.value
+            result.append(item)
+        return result
+    else:
+        return None
+
+
+def create_volume_list(model):
+    if model is not None:
+        result = []
+        for vol in model:
+            item = dict()
+            item['volume'] = vol.volume.name
+            item['value'] = vol.value
+            result.append(item)
+        return result
+    else:
+        return None
+
+
 def create_report_1(depart):
     data = []
     censuses = Census.objects.filter(department__name=depart).filter(address_id='5678')
@@ -11,20 +37,10 @@ def create_report_1(depart):
         res['inn'] = census.inn
         res['name'] = census.name
         res['category'] = census.category.name
-        res['result'] = census.category.name
+        res['result'] = census.task_result
         res['elevators'] = census.elevators_count
-
-        if census.equipmentitem_set.all() is not None:
-            equipments_dict = []
-            for eq in census.equipmentitem_set.all():
-                item = dict()
-                item['equipments'] = eq.equipment.name
-                item['value'] = eq.value
-                equipments_dict.append(item)
-
-            res['equipments'] = equipments_dict
-        else:
-            res['equipments'] = None
+        res['equipments'] = create_equipment_list(census.equipmentitem_set.all())
+        res['volumes'] = create_volume_list(census.volumeitem_set.all())
 
         if census.decision is not None:
             res['contact'] = f"{census.decision.firstname} {census.decision.lastname} {census.decision.surname}"
