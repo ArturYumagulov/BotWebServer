@@ -110,6 +110,7 @@ class CompanyDatabaseAdmin(admin.ModelAdmin):
 class VolumeAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active',)
     list_filter = ('department',)
+    prepopulated_fields = {"slug": ('name',)}
 
 
 @admin.register(models.EquipmentList)

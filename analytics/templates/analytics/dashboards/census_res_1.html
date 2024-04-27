@@ -1,5 +1,19 @@
-<div class="table-responsive mt-3">
-                <table class="table table-bordered table-sm report-1">
+<div class="table-responsive mt-3 report-1-div">
+        <div class="loader">
+	<span></span>
+	<span></span>
+	<span></span>
+	<span></span>
+	<span></span>
+	<span></span>
+	<span></span>
+	<span></span>
+	<span></span>
+	<span></span>
+	<span></span>
+	<span></span>
+</div>
+                <table class="table table-sm report-1">
                     <thead>
                     <tr>
                         <th class="table-head-item" rowspan="2" scope="col">Родитель</th>
@@ -35,34 +49,77 @@
                     </thead>
                     <tbody id="values">
                     <tr>
-                        <td id="author">author</td>   {# Родитель #}
-                        <td id="inn">inn</td>   {# ИНН #}
-                        <td id="name">name</td> {# Наименование #}
-                        <td id="contact">contact</td>   {# Контактное лицо #}
-                        <td>text</td>   {# Телефон #}
-                        <td>text</td>   {# Сегмент #}
-                        <td>1,001</td>  {# Результат #}
-                        <td>random</td> {# Подъемники #}
-                        <td>data</td> {# Парк техники #}
-                        <td>placeholder</td> {# Количество #}
-                        <td>text</td> {# Объем потребления масел #}
+                        <td rowspan="4" id="author"><span>author</span></td>
+                        <td rowspan="4" id="inn">inn</td>
+                        <td rowspan="4" id="name">name</td>
+                        <td rowspan="4" id="contact">contact</td>
+                        <td rowspan="4" id="phone">text</td>
+                        <td rowspan="4" id="category">text</td>
+                        <td rowspan="4" id="result">1,001</td>
+                        <td rowspan="4" id="elevators">random</td>
+                        <td id="equipments">Парк техники 1</td>
+                        <td id="eq_value">10</td>
+                        <td rowspan="4">Volume</td>
 {#                        -------------------------------------------------#}
-                        <td>text</td> {# Общее потребления масел #}
-                        <td>1,001</td>   {# Разница #}
-                        <td>random</td>   {# Действующий #}
-                        <td>data</td> {# Категория клиента начальная #}
-                        <td>placeholder</td>   {# Категория клиента действующая #}
-                        <td>text</td>   {# Потенциал #}
-                        <td>text</td>   {# Частота заказа #}
-                        <td>text</td> {# Объем потребления масел #}
+                        <td rowspan="4">text</td>
+                        <td rowspan="4">1,001</td>
+                        <td rowspan="4">random</td>
+                        <td rowspan="4">data</td>
+                        <td rowspan="4">placeholder</td>
+                        <td rowspan="4">text</td>
+                        <td rowspan="4">text</td>
+                        <td rowspan="4">text</td>
 {#                        -------------------------------------------------------#}
-                        <td>test</td> {# Общее потребления масел #}
-                        <td>test1</td>   {# Разница #}
-                        <td>random</td>   {# Действующий #}
-                        <td>data</td> {# Категория клиента начальная #}
-                        <td>placeholder</td>   {# Категория клиента действующая #}
-                        <td>text</td>   {# Потенциал #}
-                        <td>text</td>   {# Частота заказа #}
+                        <td rowspan="4">test</td>
+                        <td rowspan="4">test1</td>
+                        <td rowspan="4">random</td>
+                        <td rowspan="4">data</td>
+                        <td rowspan="4">placeholder</td>
+                        <td rowspan="4">text</td>
+                        <td rowspan="4">text</td>
+                    </tr>
+{#                             if equipments #}
+                    <tr id="equipment">
+                        <td>Парк техники 1</td>
+                        <td>10</td>
+                    </tr>
+                    <tr id="equipment">
+                        <td>Парк техники 1</td>
+                        <td>10</td>
+                    </tr>
+                    <tr id="equipment">
+                        <td>Парк техники 1</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td id="author">author</td>
+                        <td id="inn">inn</td>
+                        <td id="name">name</td>
+                        <td id="contact">contact</td>
+                        <td id="phone">text</td>
+                        <td id="category">text</td>
+                        <td id="result">1,001</td>
+                        <td id="elevators">random</td>
+                        <td>data</td>
+                        <td>placeholder</td>
+                        <td>text</td>
+{#                        -------------------------------------------------#}
+                        <td>text</td>
+                        <td>1,001</td>
+                        <td>random</td>
+                        <td>data</td>
+                        <td>placeholder</td>
+                        <td>text</td>
+                        <td>text</td>
+                        <td>text</td>
+{#                        -------------------------------------------------------#}
+                        <td>test</td>
+                        <td>test1</td>
+                        <td>random</td>
+                        <td>data</td>
+                        <td>placeholder</td>
+                        <td>text</td>
+                        <td>text</td>
                     </tr>
                     </tbody>
                 </table>

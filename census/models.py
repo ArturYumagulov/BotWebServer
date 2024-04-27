@@ -118,6 +118,7 @@ class Volume(models.Model):
     is_active = models.BooleanField(default=False, verbose_name="Активность")
     name = models.CharField(verbose_name="Название", max_length=500)
     department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='volume')
+    slug = models.SlugField(default=None, blank=True, null=True)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
 
