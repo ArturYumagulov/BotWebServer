@@ -1,5 +1,6 @@
 from census.models import Census
 from tasks.models import Task
+from census.models import Volume
 
 
 class Paginator:
@@ -30,34 +31,51 @@ def create_equipment_list(model):
         return None
 
 
-def create_volume_list(model):
+def create_volume_list(model, depart):
+    volumes = [vol.name for vol in Volume.objects.filter(is_active=True).filter(department__name=depart)]
+    volume_items = [v.volume.name for v in model]
     if model is not None:
         result = []
-        for vol in model:
-            item = dict()
-            item['volume'] = vol.volume.name
-            item['value'] = vol.value
-            item['slug'] = vol.volume.slug
+        for volume in volumes:
+            item: dict = dict()
+
+            if volume in volume_items:
+                vol = model.get(volume__name=volume)
+                item['volume'] = volume
+                item['value'] = vol.value
+            else:
+                item['volume'] = volume
+                item['value'] = "0"
             result.append(item)
         return result
     else:
         return None
 
 
+def create_car_list(model, depart):
+    pass
+
+
 def create_report_1(depart):
     data = []
-    censuses = Census.objects.filter(department__name=depart)\
-        .filter(address_id='5678')
+    censuses = Census.objects.filter(department__name=depart) \
+        # .filter(address_id='5678')
     for census in censuses:
         res: dict = dict()
         res['author'] = census.task_author
         res['inn'] = census.inn
-        res['name'] = census.name
+        res['name'] = census.name.replace('%20', ' ')
         res['category'] = census.category.name
         res['result'] = census.task_result
         res['elevators'] = census.elevators_count
         res['equipments'] = create_equipment_list(census.equipmentitem_set.all())
-        res['volumes'] = create_volume_list(census.volumeitem_set.all())
+        res['volumes'] = create_volume_list(census.volumeitem_set.all(), depart)
+        res['cars'] = [car.name for car in census.cars.all()]
+
+        if census.working is None:
+            res['working'] = "Нет"
+        else:
+            res['working'] = "Да"
 
         if census.decision is not None:
             res['contact'] = f"{census.decision.firstname} {census.decision.lastname} {census.decision.surname}"

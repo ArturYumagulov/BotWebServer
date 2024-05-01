@@ -3,6 +3,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from analytics import services
 from census.models import Volume
@@ -15,12 +16,17 @@ def index(request):
     return render(request, 'analytics/report_1.html')
 
 
+@csrf_exempt
 def report_1(request):
-    data = services.create_report_1('industrial')
-    return JsonResponse(
-        {"data": data},
-        safe=False
-    )
+    if request.method == "POST":
+        depart = json.loads(request.body).get('depart')
+        data = services.create_report_1(depart)
+        return JsonResponse(
+            {"data": data},
+            safe=False
+        )
+    else:
+        return {'method is get'}
 
 
 def get_volumes(request):

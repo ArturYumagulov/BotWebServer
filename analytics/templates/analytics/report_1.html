@@ -18,7 +18,7 @@
     left: 50%;
     top: 50%;
     min-height: 1px;
-    opacity: 0;
+    opacity: 1;
     }
 
     .loader{
@@ -166,7 +166,7 @@
         let report_1 = "{% url 'report_1' %}"
         let volume_url = "{% url 'get_volumes' %}"
         let csrf = "{{ csrf_token }}"
-        let depart = 'b2c'
+        let depart = 'industrial'
     </script>
     <script src="{% static 'js/analytics/report_1.js'%}"></script>
 {% endblock %}
