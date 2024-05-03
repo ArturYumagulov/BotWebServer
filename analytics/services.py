@@ -1,6 +1,7 @@
 from census.models import Census
-from tasks.models import Task
 from census.models import Volume
+from pymongo import MongoClient
+from pymongo.errors import DuplicateKeyError
 
 
 class Paginator:
@@ -52,24 +53,21 @@ def create_volume_list(model, depart):
         return None
 
 
-def create_car_list(model, depart):
-    pass
-
-
-def create_report_1(depart):
+def create_report_1():
     data = []
-    censuses = Census.objects.filter(department__name=depart) \
-        # .filter(address_id='5678')
+    censuses = Census.objects.all()
     for census in censuses:
         res: dict = dict()
+        res['_id'] = census.pk
         res['author'] = census.task_author
+        res['depart'] = census.department.name
         res['inn'] = census.inn
         res['name'] = census.name.replace('%20', ' ')
         res['category'] = census.category.name
         res['result'] = census.task_result
         res['elevators'] = census.elevators_count
         res['equipments'] = create_equipment_list(census.equipmentitem_set.all())
-        res['volumes'] = create_volume_list(census.volumeitem_set.all(), depart)
+        res['volumes'] = create_volume_list(census.volumeitem_set.all(), census.department.name)
         res['cars'] = [car.name for car in census.cars.all()]
 
         if census.working is None:
@@ -88,8 +86,35 @@ def create_report_1(depart):
     return data
 
 
+class ReportDataOnMongoDB:
+    def __init__(self, host="localhost", port=27017):
+        self.client = client = MongoClient(host, port)
+        self.db = client['test']
+        self.series_collection = self.db['census']
+
+    def insert_many_document(self, data: list):
+        print(data)
+        for dt in data:
+            try:
+                return self.series_collection.insert_one(dt)
+
+            except DuplicateKeyError:
+                continue
+
+    def find_document(self, elements: dict | str = "", multiple: bool = False, all_item: bool = False) -> list:
+        if all_item:
+            results = self.series_collection.find({}, {'_id': 0})
+            return [r for r in results]
+        elif multiple:
+            results = self.series_collection.find(elements, {'_id': 0})
+            return [r for r in results]
+        else:
+            return self.series_collection.find_one(elements, {'_id': 0})
+
+
 if __name__ == '__main__':
-    create_report_1('industrial')
+    create_report_1()
+    # ReportDataOnRedis().save_report_1('b2c')
 
     # Пример использования пагинатора
     items = list(range(1, 101))  # список чисел от 1 до 100

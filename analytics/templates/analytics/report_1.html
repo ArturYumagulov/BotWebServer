@@ -107,42 +107,42 @@
 {% endblock %}
 
 {% block content %}
-    <div class="m-3">
-        <div class="btn-group">
-            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                    data-bs-auto-close="inside" aria-expanded="false">
-                Фильтр
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Menu item</a></li>
-                <li><a class="dropdown-item" href="#">Menu item</a></li>
-                <li><a class="dropdown-item" href="#">Menu item</a></li>
-            </ul>
-        </div>
+    <div class="m-3" id="filters">
+{#        <div class="btn-group">#}
+{#            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"#}
+{#                    data-bs-auto-close="inside" aria-expanded="false">#}
+{#                Фильтр#}
+{#            </button>#}
+{#            <ul class="dropdown-menu">#}
+{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
+{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
+{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
+{#            </ul>#}
+{#        </div>#}
 
-        <div class="btn-group">
-            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                    data-bs-auto-close="outside" aria-expanded="false">
-                Фильтр
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Menu item</a></li>
-                <li><a class="dropdown-item" href="#">Menu item</a></li>
-                <li><a class="dropdown-item" href="#">Menu item</a></li>
-            </ul>
-        </div>
+{#        <div class="btn-group">#}
+{#            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"#}
+{#                    data-bs-auto-close="outside" aria-expanded="false">#}
+{#                Фильтр#}
+{#            </button>#}
+{#            <ul class="dropdown-menu">#}
+{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
+{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
+{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
+{#            </ul>#}
+{#        </div>#}
 
-        <div class="btn-group">
-            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                    data-bs-auto-close="false" aria-expanded="false">
-                Фильтр
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Menu item</a></li>
-                <li><a class="dropdown-item" href="#">Menu item</a></li>
-                <li><a class="dropdown-item" href="#">Menu item</a></li>
-            </ul>
-        </div>
+{#        <div class="btn-group">#}
+{#            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"#}
+{#                    data-bs-auto-close="false" aria-expanded="false">#}
+{#                Фильтр#}
+{#            </button>#}
+{#            <ul class="dropdown-menu">#}
+{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
+{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
+{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
+{#            </ul>#}
+{#        </div>#}
     </div>
 
     {% include 'analytics/dashboards/census_res_1.html' %}
@@ -166,7 +166,7 @@
         let report_1 = "{% url 'report_1' %}"
         let volume_url = "{% url 'get_volumes' %}"
         let csrf = "{{ csrf_token }}"
-        let depart = 'industrial'
+        let depart = 'b2c'
     </script>
     <script src="{% static 'js/analytics/report_1.js'%}"></script>
 {% endblock %}

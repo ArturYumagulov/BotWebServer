@@ -20,47 +20,105 @@ async function load_data() {
   const volumes = await volumes_data.json();
   return [reports, volumes];
 }
-
 let b2c_column_list = [
-    {'id': 'author', 'name': "Родитель"},
-    {'id': 'inn', 'name': "ИНН"},
-    {'id': 'name', 'name': "Наименование"},
-    {'id': 'contact', 'name': "Контактное лицо"},
-    {'id': 'phone', 'name': "Телефон"},
-    {'id': 'category', 'name': "Сегмент"},
-    {'id': 'result', 'name': "Результат"},
-    {'id': 'elevators', 'name': "Подъемники"},
-    {'id': 'cars', 'name': "Автомобили"},
+    {'id': 'author', 'name': "Родитель", 'filter': true},
+    {'id': 'inn', 'name': "ИНН", 'filter': false},
+    {'id': 'name', 'name': "Наименование", 'filter': false},
+    {'id': 'contact', 'name': "Контактное лицо", 'filter': false},
+    {'id': 'phone', 'name': "Телефон", 'filter': false},
+    {'id': 'category', 'name': "Сегмент", 'filter': true},
+    {'id': 'result', 'name': "Результат", 'filter': true},
+    {'id': 'elevators', 'name': "Подъемники", 'filter': true},
+    {'id': 'cars', 'name': "Автомобили", 'filter': true},
     // {'id': 'across_oil', 'name': "Количество"},
-    {'id': 'volume_census', 'name': "Объем потребления масел (сенсус)"},
-    {'id': 'volume_oil', 'name': "Общее потребления масел"},
-    {'id': 'working', 'name': "Действующий"},
-    {'id': 'diff', 'name': "Разница"},
-    {'id': 'start_category', 'name': "Категория клиента начальная"},
-    {'id': 'now_category', 'name': "Категория клиента действующая"},
-    {'id': 'potential', 'name': "Потенциал"},
-    {'id': 'frequency', 'name': "Частота заказа"}
+    {'id': 'volume_census', 'name': "Объем потребления масел (сенсус)", 'filter': false},
+    // {'id': 'volume_oil', 'name': "Общее потребления масел"},
+    {'id': 'working', 'name': "Действующий", 'filter': true},
+    {'id': 'diff', 'name': "Разница", 'filter': false},
+    // {'id': 'start_category', 'name': "Категория клиента начальная", 'filter': false},
+    {'id': 'now_category', 'name': "Категория клиента действующая", 'filter': false},
+    {'id': 'potential', 'name': "Потенциал", 'filter': true},
+    // {'id': 'frequency', 'name': "Частота заказа", 'filter': false}
 ]
 
 let b2b_column_list = [
-    {'id': 'author', 'name': "Родитель"},
-    {'id': 'inn', 'name': "ИНН"},
-    {'id': 'name', 'name': "Наименование"},
-    {'id': 'contact', 'name': "Контактное лицо"},
-    {'id': 'phone', 'name': "Телефон"},
-    {'id': 'category', 'name': "Сегмент"},
-    {'id': 'result', 'name': "Результат"},
-    {'id': 'equipment', 'name': "Парк техники"},
-    {'id': 'across_oil', 'name': "Количество"},
-    {'id': 'volume_census', 'name': "Объем потребления масел (сенсус)"},
-    {'id': 'volume_oil', 'name': "Общее потребления масел"},
-    {'id': 'working', 'name': "Действующий"},
-    {'id': 'diff', 'name': "Разница"},
-    {'id': 'start_category', 'name': "Категория клиента начальная"},
-    {'id': 'now_category', 'name': "Категория клиента действующая"},
-    {'id': 'potential', 'name': "Потенциал"},
-    {'id': 'frequency', 'name': "Частота заказа"}
+    {'id': 'author', 'name': "Родитель", 'filter': true},
+    {'id': 'inn', 'name': "ИНН", 'filter': false},
+    {'id': 'name', 'name': "Наименование", 'filter': false},
+    {'id': 'contact', 'name': "Контактное лицо", 'filter': false},
+    {'id': 'phone', 'name': "Телефон", 'filter': false},
+    {'id': 'category', 'name': "Сегмент", 'filter': false},
+    {'id': 'result', 'name': "Результат", 'filter': false},
+    {'id': 'equipment', 'name': "Парк техники", 'filter': false},
+    {'id': 'across_oil', 'name': "Количество", 'filter': false},
+    {'id': 'volume_census', 'name': "Объем потребления масел (сенсус)", 'filter': false},
+    {'id': 'volume_oil', 'name': "Общее потребления масел", 'filter': false},
+    {'id': 'working', 'name': "Действующий", 'filter': false},
+    {'id': 'diff', 'name': "Разница", 'filter': false},
+    {'id': 'start_category', 'name': "Категория клиента начальная", 'filter': false},
+    {'id': 'now_category', 'name': "Категория клиента действующая", 'filter': false},
+    {'id': 'potential', 'name': "Потенциал", 'filter': false},
+    {'id': 'frequency', 'name': "Частота заказа", 'filter': false}
 ]
+
+function create_filter_bottom(category_name, items) {
+    let button_div = document.createElement('div')
+    button_div.classList.add('btn-group', 'm-1')
+    button_div.setAttribute('id', category_name.id)
+    let button = document.createElement('button')
+    let dropdown_menu = document.createElement('ul')
+    dropdown_menu.classList.add('dropdown-menu')
+
+    items.forEach((item) => {
+        let item_li = document.createElement('li')
+        let item_a = document.createElement('a')
+        item_a.classList.add('dropdown-item')
+        item_a.innerHTML = item
+        item_li.append(item_a)
+        dropdown_menu.append(item_li)
+    })
+
+
+    button.classList.add('btn', 'btn-secondary', 'dropdown-toggle')
+    button.setAttribute('type', 'button')
+    button.setAttribute('data-bs-toggle', 'dropdown')
+    button.setAttribute('data-bs-auto-close', 'false')
+    button.setAttribute('aria-expanded', 'false')
+    button.innerHTML = category_name.name
+    button_div.append(button)
+    button_div.append(dropdown_menu)
+    return button_div
+}
+
+function create__filter_bottom_item(data, block_id) {
+    let item_set = new Set()
+    data.data.forEach((item) => {
+        if (item[block_id] !== undefined) {
+            item_set.add(item[block_id])
+        }
+    })
+    return item_set
+}
+
+function create__filter_bottom_many_item(data) {
+    let item_set = new Set()
+    data.data.forEach((item) => {
+        item_set.add(item.category)
+    })
+    return item_set
+}
+
+function create_filters(filters_buttons_list, data) {
+    let filters_block = document.getElementById('filters')
+    filters_buttons_list.forEach((button)=>{
+        if (button.filter) {
+            let filter_items = create__filter_bottom_item(data, button.id)
+            if (filter_items.size > 0) {
+                filters_block.append(create_filter_bottom(button, filter_items))
+            }
+        }
+    })
+}
 function create_table_head(column_list, volumes) {
     let t_head = document.createElement('thead')
     let tr = document.createElement('tr')
@@ -161,9 +219,9 @@ function create_table_row(report, columns_list) {
             else if (i === 9) {
                 create_volume_data(report.volumes, tr)
             }
-            else if (i === 10) {
-                create_volume_sum(report.volumes, tr)
-            }
+            // else if (i === 10) {
+            //     create_volume_sum(report.volumes, tr)
+            // }
             else {
                 td.setAttribute('rowspan', eq_rowspan_len)
                 td.innerHTML = report[`${columns_list[i].id}`]
@@ -179,6 +237,8 @@ function create_table_row(report, columns_list) {
 
 load_data().then(([reports, volumes]) => {
     console.log(reports)
+    // create__filter_bottom_item(reports, 'category')
+    create_filters(b2c_column_list, reports)
     if (depart === 'b2c') {
         create_table_head(b2c_column_list, volumes)
         reports.data.forEach((report) => {
@@ -196,5 +256,7 @@ load_data().then(([reports, volumes]) => {
     footer_load.style.height = '0'
     loader.style.display = 'none'
 })
+
+// create_filters(b2c_column_list)
 
 
