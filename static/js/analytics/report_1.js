@@ -1,65 +1,65 @@
 let table = document.querySelector('.report-1')
+let filters_block = document.getElementById('filters')
 let loader = document.querySelector('.loader')
 let head_load = document.getElementById('head-load')
 let footer_load = document.getElementById('footer-load')
 
-async function load_data() {
-  const [reports_data, volumes_data] = await Promise.all([
-    fetch(report_1, {
-        method: "POST",
-        headers: {"X-CSRFToken": csrf},
-        body: JSON.stringify({depart: depart}),
-    }),
-    fetch(volume_url, {
-        method: "POST",
-        headers: {"X-CSRFToken": csrf},
-        body: JSON.stringify({depart: depart}),
-    })
+
+const b2c_column_list = JSON.parse(
+    document.getElementById('b2c_column_list').textContent
+);
+const industrial_column_list = JSON.parse(
+    document.getElementById('industrial_column_list').textContent
+);
+const b2b_column_list = JSON.parse(
+    document.getElementById('b2b_column_list').textContent
+);
+
+function fetchVolume(url) {
+   return fetch(url, {
+          method: "POST",
+          headers: {"X-CSRFToken": csrf},
+          body: JSON.stringify({depart: depart}),
+      }
+  ).then((res) => res.json())
+        .then((data) => {
+            return data})
+}
+
+
+let volumes = fetchVolume(volume_url)
+let elements = []
+let limits = new Map()
+
+async function load_data(limit, skip) {
+  const [reports_data, volumes_data, length_data, volumes_sum_data] = await Promise.all([
+      fetch(`${report_1}?limit=100&skip=0`, {
+          method: "POST",
+          headers: {"X-CSRFToken": csrf},
+          body: JSON.stringify({depart: depart}),
+      }),
+      fetch(volume_url, {
+          method: "POST",
+          headers: {"X-CSRFToken": csrf},
+          body: JSON.stringify({depart: depart}),
+      }),
+      fetch(get_length, {
+          method: "POST",
+          headers: {"X-CSRFToken": csrf},
+          body: JSON.stringify({depart: depart}),
+      }),
+      fetch(volumes_sum_url, {
+          method: "POST",
+          headers: {"X-CSRFToken": csrf},
+          body: JSON.stringify({depart: depart}),
+      })
   ]);
   const reports = await reports_data.json();
   const volumes = await volumes_data.json();
-  return [reports, volumes];
+  const length = await length_data.json();
+  const volumes_sum = await volumes_sum_data.json();
+  return [reports, volumes, length, volumes_sum];
 }
-let b2c_column_list = [
-    {'id': 'author', 'name': "Родитель", 'filter': true},
-    {'id': 'inn', 'name': "ИНН", 'filter': false},
-    {'id': 'name', 'name': "Наименование", 'filter': false},
-    {'id': 'contact', 'name': "Контактное лицо", 'filter': false},
-    {'id': 'phone', 'name': "Телефон", 'filter': false},
-    {'id': 'category', 'name': "Сегмент", 'filter': true},
-    {'id': 'result', 'name': "Результат", 'filter': true},
-    {'id': 'elevators', 'name': "Подъемники", 'filter': true},
-    {'id': 'cars', 'name': "Автомобили", 'filter': true},
-    // {'id': 'across_oil', 'name': "Количество"},
-    {'id': 'volume_census', 'name': "Объем потребления масел (сенсус)", 'filter': false},
-    // {'id': 'volume_oil', 'name': "Общее потребления масел"},
-    {'id': 'working', 'name': "Действующий", 'filter': true},
-    {'id': 'diff', 'name': "Разница", 'filter': false},
-    // {'id': 'start_category', 'name': "Категория клиента начальная", 'filter': false},
-    {'id': 'now_category', 'name': "Категория клиента действующая", 'filter': false},
-    {'id': 'potential', 'name': "Потенциал", 'filter': true},
-    // {'id': 'frequency', 'name': "Частота заказа", 'filter': false}
-]
-
-let b2b_column_list = [
-    {'id': 'author', 'name': "Родитель", 'filter': true},
-    {'id': 'inn', 'name': "ИНН", 'filter': false},
-    {'id': 'name', 'name': "Наименование", 'filter': false},
-    {'id': 'contact', 'name': "Контактное лицо", 'filter': false},
-    {'id': 'phone', 'name': "Телефон", 'filter': false},
-    {'id': 'category', 'name': "Сегмент", 'filter': false},
-    {'id': 'result', 'name': "Результат", 'filter': false},
-    {'id': 'equipment', 'name': "Парк техники", 'filter': false},
-    {'id': 'across_oil', 'name': "Количество", 'filter': false},
-    {'id': 'volume_census', 'name': "Объем потребления масел (сенсус)", 'filter': false},
-    {'id': 'volume_oil', 'name': "Общее потребления масел", 'filter': false},
-    {'id': 'working', 'name': "Действующий", 'filter': false},
-    {'id': 'diff', 'name': "Разница", 'filter': false},
-    {'id': 'start_category', 'name': "Категория клиента начальная", 'filter': false},
-    {'id': 'now_category', 'name': "Категория клиента действующая", 'filter': false},
-    {'id': 'potential', 'name': "Потенциал", 'filter': false},
-    {'id': 'frequency', 'name': "Частота заказа", 'filter': false}
-]
 
 function create_filter_bottom(category_name, items) {
     let button_div = document.createElement('div')
@@ -70,12 +70,27 @@ function create_filter_bottom(category_name, items) {
     dropdown_menu.classList.add('dropdown-menu')
 
     items.forEach((item) => {
-        let item_li = document.createElement('li')
-        let item_a = document.createElement('a')
-        item_a.classList.add('dropdown-item')
-        item_a.innerHTML = item
-        item_li.append(item_a)
-        dropdown_menu.append(item_li)
+        if (item !== null) {
+            if (typeof item === 'object') {
+                for (let i = 0; i < item.length; i++) {
+                    let item_li = document.createElement('li')
+                    let item_a = document.createElement('a')
+                    item_a.classList.add('dropdown-item', 'filter')
+                    item_a.setAttribute('category', category_name.id)
+                    item_a.innerHTML = item[i]
+                    item_li.append(item_a)
+                    dropdown_menu.append(item_li)
+                }
+            } else {
+                let item_li = document.createElement('li')
+                let item_a = document.createElement('a')
+                item_a.classList.add('dropdown-item', 'filter')
+                item_a.setAttribute('category', category_name.id)
+                item_a.innerHTML = item
+                item_li.append(item_a)
+                dropdown_menu.append(item_li)
+            }
+        }
     })
 
 
@@ -92,24 +107,18 @@ function create_filter_bottom(category_name, items) {
 
 function create__filter_bottom_item(data, block_id) {
     let item_set = new Set()
-    data.data.forEach((item) => {
-        if (item[block_id] !== undefined) {
-            item_set.add(item[block_id])
-        }
-    })
-    return item_set
-}
+    if (data.data.length >= 1) {
+        data.data.forEach((item) => {
+            if (item[block_id] !== undefined) {
+                item_set.add(item[block_id])
+            }
+        })
+    }
 
-function create__filter_bottom_many_item(data) {
-    let item_set = new Set()
-    data.data.forEach((item) => {
-        item_set.add(item.category)
-    })
     return item_set
 }
 
 function create_filters(filters_buttons_list, data) {
-    let filters_block = document.getElementById('filters')
     filters_buttons_list.forEach((button)=>{
         if (button.filter) {
             let filter_items = create__filter_bottom_item(data, button.id)
@@ -196,59 +205,206 @@ function create_eq_or_cars_rows(report, tbody) {
 }
 
 
-function create_table_row(report, columns_list) {
+function create_table_row(report, columns_list, volumes_sum) {
     let tbody = document.createElement('tbody')
     tbody.setAttribute('id', 'values')
     let tr = document.createElement('tr')
 
-    // reports_list.forEach((report) => {
-        let  eq_rowspan_len = rowspan_count(report)
-        for (let i = 0; i < columns_list.length; i++) {
-            let td = document.createElement('td')
-            if (i < 8) {
-                td.setAttribute('rowspan', eq_rowspan_len)
-                td.innerHTML = report[`${columns_list[i].id}`]
-                td.style.textAlign = 'center'
-                tr.append(td)
-            }
-            else if (i === 8) {
-                td.innerHTML = report[`${columns_list[i].id}`][0]
-                td.style.textAlign = 'center'
-                tr.append(td)
-            }
-            else if (i === 9) {
-                create_volume_data(report.volumes, tr)
-            }
-            // else if (i === 10) {
-            //     create_volume_sum(report.volumes, tr)
-            // }
-            else {
-                td.setAttribute('rowspan', eq_rowspan_len)
-                td.innerHTML = report[`${columns_list[i].id}`]
-                tr.append(td)
-            }
+    let eq_rowspan_len = rowspan_count(report)
+    for (let i = 0; i < columns_list.length; i++) {
+        let td = document.createElement('td')
+        if (i < 8) {
+            td.setAttribute('rowspan', eq_rowspan_len)
+            td.innerHTML = report[`${columns_list[i].id}`]
+            td.style.textAlign = 'center'
+            tr.append(td)
+        } else if (i === 8) {    // cars
+            td.innerHTML = report[`${columns_list[i].id}`]
+            td.style.textAlign = 'center'
+            tr.append(td)
+        } else if (i === 9) {  // volumes
+            create_volume_data(report.volumes, tr)
         }
-        tbody.append(tr)
-        create_eq_or_cars_rows(report, tbody)
-        table.append(tbody)
-    // })
+        else {
+            td.setAttribute('rowspan', eq_rowspan_len)
+            td.innerHTML = report[`${columns_list[i].id}`]
+            td.style.textAlign = 'center'
+            tr.append(td)
+        }
+    }
+    tbody.append(tr)
+    create_eq_or_cars_rows(report, tbody)
+    table.append(tbody)
 }
 
 
-load_data().then(([reports, volumes]) => {
-    console.log(reports)
-    // create__filter_bottom_item(reports, 'category')
-    create_filters(b2c_column_list, reports)
+function clean_duplicate_filters() {
+    // очистка дубликатов в фильтрах
+
+    let filters = document.getElementById('filters')
+
+    filters.childNodes.forEach((filter)=>{
+        if (filter.childNodes[1] !== undefined) {
+            if (filter.childNodes[1].childNodes.length > 1) {
+                let filter_list = []
+                for (let i = 0; i < filter.childNodes[1].childNodes.length; i++) {
+                    if (!filter_list.includes(filter.childNodes[1].childNodes[i].innerText)) {
+                        filter_list.push(filter.childNodes[1].childNodes[i].innerText)
+                    }
+                    else {
+                        filter.childNodes[1].childNodes[i].remove()
+                    }
+                    filter_list.push(filter.childNodes[1].childNodes[i].innerText)
+                }
+            }
+        }
+    })
+}
+
+function create_paginator(pages_count, peer_count) {
+    let paginator_ul = document.querySelector('.pagination')
+    let prev = document.querySelector('previous')
+    let pages =  Math.ceil(pages_count/ peer_count)
+    let next_li = document.createElement('li')
+    let next_div = document.createElement('div')
+    next_div.classList.add('page-link')
+    next_li.classList.add('page-item')
+    next_div.setAttribute('id', 'next')
+    next_div.innerHTML = 'Далее'
+    next_li.append(next_div)
+    for (let i = 1; i < pages + 1; i++) {
+        let li = document.createElement('li')
+        let li_div = document.createElement('div')
+        li.classList.add('page-item')
+        li.setAttribute('id', `page-${i}`)
+        li_div.classList.add('page-link')
+        if (i === 1) {
+            li_div.setAttribute('limit', peer_count)
+            li.classList.add('active')
+            li_div.setAttribute('skip', 0)
+            li.setAttribute('id', `page-1`)
+        } else {
+            li_div.setAttribute('limit', Number(peer_count) * i)
+            li_div.setAttribute('skip', Number((peer_count) * i) - peer_count)
+        }
+        li_div.innerHTML = i
+        li.append(li_div)
+        paginator_ul.append(li)
+    }
+    paginator_ul.append(next_li)
+
+}
+
+function filterReport(url, limit=100, skip=0, filters) {
+   return fetch(`${url}?limit=${limit}&skip=${skip}`, {
+          method: "POST",
+          headers: {"X-CSRFToken": csrf},
+          body: JSON.stringify({depart: depart, filters: filters}),
+      }
+  ).then((res) => res.json())
+        .then((data) => {
+            return data})
+}
+
+function create_filters_table(filter_item, column_lists) {
+    let new_set = new Map()
+    new_set.set('filter_category', filter_item.getAttribute('category'))
+
+    elements.push(`${filter_item.getAttribute('category')}_${filter_item.innerHTML}`)
+    let data = filterReport(filter_report_1, limits.limit, limits.skip, elements)
+    table.innerHTML = ''
+    filters_block.innerHTML = ''
+    console.log(elements)
+    data.then((reports) => {
+        create_filters(column_lists, reports)
+        clean_duplicate_filters()
+        volumes.then((volumes) => {
+            create_table_head(column_lists, volumes)
+            reports.data.forEach((report) => {
+                create_table_row(report, column_lists, volumes)
+            })
+            filters_control(column_lists, reports)
+        })
+    })
+}
+
+function filters_control(column_lists) {
+
+    let filters_list = document.querySelectorAll('.filter')
+
+    filters_list.forEach((filter_item) => {
+        filter_item.addEventListener('click', () => {
+            create_filters_table(filter_item, column_lists)
+        })
+    })
+}
+
+
+function links_control(column_lists, volumes) {
+    let links = document.querySelectorAll('.page-link')
+
+    links.forEach((link => {
+        link.addEventListener('click', () => {
+            console.log(elements)
+            if (link.getAttribute('id') !== 'next') {
+                link.parentNode.classList.add('active')
+                let limit = link.getAttribute('limit')
+                let skip = link.getAttribute('skip')
+                limits.set('limit', limit)
+                if (limit > 0) {
+                    let nxt_btn = document.getElementById(`page-${(limit / 100) - 1}`)
+                    let prv_btn = document.getElementById(`page-${(limit / 100) + 1}`)
+
+                    if (nxt_btn != null) {
+                        nxt_btn.classList.remove('active')
+                    } else if (prv_btn != null) {
+                        prv_btn.classList.remove('active')
+                    }
+
+                }
+                limits.set('skip', skip)
+                table.innerHTML = ''
+                filters_block.innerHTML = ''
+                let data = filterReport(filter_report_1, Number(limits.get('limit')), Number(limits.get('skip')), elements)
+                data.then((data) => {
+                    create_filters(column_lists, data)
+                    clean_duplicate_filters()
+                    create_table_head(column_lists, volumes)
+                    data.data.forEach((report) => {
+                        create_table_row(report, column_lists, volumes)
+                    })
+                    filters_control(column_lists, data)
+                })
+            } else {
+                console.log('click')
+            }
+        })
+    }))
+
+}
+
+// Первоначальная загрузка
+load_data(100, 0).then(([reports, volumes, length, volumes_sum]) => {
     if (depart === 'b2c') {
+        // filters_control(b2c_column_list)
+        create_filters(b2c_column_list, reports)
+        clean_duplicate_filters()
         create_table_head(b2c_column_list, volumes)
         reports.data.forEach((report) => {
-            create_table_row(report, b2c_column_list, volumes)
+            create_table_row(report, b2c_column_list, volumes, volumes_sum)
         })
+        create_paginator(length.count, 100)
+        filters_control(b2c_column_list, reports)
     } else if (depart === 'industrial' || depart === 'b2b') {
-        create_table_head(b2b_column_list, volumes)
+        create_filters(industrial_column_list, reports)
+        clean_duplicate_filters()
+        create_table_head(industrial_column_list, volumes)
         reports.data.forEach((report) => {
-            create_table_row(report, b2c_column_list, volumes)
+            create_table_row(report, industrial_column_list, volumes, volumes_sum)
         })
+        create_paginator(length.count, 100)
+        filters_control(industrial_column_list, reports)
+        links_control(industrial_column_list, volumes)
     }
 
 }).finally(() => {
@@ -256,7 +412,4 @@ load_data().then(([reports, volumes]) => {
     footer_load.style.height = '0'
     loader.style.display = 'none'
 })
-
-// create_filters(b2c_column_list)
-
 

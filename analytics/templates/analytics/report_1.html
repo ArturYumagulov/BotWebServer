@@ -4,15 +4,15 @@
 
 {% block styles %}
     .table-head-item {
-        font-size: 12px;
-        text-align: center;
+    font-size: 12px;
+    text-align: center;
     }
     .report-1-div {
-        position: relative;
+    position: relative;
     }
     table {margin: 0 auto;}
 
-{#    --------------------#}
+    {#    --------------------#}
     .loader{
     position: absolute;
     left: 50%;
@@ -103,60 +103,18 @@
     transform: scale(1,1);
     }
     }
-{#    -----------------------#}
+    {#    -----------------------#}
 {% endblock %}
 
 {% block content %}
-    <div class="m-3" id="filters">
-{#        <div class="btn-group">#}
-{#            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"#}
-{#                    data-bs-auto-close="inside" aria-expanded="false">#}
-{#                Фильтр#}
-{#            </button>#}
-{#            <ul class="dropdown-menu">#}
-{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
-{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
-{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
-{#            </ul>#}
-{#        </div>#}
-
-{#        <div class="btn-group">#}
-{#            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"#}
-{#                    data-bs-auto-close="outside" aria-expanded="false">#}
-{#                Фильтр#}
-{#            </button>#}
-{#            <ul class="dropdown-menu">#}
-{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
-{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
-{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
-{#            </ul>#}
-{#        </div>#}
-
-{#        <div class="btn-group">#}
-{#            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"#}
-{#                    data-bs-auto-close="false" aria-expanded="false">#}
-{#                Фильтр#}
-{#            </button>#}
-{#            <ul class="dropdown-menu">#}
-{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
-{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
-{#                <li><a class="dropdown-item" href="#">Menu item</a></li>#}
-{#            </ul>#}
-{#        </div>#}
-    </div>
+    <div class="m-3" id="filters"></div>
 
     {% include 'analytics/dashboards/census_res_1.html' %}
 
-    <nav aria-label="Page navigation">
+    <nav aria-label="Page navigation paginator">
         <ul class="pagination justify-content-center m-3">
-            <li class="page-item disabled">
-                <a class="page-link">Previous</a>
-            </li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#">Next</a>
+            <li class="page-item disabled previous">
+                <div class="page-link">Назад</div>
             </li>
         </ul>
     </nav>
@@ -164,9 +122,16 @@
 {% block scripts %}
     <script>
         let report_1 = "{% url 'report_1' %}"
+        let filter_report_1 = "{% url 'filter_report_1' %}"
         let volume_url = "{% url 'get_volumes' %}"
+        let get_length = "{% url 'get_len' %}"
         let csrf = "{{ csrf_token }}"
-        let depart = 'b2c'
+        let volumes_sum_url = "{% url 'get_volumes_sum' %}"
+        let depart = 'industrial'
     </script>
-    <script src="{% static 'js/analytics/report_1.js'%}"></script>
+    {{ b2c_column_list | json_script:"b2c_column_list" }}
+    {{ industrial_column_list | json_script:"industrial_column_list" }}
+    {{ b2b_column_list | json_script:"b2b_column_list" }}
+
+    <script src="{% static 'js/analytics/report_1.js' %}"></script>
 {% endblock %}
