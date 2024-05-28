@@ -268,6 +268,8 @@ class PartnersViewSet(ModelViewSet):
 
         return Response({'result': True, 'detail': f"data updated"}, status=status.HTTP_201_CREATED)
 
+    #  TODO добавить возможность обновления полей договора и суммы отгрузки, статуса обмена
+
 
 class PartnersWorkerViewSet(ModelViewSet):
 

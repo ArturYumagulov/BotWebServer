@@ -1,6 +1,18 @@
 from django.db import models
 
 
+class Department(models.Model):
+    is_active = models.BooleanField(verbose_name="Активность", default=False)
+    name = models.CharField(verbose_name="Имя", max_length=20)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "12. Подразделение"
+        verbose_name_plural = "12. Подразделения"
+
+
 class ResultGroup(models.Model):
     code = models.CharField(verbose_name="Код 1С", max_length=11, primary_key=True)
     name = models.CharField(verbose_name="Имя группы", max_length=1000)
@@ -81,6 +93,8 @@ class Partner(models.Model):
         verbose_name_plural = "03. Контрагенты"
         ordering = ['name']
 
+    #  TODO добавить наличие договора, и сумму отгрузки, статус обмена
+
 
 class PartnerWorker(models.Model):
     partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name="workers")
@@ -105,6 +119,7 @@ class Worker(models.Model):
     supervisor = models.ForeignKey('Supervisor', on_delete=models.PROTECT, null=True, blank=True)
     controller = models.BooleanField(default=False)
     partner = models.CharField(max_length=11, blank=True, null=True)
+    department = models.ForeignKey(Department, blank=True, null=True, on_delete=models.PROTECT)
 
     def __str__(self):
         return f"{self.name}"
@@ -120,6 +135,7 @@ class Head(models.Model):
     code = models.CharField(verbose_name="Код 1С", primary_key=True, max_length=11)
     chat_id = models.IntegerField(unique=True, blank=True, null=True)
     phone = models.CharField(verbose_name="Телефон", max_length=15, null=True, blank=True)
+    department = models.ForeignKey(Department, blank=True, null=True, on_delete=models.PROTECT)
 
     def __str__(self):
         return f"{self.name}"
@@ -137,6 +153,7 @@ class Supervisor(models.Model):
     code = models.CharField(verbose_name="Код 1С", primary_key=True, max_length=11)
     chat_id = models.IntegerField(unique=True, blank=True, null=True)
     phone = models.CharField(verbose_name="Телефон", max_length=15, null=True, blank=True)
+    department = models.ForeignKey(Department, blank=True, null=True, on_delete=models.PROTECT)
 
     def __str__(self):
         return f"{self.name}"

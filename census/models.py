@@ -1,20 +1,8 @@
 from django.db import models
-from tasks.models import Partner, Result, Task
+from tasks.models import Partner, Result, Department
 
 
 # Create your models here.
-
-class Department(models.Model):
-    is_active = models.BooleanField(verbose_name="Активность", default=False)
-    name = models.CharField(verbose_name="Имя", max_length=20)
-
-    def __str__(self):
-        return f"{self.name}"
-
-    class Meta:
-        verbose_name = "Подразделение"
-        verbose_name_plural = "Подразделения"
-
 
 class PointTypes(models.Model):
     is_active = models.BooleanField(default=False, verbose_name="Активность")
@@ -193,10 +181,6 @@ class PointVectorsItem(models.Model):
 
     def __str__(self):
         return f"{self.census} - {self.vectors} - {self.value}"
-
-
-def get_default_task():
-    return Task.objects.get(number="00000000001")
 
 
 class CensusFiles(models.Model):

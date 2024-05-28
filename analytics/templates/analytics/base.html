@@ -1,3 +1,5 @@
+{% url 'analytics' as main %}
+{% url 'report_2' as report_2 %}
 <!doctype html>
 {% load static %}
 <html lang="en">
@@ -50,7 +52,10 @@
     <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
     <div class="navbar-nav">
         <div class="nav-item text-nowrap">
-            <a class="nav-link px-3" href="#">Sign out</a>
+            {% if user.is_authenticated %}
+{#                <a class="nav-link px-3" href="{% url 'logout' %}">Sign out</a>#}
+                  <a class="nav-link px-3" href="{% url 'logout' %}">Выйти</a>
+            {% endif %}
         </div>
     </div>
 </header>
@@ -61,15 +66,15 @@
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'analytics' %}">
+                        <a class="nav-link {% if request.path == main %}active{% else %}{% endif %}" aria-current="page" href="{{ main }}">
                             <span data-feather="home"></span>
-                            Отчет 1
+                            Сенсус с потенциалом (Отчет 1)
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link {% if request.path == report_2 %}active{% else %}{% endif %}" href="{{ report_2 }}">
                             <span data-feather="file"></span>
-                            Отчет 2
+                            Общее выполнение сенсуса (Отчет 2)
                         </a>
                     </li>
 {#                    <li class="nav-item">#}

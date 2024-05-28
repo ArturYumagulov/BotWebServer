@@ -127,7 +127,7 @@
         let get_length = "{% url 'get_len' %}"
         let csrf = "{{ csrf_token }}"
         let volumes_sum_url = "{% url 'get_volumes_sum' %}"
-        let depart = 'industrial'
+        let depart = 'b2c'
     </script>
     {{ b2c_column_list | json_script:"b2c_column_list" }}
     {{ industrial_column_list | json_script:"industrial_column_list" }}

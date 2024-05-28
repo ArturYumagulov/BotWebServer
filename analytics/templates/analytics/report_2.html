@@ -1,0 +1,45 @@
+{% extends 'analytics/base.html' %}
+{% load static %}
+{% block content %}
+
+
+<table class="table table-striped">
+    <div class="m-3" id="filters"></div>
+{#  <thead>#}
+{#    <tr>#}
+{#        <th scope="col">Подразделение</th>#}
+{#        <th scope="col">Ответственный (Инициатор)</th>#}
+{#        <th scope="col">Исполнитель</th>#}
+{#        <th scope="col">Активные задачи</th>#}
+{#        <th scope="col">Отработали</th>#}
+{#        <th scope="col">В работе</th>#}
+{#        <th scope="col">Дейсвующие клиенты</th>#}
+{#        <th scope="col">Потенциальные клиенты</th>#}
+{#    </tr>#}
+{#  </thead>#}
+{#  <tbody>#}
+{#    <tr>#}
+{#      <th scope="row">1</th>#}
+{#      <td>Mark</td>#}
+{#      <td>Otto</td>#}
+{#      <td>@mdo</td>#}
+{#    </tr>#}
+{#    <tr>#}
+{#      <th scope="row">2</th>#}
+{#      <td>Jacob</td>#}
+{#      <td>Thornton</td>#}
+{#      <td>@fat</td>#}
+{#    </tr>#}
+{#    <tr>#}
+{#      <th scope="row">3</th>#}
+{#      <td>Larry the Bird</td>#}
+{#        <td>@twitter</td>#}
+{#        <td>@fat</td>#}
+{#    </tr>#}
+{#  </tbody>#}
+</table>
+
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'js/analytics/report_2.js' %}"></script>
+{% endblock %}

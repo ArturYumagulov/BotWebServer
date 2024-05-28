@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 
 
+# ------------------------Report 1------------------------
+
 class Paginator:
     def __init__(self, items, items_per_page):
         self.items = items
@@ -83,9 +85,8 @@ def create_index_dict(dataframe_items):
 
 
 def create_report_1():
-    volume_count = 0
     data = []
-    censuses = Census.objects.filter(department__name='industrial')
+    censuses = Census.objects.filter(department__name='b2c').filter(loaded=False)
     all_volumes = [x.volumeitem_set.filter(volume__name='Общий') for x in censuses]
     we_oils = [x.volumeitem_set.exclude(volume__name='Общий') for x in censuses]
     all_volume_count = create_volumes(all_volumes)
@@ -123,9 +124,9 @@ def create_report_1():
         res['_id'] = census.pk
         res['author'] = census.task_author
         res['depart'] = census.department.name
+        res['worker'] = census.worker
         res['inn'] = census.inn
         res['name'] = census.name.replace('%20', ' ')
-        res['segment'] = census.category.name
         res['result'] = census.task_result
         res['elevators'] = str(census.elevators_count)
         res['equipments'] = create_equipment_list(census.equipmentitem_set.all())
@@ -134,21 +135,28 @@ def create_report_1():
         res['potential'] = str(create_potential())
         res['cars'] = [car.name for car in census.cars.all()]
 
+        if census.category is None:
+            res['segment'] = None
+        else:
+            res['segment'] = census.category.name
+
         if census.working is None:
             res['working'] = "Нет"
         else:
             res['working'] = "Да"
 
-        if census.decision is not None:
-            res['contact'] = f"{census.decision.firstname} {census.decision.lastname} {census.decision.surname}"
-            res['phone'] = f"{census.decision.phone}"
-        else:
+        if census.decision is None:
             res['contact'] = None
             res['phone'] = None
-        data.append(res)
-        # census.loaded = True
-        # census.save()
+        else:
+            res['contact'] = f"{census.decision.firstname} {census.decision.lastname} {census.decision.surname}"
+            res['phone'] = f"{census.decision.phone}"
 
+        data.append(res)
+        census.loaded = True
+        census.save()
+
+    # ABC
     dataframe = pd.DataFrame(list(sub_pot_dict.items()), columns=['census_pk', 'category'])\
         .sort_values(ascending=False, by=['category'])
     dataframe['ABC'] = np.where(dataframe['category'] >= 70, 'A', np.where(dataframe['category'] >= 70, 'B', np.where(dataframe['category'] >= 20, 'B', "C")))
@@ -219,6 +227,12 @@ def get_table_column(depart):
         data_dict.clear()
 
     return table
+
+
+# ------------------------Report 2------------------------
+
+def create_report_2():
+    pass
 
 
 if __name__ == '__main__':

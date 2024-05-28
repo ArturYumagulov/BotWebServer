@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     'api',
     'census',
     'core',
-    'analytics'
+    'analytics',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -103,14 +104,25 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 #     }
 # }
 #
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": env('database'),
+#         'USER': env('user'),
+#         'HOST': env('host'),
+#         'PORT': env('port'),
+#         'PASSWORD': env('password'),
+#         }
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": env('database'),
-        'USER': env('user'),
-        'HOST': env('host'),
-        'PORT': env('port'),
-        'PASSWORD': env('password'),
+        "NAME": 'census',
+        'USER': 'postgres',
+        'HOST': 'localhost',
+        'PORT': '5433',
+        'PASSWORD': 'postgres',
         }
 }
 
@@ -237,4 +249,6 @@ CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_RESULT_EXTENDED = True
 
 
-LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "analytics"
+LOGOUT_REDIRECT_URL = "analytics"
