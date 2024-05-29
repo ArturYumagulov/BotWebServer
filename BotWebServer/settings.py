@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'census',
     'core',
     'analytics',
-    'users'
+    'users',
+    'sales'
 ]
 
 MIDDLEWARE = [

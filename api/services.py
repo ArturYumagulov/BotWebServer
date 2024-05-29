@@ -1,7 +1,7 @@
 import environ
-
 import requests
 import json
+
 from tasks.models import Worker, Basics, AuthorComments, WorkerComments, Partner, Task, ResultGroup  # noqa
 
 env = environ.Env()
