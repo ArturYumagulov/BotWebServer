@@ -7,8 +7,10 @@ let table_column_list = [
     {'id': 'tasks', 'name': 'Количество задач', 'filter': false},
     {'id': 'ready_task', 'name': 'Выполнено задач', 'filter': false},
     {'id': 'active_task', 'name': 'В работе', 'filter': false},
-    {'id': 'active_clients', 'name': 'Действующие клиенты', 'filter': false},
-    {'id': 'potential_clients', 'name': 'Потенциальные клиенты', 'filter': false},
+    {'id': 'active_clients', 'name': 'Действующие торговые точки', 'filter': false},
+    {'id': 'potential_clients', 'name': 'Потенциальные торговые точки', 'filter': false},
+    {'id': 'contract', 'name': 'Договор', 'filter': false},
+    {'id': 'amount_sum', 'name': 'Сумма отгрузки', 'filter': false},
 ]
 
 function fetchVolume(url) {

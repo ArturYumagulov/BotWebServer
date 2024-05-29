@@ -84,6 +84,7 @@ class Partner(models.Model):
     name = models.CharField(verbose_name="Имя", max_length=1000)
     code = models.CharField(verbose_name="Код 1С", max_length=11, primary_key=True)
     inn = models.CharField(max_length=12, verbose_name="ИНН", blank=True, null=True, default=None)
+    contract = models.BooleanField(default=False, verbose_name="Договор")
 
     def __str__(self):
         return f"{self.name}"
