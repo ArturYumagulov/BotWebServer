@@ -14,7 +14,7 @@ class RetailUnitAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'article', 'access_category')
     list_filter = ('access_category',)
-    fields = ('name', 'article', 'access_category', 'price', 'edit_date', 'created_date',)
+    fields = ('code', 'name', 'article', 'access_category', 'edit_date', 'created_date',)
     readonly_fields = ('edit_date', 'created_date',)
 
 

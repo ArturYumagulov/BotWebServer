@@ -4,12 +4,13 @@ from rest_framework.routers import DefaultRouter
 
 from tasks.models import Task, Worker, PartnerWorker
 from api.serializers import tasks
-from api.views import task_views, census_views
+from api.views import task_views, census_views, sales_views
 
 router = DefaultRouter()
 router.get_api_root_view().cls.__name__ = "Tasks & Census_API"
 router.get_api_root_view().cls.__doc__ = "API для бота по задачам из 1С"
 
+# ----------------------TASKS-------------------------------------------------
 router.register('base', task_views.BaseViewSet, basename="base")
 router.register('tasks', task_views.TaskViewSet, basename='tasks')
 router.register('all-tasks', task_views.TaskViewListSet, basename="all_tasks")
@@ -23,9 +24,19 @@ router.register('worker_comment', task_views.WorkerCommentsViews, basename="work
 router.register('result', task_views.ResultListView, basename='result_list')
 router.register('result-group', task_views.ResultGroupListView, basename='result_group_list')
 router.register('result-data', task_views.ResultDataListView, basename='result_data_list')
+router.register('task-message-update', task_views.TaskMessageUpdateView, basename='task_message_update')
+
+# ----------------------CENSUS-------------------------------------------------
 router.register('census', census_views.CensusView, basename='census')
 # router.register('census-update', views.CensusUpdate, basename='census_update')
-router.register('task-message-update', task_views.TaskMessageUpdateView, basename='task_message_update')
+
+
+# ----------------------SALES-------------------------------------------------
+
+router.register('products', sales_views.ProductsView, basename='products')
+router.register('orders', sales_views.OrdersView, basename='orders')
+router.register('orders-item', sales_views.OrderItemView, basename='orders_item')
+router.register('retail-unit', sales_views.RetailUnitView, basename='retail_unit')
 
 
 # Фильтры
