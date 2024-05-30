@@ -144,4 +144,8 @@ class CensusUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
+class AddressesCountSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = census_models.AddressesCount
+        fields = '__all__'

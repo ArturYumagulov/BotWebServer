@@ -17,6 +17,7 @@ class Product(models.Model):
 
     code = models.CharField(max_length=50, primary_key=True, verbose_name="Код")
     name = models.CharField(max_length=2000, verbose_name="Наименование")
+    brand = models.CharField(max_length=2000, verbose_name="Бренд", blank=True, null=True)
     article = models.CharField(max_length=100, verbose_name="Артикул", blank=True, null=True)
     access_category = models.CharField(verbose_name="Категория товара", max_length=1000, blank=True, null=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)

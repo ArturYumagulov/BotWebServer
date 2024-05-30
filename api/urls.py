@@ -7,7 +7,7 @@ from api.serializers import tasks
 from api.views import task_views, census_views, sales_views
 
 router = DefaultRouter()
-router.get_api_root_view().cls.__name__ = "Tasks & Census_API"
+router.get_api_root_view().cls.__name__ = "Tasks & Census_API v.1"
 router.get_api_root_view().cls.__doc__ = "API для бота по задачам из 1С"
 
 # ----------------------TASKS-------------------------------------------------
@@ -17,17 +17,18 @@ router.register('all-tasks', task_views.TaskViewListSet, basename="all_tasks")
 router.register('all-tasks-update', task_views.AllTasksUpdateView, basename="all_tasks_update")
 router.register('partners', task_views.PartnersViewSet, basename='partners')
 router.register('partners-worker', task_views.PartnersWorkerViewSet, basename="partners_worker_list")
-router.register('workers', task_views.WorkerViewSet)
-router.register('supervisors', task_views.SupervisorViewSet, basename="supervisors_list")
 router.register('author_comment', task_views.AuthorCommentsViews, basename="author_comments")
 router.register('worker_comment', task_views.WorkerCommentsViews, basename="worker_comment")
-router.register('result', task_views.ResultListView, basename='result_list')
-router.register('result-group', task_views.ResultGroupListView, basename='result_group_list')
-router.register('result-data', task_views.ResultDataListView, basename='result_data_list')
 router.register('task-message-update', task_views.TaskMessageUpdateView, basename='task_message_update')
+# router.register('result', task_views.ResultListView, basename='result_list')
+# router.register('result-group', task_views.ResultGroupListView, basename='result_group_list')
+# router.register('result-data', task_views.ResultDataListView, basename='result_data_list')
+# router.register('workers', task_views.WorkerViewSet)
+# router.register('supervisors', task_views.SupervisorViewSet, basename="supervisors_list")
 
 # ----------------------CENSUS-------------------------------------------------
 router.register('census', census_views.CensusView, basename='census')
+router.register('address-count', census_views.AddressesCountView, basename='address_count')
 # router.register('census-update', views.CensusUpdate, basename='census_update')
 
 

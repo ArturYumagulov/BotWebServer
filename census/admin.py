@@ -131,3 +131,8 @@ class DepartmentAdmin(admin.ModelAdmin):
 class PointVectorsSelectItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active',)
     list_filter = ('is_active', 'vectors')
+
+
+@admin.register(models.AddressesCount)
+class AddressesCountAdmin(admin.ModelAdmin):
+    pass
