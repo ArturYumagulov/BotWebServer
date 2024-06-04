@@ -209,7 +209,6 @@ function create_table_row(report, columns_list, volumes_sum) {
     let tbody = document.createElement('tbody')
     tbody.setAttribute('id', 'values')
     let tr = document.createElement('tr')
-
     let eq_rowspan_len = rowspan_count(report)
     for (let i = 0; i < columns_list.length; i++) {
         let td = document.createElement('td')
@@ -219,7 +218,7 @@ function create_table_row(report, columns_list, volumes_sum) {
             td.style.textAlign = 'center'
             tr.append(td)
         } else if (i === 8) {    // cars
-            td.innerHTML = report[`${columns_list[i].id}`]
+            td.innerHTML = report[`${columns_list[i].id}`][0]
             td.style.textAlign = 'center'
             tr.append(td)
         } else if (i === 9) {  // volumes
@@ -254,7 +253,7 @@ function clean_duplicate_filters() {
                     else {
                         filter.childNodes[1].childNodes[i].remove()
                     }
-                    filter_list.push(filter.childNodes[1].childNodes[i].innerText)
+                    // filter_list.push(filter.childNodes[1].childNodes[i].innerText)
                 }
             }
         }
@@ -385,31 +384,65 @@ function links_control(column_lists, volumes) {
 
 // Первоначальная загрузка
 load_data(100, 0).then(([reports, volumes, length, volumes_sum]) => {
-    if (depart === 'b2c') {
-        // filters_control(b2c_column_list)
-        create_filters(b2c_column_list, reports)
-        clean_duplicate_filters()
-        create_table_head(b2c_column_list, volumes)
-        reports.data.forEach((report) => {
-            create_table_row(report, b2c_column_list, volumes, volumes_sum)
-        })
-        create_paginator(length.count, 100)
-        filters_control(b2c_column_list, reports)
-    } else if (depart === 'industrial' || depart === 'b2b') {
-        create_filters(industrial_column_list, reports)
-        clean_duplicate_filters()
-        create_table_head(industrial_column_list, volumes)
-        reports.data.forEach((report) => {
-            create_table_row(report, industrial_column_list, volumes, volumes_sum)
-        })
-        create_paginator(length.count, 100)
-        filters_control(industrial_column_list, reports)
-        links_control(industrial_column_list, volumes)
-    }
 
+     if (window.location.search.length > 0) {
+         let filter_mask = window.location.search.slice(1).split('&')
+         let worker = decodeURI(filter_mask[0].split('=')[1])
+         let author = decodeURI(filter_mask[1].split('=')[1])
+         let dep = decodeURI(filter_mask[2].split('=')[1])
+         let filters = [`worker_${worker}`, `author_${author}`, 'working_Нет']
+
+         let response = fetch(`${filter_report_1}?limit=100&skip=0`, {
+             method: 'POST',
+             headers: {"X-CSRFToken": csrf},
+             body: JSON.stringify({depart: dep, 'filters': filters}),
+         })
+         response.then((res) => res.json()).then((data) => {
+             if (dep === 'b2c') {
+                 create_filters(b2c_column_list, data)
+                 clean_duplicate_filters()
+                 create_table_head(b2c_column_list, volumes)
+                 data.data.forEach((report) => {
+                     create_table_row(report, b2c_column_list, volumes, volumes_sum)
+                 })
+             } else if (depart === 'industrial' || depart === 'b2b') {
+                 create_filters(industrial_column_list, data)
+                 clean_duplicate_filters()
+                 create_table_head(industrial_column_list, volumes)
+                 data.data.forEach((report) => {
+                     create_table_row(report, industrial_column_list, volumes, volumes_sum)
+                 })
+                 filters_control(industrial_column_list, reports)
+             }
+         })
+     } else {
+
+         if (depart === 'b2c') {
+             // filters_control(b2c_column_list)
+             create_filters(b2c_column_list, reports)
+             clean_duplicate_filters()
+             create_table_head(b2c_column_list, volumes)
+             reports.data.forEach((report) => {
+                 create_table_row(report, b2c_column_list, volumes, volumes_sum)
+             })
+             // create_paginator(length.count, 100)
+             filters_control(b2c_column_list, reports)
+         } else if (depart === 'industrial' || depart === 'b2b') {
+             create_filters(industrial_column_list, reports)
+             clean_duplicate_filters()
+             create_table_head(industrial_column_list, volumes)
+             reports.data.forEach((report) => {
+                 create_table_row(report, industrial_column_list, volumes, volumes_sum)
+             })
+             // create_paginator(length.count, 100)
+             filters_control(industrial_column_list, reports)
+             links_control(industrial_column_list, volumes)
+         } else if (depart === 'director') {
+
+         }
+     }
 }).finally(() => {
     head_load.style.height = '0'
     footer_load.style.height = '0'
     loader.style.display = 'none'
 })
-

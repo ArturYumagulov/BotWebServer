@@ -40,6 +40,7 @@ class CensusAdmin(admin.ModelAdmin):
               'tender',
               'position',
               'dadata',
+              'volume',
               )
 
     @admin.action(description="Отменить загрузку Сенсуса")

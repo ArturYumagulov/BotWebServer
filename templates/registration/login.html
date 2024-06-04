@@ -78,8 +78,8 @@ body {
 <main class="form-signin">
   <form method="post" action="{% url 'login' %}">
       {% csrf_token %}
-{#    <img class="mb-4" src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">#}
-    <h1 class="h3 mb-3 fw-normal">Вход</h1>
+    <img class="mb-4" src="{% static 'images/logo.svg' %}" alt="" width="72" height="57">
+{#    <h1 class="h3 mb-3 fw-normal">Вход</h1>#}
 
     <div class="form-floating">
       <input type="email" class="form-control" id="email" placeholder="name@example.com" name="username">
@@ -90,7 +90,7 @@ body {
       <label for="password">Пароль</label>
     </div>
 
-    <button class="w-100 btn btn-lg btn-primary" type="submit">Войти</button>
+    <button class="w-100 btn btn-lg btn-secondary" type="submit">Войти</button>
     <p class="mt-5 mb-3 text-muted">&copy; ООО "Транзит-Ойл"</p>
   </form>
 </main>

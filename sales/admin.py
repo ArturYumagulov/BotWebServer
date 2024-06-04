@@ -1,6 +1,9 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 
 from . import models
+from .resources import ProductResource
+
 
 # Register your models here.
 
@@ -11,10 +14,11 @@ class RetailUnitAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ImportExportModelAdmin):
+    resource_class = ProductResource
     list_display = ('name', 'article', 'access_category')
     list_filter = ('access_category',)
-    fields = ('code', 'name', 'article', 'access_category', 'edit_date', 'created_date',)
+    fields = ('code', 'name', 'brand', 'article', 'access_category', 'edit_date', 'created_date',)
     readonly_fields = ('edit_date', 'created_date',)
 
 

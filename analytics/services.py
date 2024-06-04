@@ -128,6 +128,7 @@ def create_report_1():
         res['inn'] = census.inn
         res['name'] = census.name.replace('%20', ' ')
         res['result'] = census.task_result
+        # if
         res['elevators'] = str(census.elevators_count)
         res['equipments'] = create_equipment_list(census.equipmentitem_set.all())
         res['volumes'] = create_volume_list(census.volumeitem_set.all(), census.department.name)
@@ -151,6 +152,8 @@ def create_report_1():
         else:
             res['contact'] = f"{census.decision.firstname} {census.decision.lastname} {census.decision.surname}"
             res['phone'] = f"{census.decision.phone}"
+
+        #  TODO написать функцию для передачи парка техники
 
         data.append(res)
         census.loaded = True

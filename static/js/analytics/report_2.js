@@ -1,44 +1,62 @@
-let table_div = document.querySelector('.table')
+(function() {
 
-let table_column_list = [
-    {'id': 'department', 'name': 'Подразделение', 'filter': true},
-    {'id': 'author', 'name': 'Ответственный (Инициатор)', 'filter': true},
-    {'id': 'worker', 'name': 'Исполнитель', 'filter': true},
-    {'id': 'tasks', 'name': 'Количество задач', 'filter': false},
-    {'id': 'ready_task', 'name': 'Выполнено задач', 'filter': false},
-    {'id': 'active_task', 'name': 'В работе', 'filter': false},
-    {'id': 'active_clients', 'name': 'Действующие торговые точки', 'filter': false},
-    {'id': 'potential_clients', 'name': 'Потенциальные торговые точки', 'filter': false},
-    {'id': 'contract', 'name': 'Договор', 'filter': false},
-    {'id': 'amount_sum', 'name': 'Сумма отгрузки', 'filter': false},
-]
+    async function create_head(table_column_list, table) {
+        let thead = document.createElement('thead')
+        let tr = document.createElement('tr')
+        table_column_list.forEach((column) => {
+            let th = document.createElement('th')
+            th.setAttribute('scope', 'col')
+            th.innerHTML = column.name
+            th.style.textAlign = 'center'
+            th.style.fontSize = '13px'
+            tr.append(th)
+        })
+        thead.append(tr)
+        table.append(thead)
+    }
 
-function fetchVolume(url) {
-   return fetch(url, {
-          method: "POST",
-          headers: {"X-CSRFToken": csrf},
-          body: JSON.stringify({depart: depart}),
-      }
-  ).then((res) => res.json())
-        .then((data) => {
-            return data})
-}
+    async function LoadData() {
+        const [report_2, categoriesResponse] = await Promise.all([
+            fetch(report_2_url, {
+                method: 'POST',
+                headers: {"X-CSRFToken": csrf},
+                body: JSON.stringify({
+                    "depart": depart,
+                    "user_id": user_id
+                })
+            }),
+            // fetch('/categories')
+        ]);
+        const report_2_data = await report_2.json();
+        // const categories = await categoriesResponse.json();
+        return report_2_data;
+    }
 
-function create_head(table_column_list) {
-    let thead = document.createElement('thead')
-    let tr = document.createElement('tr')
-    table_column_list.forEach((column) => {
-        let th = document.createElement('th')
-        th.setAttribute('scope', 'col')
-        th.innerHTML = column.name
-        tr.append(th)
-    })
-    thead.append(tr)
-    table_div.append(thead)
-}
+    async function createTable(table) {
+        await create_head(table_column_list, table)
 
-function create_table_row() {
+        LoadData().then((report_data) => {
+            let data = report_data.data
+            let tbody = document.createElement('tbody')
+            data.forEach((dt) => {
+                let tr = document.createElement('tr')
+                for (let i = 0; i < table_column_list.length; i++) {
+                    let th = document.createElement('td')
+                    th.innerHTML = dt[table_column_list[i].id]
+                    th.style.textAlign = 'center'
+                    tr.append(th)
+                }
+                tbody.append(tr)
+            })
+            table.append(tbody)
+        });
+    }
 
-}
+    window.createTable = createTable;
+})();
 
-create_head(table_column_list)
+
+
+
+
+
