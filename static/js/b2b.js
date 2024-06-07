@@ -257,6 +257,9 @@
         })
 
         $('#volumeIdDiv').on('select2:select', function (e) {
+            let other_div = document.getElementById('otherVolDivId')
+            other_div.style.display = 'block'
+            other_div.setAttribute('required', '')
             let category_name = this.children[0].name
             let element = e.params.data
             let div = createFloatDiv(element, category_name, 'Объем потребления масла', 'в месяц в литрах')
@@ -273,6 +276,10 @@
         })
 
         $('#volumeIdDiv').on('select2:unselect', function (e) {
+            let other_div = document.getElementById('otherVolDivId')
+            other_div.style.display = 'none'
+            other_div.children[0].value = ''
+            other_div.removeAttribute('required')
             let element = e.params.data
             let category_name = 'other_volume_name'
             if (element.text !== "Другое") {
@@ -427,6 +434,7 @@
         floatFormValid('otherProvId', false)
         floatFormValid( 'otherVectorInputId', true)
         floatFormValid('resultCommentId', false)
+        floatFormValid('otherVolId', true, true, false)
 
 
         // let control = document.getElementById('controlId')

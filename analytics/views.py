@@ -156,12 +156,14 @@ def get_report_2(requests):
                     result['ready_task'] = ready_tasks
                     result['active_task'] = active_tasks
                     result['active_clients'] = active_clients.count()
+
                     result['potential_clients'] = \
                         f'<a style="text-decoration: none" ' \
                         f'href="/analytics/' \
                         f'?worker={task.worker.name}' \
                         f'&author={task.author.name}' \
                         f'&depart={dep_name}">{potential_clients}</a>'
+
                     result['contract'] = len(partners)
                     result['amount_sum'] = amount_sum(partners)
                     new_result = result.copy()

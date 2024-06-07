@@ -38,6 +38,14 @@
             </select>
         </div>
 
+        {#        Общий объем #}
+        <div class="form-floating mb-3" id="otherVolDivId" style="display: none;">
+            <input class="form-control" id="otherVolId" type="text" name="all_volume" placeholder="Общий объем потребления?"
+            aria-describedby="otherVolIdFeedback">
+            <label for="otherId">Общий объем потребления?</label>
+            <div id="otherVolIdFeedback" class="invalid-feedback">Напишите общий объем потребления?</div>
+        </div>
+
         {% include 'census/utils/providers.html' %}
         {% include 'census/utils/other_provider.html' %}
 

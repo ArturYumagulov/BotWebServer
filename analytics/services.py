@@ -27,10 +27,7 @@ def create_equipment_list(model):
     if model is not None:
         result = []
         for eq in model:
-            item = dict()
-            item['equipments'] = eq.equipment.name
-            item['value'] = eq.value
-            result.append(item)
+            result.append(f"{eq.equipment.name} {eq.value}")
         return result
     else:
         return None
@@ -73,10 +70,6 @@ def create_volumes(queryset):
     return count
 
 
-def cum_sum_func():
-    pass
-
-
 def create_index_dict(dataframe_items):
     index_dict = {}
     for i in dataframe_items:
@@ -86,7 +79,8 @@ def create_index_dict(dataframe_items):
 
 def create_report_1():
     data = []
-    censuses = Census.objects.filter(department__name='b2c').filter(loaded=False)
+    depart = 'industrial'
+    censuses = Census.objects.filter(department__name=depart).filter(loaded=False)
     all_volumes = [x.volumeitem_set.filter(volume__name='Общий') for x in censuses]
     we_oils = [x.volumeitem_set.exclude(volume__name='Общий') for x in censuses]
     all_volume_count = create_volumes(all_volumes)
@@ -97,7 +91,10 @@ def create_report_1():
     for census in censuses:
         census_we_oils_include_join = [float(x.value) for x in census.volumeitem_set.exclude(volume__name="Общий")]
         try:
-            sum_we_oils = int(census.volumeitem_set.get(volume__name="Общий").value)
+            if depart == 'industrial' or depart == 'b2b':
+                sum_we_oils = int(census.others.all_volume)
+            else:
+                sum_we_oils = int(census.volumeitem_set.get(volume__name="Общий").value)
         except VolumeItem.DoesNotExist:
             sum_we_oils = 0
         sum_we_oils_join = sum(census_we_oils_include_join)
@@ -128,7 +125,6 @@ def create_report_1():
         res['inn'] = census.inn
         res['name'] = census.name.replace('%20', ' ')
         res['result'] = census.task_result
-        # if
         res['elevators'] = str(census.elevators_count)
         res['equipments'] = create_equipment_list(census.equipmentitem_set.all())
         res['volumes'] = create_volume_list(census.volumeitem_set.all(), census.department.name)
@@ -152,8 +148,6 @@ def create_report_1():
         else:
             res['contact'] = f"{census.decision.firstname} {census.decision.lastname} {census.decision.surname}"
             res['phone'] = f"{census.decision.phone}"
-
-        #  TODO написать функцию для передачи парка техники
 
         data.append(res)
         census.loaded = True

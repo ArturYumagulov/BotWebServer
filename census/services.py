@@ -114,6 +114,7 @@ def del_ready_task(request, task):
 
 
 def valid_data(request):
+
     _other_name = "Другое"
     request_files = request.FILES
     request = request.POST
@@ -287,6 +288,7 @@ def valid_data(request):
             #  сохранение объема
             oil = models.PointVectors.objects.get(name="Масло")
             debit_items = models.Volume.objects.filter(is_active=True).filter(department__name=_b2c)
+
             if str(oil.pk) in request.getlist('vectors'):
                 for volume in debit_items:
                     new_volume_item = models.VolumeItem.objects.create(
@@ -328,6 +330,7 @@ def valid_data(request):
 
             new_others.providers = request.get('other_providers')
             new_others.vector = request.get('other_vector')
+            new_others.all_volume = request.get('all_volume')
 
             new_census.others = new_others
             new_others.save()

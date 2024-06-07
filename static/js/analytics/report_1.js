@@ -202,6 +202,16 @@ function create_eq_or_cars_rows(report, tbody) {
             tbody.append(tr)
         })
     }
+    else if (report.equipments.length > 0) {
+        report.equipments.slice(1).forEach((car) => {
+            let tr = document.createElement('tr')
+            let cars_td = document.createElement('td')
+            cars_td.style.textAlign = 'center'
+            cars_td.innerHTML = car
+            tr.append(cars_td)
+            tbody.append(tr)
+        })
+    }
 }
 
 
@@ -210,26 +220,51 @@ function create_table_row(report, columns_list, volumes_sum) {
     tbody.setAttribute('id', 'values')
     let tr = document.createElement('tr')
     let eq_rowspan_len = rowspan_count(report)
+    // if (depart === 'b2c') {} else {}
     for (let i = 0; i < columns_list.length; i++) {
         let td = document.createElement('td')
-        if (i < 8) {
-            td.setAttribute('rowspan', eq_rowspan_len)
-            td.innerHTML = report[`${columns_list[i].id}`]
-            td.style.textAlign = 'center'
-            tr.append(td)
-        } else if (i === 8) {    // cars
-            td.innerHTML = report[`${columns_list[i].id}`][0]
-            td.style.textAlign = 'center'
-            tr.append(td)
-        } else if (i === 9) {  // volumes
-            create_volume_data(report.volumes, tr)
+        if (depart === 'b2c') {
+            if (i < 8) {
+                td.setAttribute('rowspan', eq_rowspan_len)
+                td.innerHTML = report[`${columns_list[i].id}`]
+                td.style.textAlign = 'center'
+                console.log(td, i)
+                tr.append(td)
+            } else if (i === 8) {    // cars
+                td.innerHTML = report[`${columns_list[i].id}`][0]
+                td.style.textAlign = 'center'
+                tr.append(td)
+            } else if (i === 9) {  // volumes
+                create_volume_data(report.volumes, tr)
+            } else {
+                td.setAttribute('rowspan', eq_rowspan_len)
+                td.innerHTML = report[`${columns_list[i].id}`]
+                td.style.textAlign = 'center'
+                tr.append(td)
+            }
+        } else {
+            if (i < 7) {
+                td.setAttribute('rowspan', eq_rowspan_len)
+                td.innerHTML = report[`${columns_list[i].id}`]
+                td.style.textAlign = 'center'
+                console.log(td, i)
+                tr.append(td)
+            } else if (i === 7 ){
+                console.log(report[columns_list[i]])
+                console.log(columns_list[i])
+                td.innerHTML = report[`${columns_list[i].id}`][0]
+                td.style.textAlign = 'center'
+                tr.append(td)
+            }   else if (i === 8) {  // volumes
+                create_volume_data(report.volumes, tr)
+            } else {
+                td.setAttribute('rowspan', eq_rowspan_len)
+                td.innerHTML = report[`${columns_list[i].id}`]
+                td.style.textAlign = 'center'
+                tr.append(td)
+            }
         }
-        else {
-            td.setAttribute('rowspan', eq_rowspan_len)
-            td.innerHTML = report[`${columns_list[i].id}`]
-            td.style.textAlign = 'center'
-            tr.append(td)
-        }
+
     }
     tbody.append(tr)
     create_eq_or_cars_rows(report, tbody)
@@ -438,6 +473,24 @@ load_data(100, 0).then(([reports, volumes, length, volumes_sum]) => {
              filters_control(industrial_column_list, reports)
              links_control(industrial_column_list, volumes)
          } else if (depart === 'director') {
+
+             create_director_buttons()
+
+            let buttons = document.querySelectorAll('.btn')
+            let main = document.getElementById('main')
+            let div = document.getElementById('buttons')
+            console.log(buttons)
+            buttons.forEach((button) => {
+                button.addEventListener('click', ()=>{
+                    div.style.position = 'relative'
+                    div.style.top = '0'
+                    div.style.left = '0'
+                    if (button.id === 'b2c') {
+                        create_head(table_column_list, table)
+                    }
+
+                })
+            })
 
          }
      }

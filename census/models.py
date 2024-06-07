@@ -289,6 +289,7 @@ class Others(models.Model):
     volume_name = models.CharField(max_length=2000, null=True, blank=True, default=None)
     volume_value = models.CharField(max_length=2000, null=True, blank=True, default=None)
     products = models.CharField(max_length=2000, null=True, blank=True, default=None)
+    all_volume = models.CharField(max_length=2000, null=True, blank=True, default=None)
 
 
 class Decision(models.Model):
@@ -352,6 +353,9 @@ class Census(models.Model):
         verbose_name = "Сенсус"
         verbose_name_plural = "Сенсусы"
         ordering = ['-created_date']
+
+    # def save(self, commit=True, *args, **kwargs):
+    #     pass
 
     def __str__(self):
         return f"{self.address_id}"

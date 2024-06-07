@@ -47,7 +47,7 @@ class PointVectorItemsSerializer(serializers.ModelSerializer):
 class OtherSerializer(serializers.ModelSerializer):
     class Meta:
         model = census_models.Others
-        fields = ("equipment_name", "volume_name", "volume_value", 'vector', 'access_brand', 'providers')
+        fields = ("equipment_name", "volume_name", "volume_value", 'vector', 'access_brand', 'providers', 'all_volume')
 
 
 class DecisionSerializer(serializers.ModelSerializer):
