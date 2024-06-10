@@ -24,3 +24,6 @@ class ReportUpdateModel(models.Model):
     name = models.CharField(max_length=200, verbose_name="Отчет")
     date = models.DateTimeField(auto_now=True)
     depart = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name="Подразделение")
+
+    def __str__(self):
+        return f'{self.depart} - {self.date}'

@@ -1,17 +1,17 @@
+import datetime
 import json
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_user_model
 
 from analytics import services
-from analytics.services import create_report_1, create_report_2
-from census.models import Volume, Census, AddressesCount
-from sales.models import OrderItem
+from analytics.services import create_report_2, create_report_1
+from census.models import Volume
+from tasks.models import Department
 from .services import get_table_column
-from tasks.models import Task, Worker, Partner
+from .models import ReportUpdateModel
 
 # Create your views here.
 
@@ -22,11 +22,13 @@ User = get_user_model()
 def index(request):
     usr = User.objects.get(pk=request.user.pk)
     depart = usr.usercodedepartment.department
+
     context = {
         'b2c_column_list': get_table_column('b2c'),
         'industrial_column_list': get_table_column('industrial'),
         'b2b_column_list': get_table_column('b2b'),
-        'depart': depart
+        'depart': depart,
+        'last_update': ReportUpdateModel.objects.last()
     }
     return render(request, 'analytics/report_1.html', context)
 
@@ -107,10 +109,18 @@ def get_volumes_sum(request):
     return JsonResponse({'data': data})
 
 
-def save_on_mongo(request):
-    if services.ReportDataOnMongoDB().insert_many_document(create_report_1()):
-        return HttpResponse('<h1>OK</h1>')
-    return HttpResponse('<h1>Нет данных для сохранения</h1>')
+# def save_on_mongo(request):
+#     departs = Department.objects.filter(is_active=True).exclude(name='director')
+#     if len(departs) > 0:
+#         for depart in departs:
+#             new_status = ReportUpdateModel()
+#             if services.ReportDataOnMongoDB().insert_many_document(create_report_1(depart.name)):
+#                 new_status.name = depart.name
+#                 new_status.date = datetime.datetime.now()
+#                 new_status.depart = depart
+#                 new_status.save()
+#         return HttpResponse(f'<h1>OK</h1>')
+#     return HttpResponse('<h1>Нет данных для сохранения</h1>')
 
 
 def get_report_2(requests):

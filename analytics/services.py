@@ -1,6 +1,6 @@
 from census.models import Census, Volume, VolumeItem, AddressesCount
 from sales.models import OrderItem
-from tasks.models import Worker, Task
+from tasks.models import Worker, Task, Department
 from .models import ReportOneTable
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
@@ -79,9 +79,52 @@ def create_index_dict(dataframe_items):
     return index_dict
 
 
-def create_report_1():
+class ReportDataOnMongoDB:
+    def __init__(self, host="localhost", port=27017):
+        self.client = client = MongoClient(host, port)
+        self.db = client['test']
+        self.series_collection = self.db['census']
+
+    def insert_many_document(self, data: list):
+        if len(data) > 0:
+            self.series_collection.insert_many(data)
+            return True
+        else:
+            return False
+
+    def find_document(self, elements: dict | str = "", multiple: bool = False, all_item: bool = False,
+                      summary=False, limit=100, skip=100) -> list:
+        if all_item:
+            results = self.series_collection.find({}, {'_id': 0})
+            return [r for r in results]
+        elif multiple:
+            results = self.series_collection.find(elements, {'_id': 0}).limit(limit).skip(skip)
+            res = [r for r in results]
+            return res
+        elif summary:
+            results = self.series_collection.find(elements, {'_id': 0})
+            res = [r for r in results]
+            return res
+        else:
+            return self.series_collection.find_one(elements, {'_id': 0})
+
+    def get_count(self, depart):
+        return self.series_collection.count_documents(filter={'depart': depart})
+
+    def volume_sum(self, depart):
+        all_volume = []
+        result = self.find_document(elements={'depart': depart, 'volumes.value': {'$gt': '0'}}, summary=True)
+        volumes = [name.name for name in Volume.objects.filter(department__name=depart)]
+        data = {key: 0 for key in volumes}
+        for i in result:
+            for ii in range(0, len(i['volumes'])):
+                data[i['volumes'][ii]['volume']] += float(i['volumes'][ii]['value'])
+                all_volume.append(float(i['volumes'][ii]['value']))
+        return {'all_sum': sum(all_volume), 'defer': data}
+
+
+def create_report_1(depart):
     data = []
-    depart = 'b2c'
     censuses = Census.objects.filter(department__name=depart).filter(loaded=False)
     all_volumes = [x.volumeitem_set.filter(volume__name='Общий') for x in censuses]
     we_oils = [x.volumeitem_set.exclude(volume__name='Общий') for x in censuses]
@@ -167,50 +210,6 @@ def create_report_1():
         i['category'] = dataframe['ABC'][indexes[i['_id']]]
 
     return data
-
-
-class ReportDataOnMongoDB:
-    def __init__(self, host="localhost", port=27017):
-        self.client = client = MongoClient(host, port)
-        self.db = client['test']
-        self.series_collection = self.db['census']
-
-    def insert_many_document(self, data: list):
-        if len(data) > 0:
-            self.series_collection.insert_many(data)
-            return True
-        else:
-            return False
-
-    def find_document(self, elements: dict | str = "", multiple: bool = False, all_item: bool = False,
-                      summary=False, limit=100, skip=100) -> list:
-        if all_item:
-            results = self.series_collection.find({}, {'_id': 0})
-            return [r for r in results]
-        elif multiple:
-            results = self.series_collection.find(elements, {'_id': 0}).limit(limit).skip(skip)
-            res = [r for r in results]
-            return res
-        elif summary:
-            results = self.series_collection.find(elements, {'_id': 0})
-            res = [r for r in results]
-            return res
-        else:
-            return self.series_collection.find_one(elements, {'_id': 0})
-
-    def get_count(self, depart):
-        return self.series_collection.count_documents(filter={'depart': depart})
-
-    def volume_sum(self, depart):
-        all_volume = []
-        result = self.find_document(elements={'depart': depart, 'volumes.value': {'$gt': '0'}}, summary=True)
-        volumes = [name.name for name in Volume.objects.filter(department__name=depart)]
-        data = {key: 0 for key in volumes}
-        for i in result:
-            for ii in range(0, len(i['volumes'])):
-                data[i['volumes'][ii]['volume']] += float(i['volumes'][ii]['value'])
-                all_volume.append(float(i['volumes'][ii]['value']))
-        return {'all_sum': sum(all_volume), 'defer': data}
 
 
 def get_table_column(depart):

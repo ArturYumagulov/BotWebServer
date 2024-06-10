@@ -123,7 +123,7 @@
 {#                    </svg>#}
 {#                </a>#}
             </div>
-            <p class="text-secondary" id="update">Обновлено: {last_update_date}</p></div>
+            <p class="text-secondary" id="update">Обновлено: {% if last_update.date is not None %}{{ last_update.date }}{% else %}Нет данных{% endif %}</p></div>
     </div>
 
 

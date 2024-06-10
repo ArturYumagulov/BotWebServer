@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ReportOneFields, ReportOneTable
+from .models import ReportOneFields, ReportOneTable, ReportUpdateModel
 
 
 @admin.register(ReportOneTable)
@@ -11,5 +11,10 @@ class ReportOneTableAdmin(admin.ModelAdmin):
 
 
 @admin.register(ReportOneFields)
+class ReportOneFieldsAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ReportUpdateModel)
 class ReportOneFieldsAdmin(admin.ModelAdmin):
     pass

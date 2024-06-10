@@ -4,8 +4,11 @@ from django.utils.timezone import make_aware
 from datetime import datetime, timedelta
 from celery import shared_task
 
+from analytics import services
+from analytics.models import ReportUpdateModel
+from analytics.services import create_report_1
 from census.services import DataInnOnRedis, unix_to_date
-from tasks.models import Task, WorkerComments, AuthorComments
+from tasks.models import Task, WorkerComments, AuthorComments, Department
 from census.models import CensusFiles, CompanyDatabase
 
 logger = logging.getLogger(__name__)
@@ -117,5 +120,22 @@ def save_organizations(inn):
             if DataInnOnRedis().remove_data(inn):
                 logger.info(f"{inn} - {new_data.value} - удалено из Redis")
             return True
+        return True
+    return False
+
+
+@shared_task
+def update_reports_data():
+    departs = Department.objects.filter(is_active=True).exclude(name='director')
+    if len(departs) > 0:
+        for depart in departs:
+            new_status = ReportUpdateModel()
+            data = create_report_1(depart.name)
+            if len(data) > 0:
+                services.ReportDataOnMongoDB().insert_many_document(data)
+                new_status.name = depart.name
+                new_status.date = datetime.now()
+                new_status.depart = depart
+                new_status.save()
         return True
     return False
