@@ -1,4 +1,6 @@
-from census.models import Census, Volume, VolumeItem
+from census.models import Census, Volume, VolumeItem, AddressesCount
+from sales.models import OrderItem
+from tasks.models import Worker, Task
 from .models import ReportOneTable
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
@@ -79,7 +81,7 @@ def create_index_dict(dataframe_items):
 
 def create_report_1():
     data = []
-    depart = 'industrial'
+    depart = 'b2c'
     censuses = Census.objects.filter(department__name=depart).filter(loaded=False)
     all_volumes = [x.volumeitem_set.filter(volume__name='Общий') for x in censuses]
     we_oils = [x.volumeitem_set.exclude(volume__name='Общий') for x in censuses]
@@ -227,9 +229,68 @@ def get_table_column(depart):
 
 
 # ------------------------Report 2------------------------
+def amount_sum(partners_list):
+    """
+    Возвращает сумму всех заказов торговой точки.
+    Принимает список контрагентов в задачах агента.
+    """
 
-def create_report_2():
-    pass
+    for partner in partners_list:
+        sales = OrderItem.objects.filter(order__partner__code=partner)
+        return sum([x.total for x in sales])
+
+
+def create_report_2(dep_name):
+    """Функция для создания данных второго отчета"""
+
+    result_list = []
+
+    workers_set = set(worker.code for worker in
+                      Worker.objects.filter(department__name=dep_name))
+    tasks = Task.objects.filter(base__group__name='Сенсус')
+    author_lists = set(task.author.pk for task in tasks)
+
+    for code in workers_set:
+        for author in author_lists:
+            author_tasks = tasks.filter(author__code=author).filter(worker__code=code)
+            workers_list = set()
+            for task in author_tasks:
+                if task.worker.code not in workers_list:
+                    result = {}
+                    censuses = Census.objects.filter(worker=task.worker.name)
+                    active_clients = censuses.filter(working__isnull=False)
+                    potential_clients = censuses.filter(working__isnull=True).count()
+                    all_worker_task_count = author_tasks.count()
+                    active_tasks = author_tasks.filter(status='Новая').count()
+                    ready_tasks = author_tasks.filter(status='Выполнено').count()
+                    partners = [x.working.code for x in active_clients if x.working.contract is not None]
+
+                    result['department'] = dep_name
+                    result['author'] = task.author.name
+                    result['addresses'] = AddressesCount.objects.get(depart=dep_name).count
+                    result['worker'] = task.worker.name
+                    result['tasks'] = all_worker_task_count
+                    result['ready_task'] = ready_tasks
+                    result['active_task'] = active_tasks
+                    result['active_clients'] = active_clients.count()
+
+                    if potential_clients <= 0:
+                        result['potential_clients'] = potential_clients
+                    else:
+                        result['potential_clients'] = \
+                            f'<a style="text-decoration: none" ' \
+                            f'href="/analytics/' \
+                            f'?worker={task.worker.name}' \
+                            f'&author={task.author.name}' \
+                            f'&depart={dep_name}">{potential_clients}</a>'
+
+                    result['contract'] = len(partners)
+                    result['amount_sum'] = amount_sum(partners)
+                    new_result = result.copy()
+                    result_list.append(new_result)
+                    workers_list.add(task.worker.code)
+                    result.clear()
+    return result_list
 
 
 if __name__ == '__main__':

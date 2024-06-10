@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_user_model
 
 from analytics import services
-from analytics.services import create_report_1
+from analytics.services import create_report_1, create_report_2
 from census.models import Volume, Census, AddressesCount
 from sales.models import OrderItem
 from .services import get_table_column
@@ -38,7 +38,6 @@ def report_2(request):
     return render(request, 'analytics/report_2.html', {'depart': depart})
 
 
-@csrf_exempt
 def report_1(request):
     if request.method == "POST":
         limit = request.GET['limit']
@@ -58,7 +57,6 @@ def report_1(request):
         return {'method is get'}
 
 
-@csrf_exempt
 def filter_report_1(request):
     if request.method == "POST":
         limit = request.GET['limit']
@@ -95,7 +93,6 @@ def get_volumes(request):
     return JsonResponse({'method is get'}, safe=False)
 
 
-@csrf_exempt
 def get_length(request):
     if request.method == "POST":
         depart = json.loads(request.body).get('depart')
@@ -104,7 +101,6 @@ def get_length(request):
     return JsonResponse({'error'}, safe=False)
 
 
-@csrf_exempt
 def get_volumes_sum(request):
     depart = json.loads(request.body).get('depart')
     data = services.ReportDataOnMongoDB().volume_sum(depart)
@@ -117,58 +113,9 @@ def save_on_mongo(request):
     return HttpResponse('<h1>Нет данных для сохранения</h1>')
 
 
-def amount_sum(partners_list):
-    for partner in partners_list:
-        sales = OrderItem.objects.filter(order__partner__code=partner)
-        return sum([x.total for x in sales])
-
-
-@csrf_exempt
 def get_report_2(requests):
+
     dep_name = json.loads(requests.body).get('depart')
-    result_list = []
-
-    workers_set = set(worker.code for worker in
-                      Worker.objects.filter(department__name=dep_name))
-    tasks = Task.objects.filter(base__group__name='Сенсус')
-    author_lists = set(task.author.pk for task in tasks)
-
-    for code in workers_set:
-        for author in author_lists:
-            author_tasks = tasks.filter(author__code=author).filter(worker__code=code)
-            workers_list = set()
-            for task in author_tasks:
-                if task.worker.code not in workers_list:
-                    result = {}
-                    censuses = Census.objects.filter(worker=task.worker.name)
-                    active_clients = censuses.filter(working__isnull=False)
-                    potential_clients = censuses.filter(working__isnull=True).count()
-                    all_worker_task_count = author_tasks.count()
-                    active_tasks = author_tasks.filter(status='Новая').count()
-                    ready_tasks = author_tasks.filter(status='Выполнено').count()
-                    partners = [x.working.code for x in active_clients if x.working.contract is not None]
-
-                    result['department'] = dep_name
-                    result['author'] = task.author.name
-                    result['addresses'] = AddressesCount.objects.get(depart=dep_name).count
-                    result['worker'] = task.worker.name
-                    result['tasks'] = all_worker_task_count
-                    result['ready_task'] = ready_tasks
-                    result['active_task'] = active_tasks
-                    result['active_clients'] = active_clients.count()
-
-                    result['potential_clients'] = \
-                        f'<a style="text-decoration: none" ' \
-                        f'href="/analytics/' \
-                        f'?worker={task.worker.name}' \
-                        f'&author={task.author.name}' \
-                        f'&depart={dep_name}">{potential_clients}</a>'
-
-                    result['contract'] = len(partners)
-                    result['amount_sum'] = amount_sum(partners)
-                    new_result = result.copy()
-                    result_list.append(new_result)
-                    workers_list.add(task.worker.code)
-                    result.clear()
+    result_list = create_report_2(dep_name)
 
     return JsonResponse({'data': result_list}, safe=False)

@@ -434,20 +434,22 @@ load_data(100, 0).then(([reports, volumes, length, volumes_sum]) => {
          })
          response.then((res) => res.json()).then((data) => {
              if (dep === 'b2c') {
-                 create_filters(b2c_column_list, data)
-                 clean_duplicate_filters()
+                 // create_filters(b2c_column_list, data)
+                 // clean_duplicate_filters()
                  create_table_head(b2c_column_list, volumes)
                  data.data.forEach((report) => {
                      create_table_row(report, b2c_column_list, volumes, volumes_sum)
                  })
+                 // filters_control(b2c_column_list, reports)
+
              } else if (depart === 'industrial' || depart === 'b2b') {
-                 create_filters(industrial_column_list, data)
-                 clean_duplicate_filters()
+                 // create_filters(industrial_column_list, data)
+                 // clean_duplicate_filters()
                  create_table_head(industrial_column_list, volumes)
                  data.data.forEach((report) => {
                      create_table_row(report, industrial_column_list, volumes, volumes_sum)
                  })
-                 filters_control(industrial_column_list, reports)
+                 // filters_control(industrial_column_list, reports)
              }
          })
      } else {
