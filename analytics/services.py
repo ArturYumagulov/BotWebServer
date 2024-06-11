@@ -227,6 +227,19 @@ def get_table_column(depart):
     return table
 
 
+def get_volumes_list(depart):
+    result = []
+    volumes = Volume.objects.filter(is_active=True).filter(department__name=depart)
+    for item in volumes:
+        data = {'id': item.pk, 'name': item.name, 'slug': item.slug}
+        result.append(data)
+    return result
+
+
+def get_volume_sum_list(depart):
+    return ReportDataOnMongoDB().volume_sum(depart)
+
+
 # ------------------------Report 2------------------------
 def amount_sum(partners_list):
     """

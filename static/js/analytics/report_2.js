@@ -32,32 +32,50 @@
         return report_2_data;
     }
 
+    async function create_director_report_2(depart, table) {
+        LoadData(depart).then((report_data) => {
+            let data = report_data.data
+            let tbody = document.createElement('tbody')
+            data.forEach((dt) => {
+                let tr = document.createElement('tr')
+                for (let i = 0; i < table_column_list.length; i++) {
+                    let th = document.createElement('td')
+                    th.innerHTML = dt[table_column_list[i].id]
+                    th.style.textAlign = 'center'
+                    tr.append(th)
+                }
+                tbody.append(tr)
+            })
+            table.append(tbody)
+        })
+    }
+
     async function createTable(table) {
         if (depart === 'director') {
             create_director_buttons()
-
-
             let buttons = document.querySelectorAll('.btn')
             let main = document.getElementById('main')
             let div = document.getElementById('buttons')
-            console.log(buttons)
             buttons.forEach((button) => {
                 button.addEventListener('click', ()=>{
+                    table.innerHTML = ''
                     div.style.position = 'relative'
                     div.style.top = '0'
                     div.style.left = '0'
-
                     if (button.id === 'b2c') {
                         create_head(table_column_list, table)
+                        create_director_report_2(button.id, table)
+                    }  else if (button.id === 'b2b') {
+                        create_head(table_column_list, table)
+                        create_director_report_2(button.id, table)
+                    }  else if (button.id === 'industrial') {
+                        create_head(table_column_list, table)
+                        create_director_report_2(button.id, table)
                     }
-
                 })
             })
-
-
         } else {
             await create_head(table_column_list, table)
-
             LoadData(depart).then((report_data) => {
                 let data = report_data.data
                 let tbody = document.createElement('tbody')

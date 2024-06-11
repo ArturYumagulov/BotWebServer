@@ -5,16 +5,6 @@ let head_load = document.getElementById('head-load')
 let footer_load = document.getElementById('footer-load')
 
 
-const b2c_column_list = JSON.parse(
-    document.getElementById('b2c_column_list').textContent
-);
-const industrial_column_list = JSON.parse(
-    document.getElementById('industrial_column_list').textContent
-);
-const b2b_column_list = JSON.parse(
-    document.getElementById('b2b_column_list').textContent
-);
-
 function fetchVolume(url) {
    return fetch(url, {
           method: "POST",
@@ -66,8 +56,10 @@ function create_filter_bottom(category_name, items) {
     button_div.classList.add('btn-group', 'm-1')
     button_div.setAttribute('id', category_name.id)
     let button = document.createElement('button')
+    button.id = `dropdownMenu${category_name.id}_id`
     let dropdown_menu = document.createElement('ul')
     dropdown_menu.classList.add('dropdown-menu')
+    dropdown_menu.setAttribute('aria-labelledby', `dropdownMenu${category_name.id}_id`)
 
     items.forEach((item) => {
         if (item !== null) {
@@ -97,7 +89,7 @@ function create_filter_bottom(category_name, items) {
     button.classList.add('btn', 'btn-secondary', 'dropdown-toggle')
     button.setAttribute('type', 'button')
     button.setAttribute('data-bs-toggle', 'dropdown')
-    button.setAttribute('data-bs-auto-close', 'false')
+    // button.setAttribute('data-bs-auto-close', 'false')
     button.setAttribute('aria-expanded', 'false')
     button.innerHTML = category_name.name
     button_div.append(button)
@@ -105,7 +97,7 @@ function create_filter_bottom(category_name, items) {
     return button_div
 }
 
-function create__filter_bottom_item(data, block_id) {
+function create_filter_bottom_item(data, block_id) {
     let item_set = new Set()
     if (data.data.length >= 1) {
         data.data.forEach((item) => {
@@ -121,7 +113,7 @@ function create__filter_bottom_item(data, block_id) {
 function create_filters(filters_buttons_list, data) {
     filters_buttons_list.forEach((button)=>{
         if (button.filter) {
-            let filter_items = create__filter_bottom_item(data, button.id)
+            let filter_items = create_filter_bottom_item(data, button.id)
             if (filter_items.size > 0) {
                 filters_block.append(create_filter_bottom(button, filter_items))
             }
@@ -215,7 +207,7 @@ function create_eq_or_cars_rows(report, tbody) {
 }
 
 
-function create_table_row(report, columns_list, volumes_sum) {
+function create_table_row(report, columns_list) {
     let tbody = document.createElement('tbody')
     tbody.setAttribute('id', 'values')
     let tr = document.createElement('tr')
@@ -228,7 +220,6 @@ function create_table_row(report, columns_list, volumes_sum) {
                 td.setAttribute('rowspan', eq_rowspan_len)
                 td.innerHTML = report[`${columns_list[i].id}`]
                 td.style.textAlign = 'center'
-                console.log(td, i)
                 tr.append(td)
             } else if (i === 8) {    // cars
                 td.innerHTML = report[`${columns_list[i].id}`][0]
@@ -247,11 +238,8 @@ function create_table_row(report, columns_list, volumes_sum) {
                 td.setAttribute('rowspan', eq_rowspan_len)
                 td.innerHTML = report[`${columns_list[i].id}`]
                 td.style.textAlign = 'center'
-                console.log(td, i)
                 tr.append(td)
             } else if (i === 7 ){
-                console.log(report[columns_list[i]])
-                console.log(columns_list[i])
                 td.innerHTML = report[`${columns_list[i].id}`][0]
                 td.style.textAlign = 'center'
                 tr.append(td)
@@ -345,6 +333,9 @@ function create_filters_table(filter_item, column_lists) {
     new_set.set('filter_category', filter_item.getAttribute('category'))
 
     elements.push(`${filter_item.getAttribute('category')}_${filter_item.innerHTML}`)
+    if (depart === 'director') {
+        let data = filterReport(filter_report_1, limits.limit, limits.skip, elements)
+    }
     let data = filterReport(filter_report_1, limits.limit, limits.skip, elements)
     table.innerHTML = ''
     filters_block.innerHTML = ''
@@ -365,7 +356,6 @@ function create_filters_table(filter_item, column_lists) {
 function filters_control(column_lists) {
 
     let filters_list = document.querySelectorAll('.filter')
-
     filters_list.forEach((filter_item) => {
         filter_item.addEventListener('click', () => {
             create_filters_table(filter_item, column_lists)
@@ -417,6 +407,9 @@ function links_control(column_lists, volumes) {
 
 }
 
+
+
+
 // Первоначальная загрузка
 load_data(100, 0).then(([reports, volumes, length, volumes_sum]) => {
 
@@ -442,7 +435,7 @@ load_data(100, 0).then(([reports, volumes, length, volumes_sum]) => {
                  })
                  // filters_control(b2c_column_list, reports)
 
-             } else if (depart === 'industrial' || depart === 'b2b') {
+             } else if (depart === 'industrial' || depart === 'b2b' || 'director') {
                  // create_filters(industrial_column_list, data)
                  // clean_duplicate_filters()
                  create_table_head(industrial_column_list, volumes)
@@ -474,23 +467,28 @@ load_data(100, 0).then(([reports, volumes, length, volumes_sum]) => {
              // create_paginator(length.count, 100)
              filters_control(industrial_column_list, reports)
              links_control(industrial_column_list, volumes)
+
          } else if (depart === 'director') {
 
-             create_director_buttons()
+            create_director_buttons()
 
             let buttons = document.querySelectorAll('.btn')
             let main = document.getElementById('main')
             let div = document.getElementById('buttons')
-            console.log(buttons)
             buttons.forEach((button) => {
                 button.addEventListener('click', ()=>{
+                    table.innerHTML = ''
                     div.style.position = 'relative'
                     div.style.top = '0'
                     div.style.left = '0'
                     if (button.id === 'b2c') {
-                        create_head(table_column_list, table)
+                        create_director_report_1(button.id, b2c_column_list, b2c_volume_list)
                     }
-
+                    else if (button.id === 'b2b') {
+                        create_director_report_1(button.id, b2b_column_list, b2b_volume_list)
+                    } else if (button.id === 'industrial') {
+                        create_director_report_1(button.id, industrial_column_list, industrial_volume_list)
+                    }
                 })
             })
 

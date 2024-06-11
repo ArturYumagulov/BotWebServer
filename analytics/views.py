@@ -1,4 +1,4 @@
-import datetime
+import environ
 import json
 
 from django.contrib.auth.decorators import login_required
@@ -7,7 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import get_user_model
 
 from analytics import services
-from analytics.services import create_report_2, create_report_1
+from analytics.services import create_report_2, create_report_1, get_volumes_list, get_volume_sum_list
 from census.models import Volume
 from tasks.models import Department
 from .services import get_table_column
@@ -17,6 +17,14 @@ from .models import ReportUpdateModel
 
 User = get_user_model()
 
+env = environ.Env()
+environ.Env.read_env()
+
+
+_b2b = env('B2B')
+_b2c = env('B2C')
+_industrial = env('INDUSTRIAL')
+
 
 @login_required
 def index(request):
@@ -24,7 +32,15 @@ def index(request):
     depart = usr.usercodedepartment.department
 
     context = {
-        'b2c_column_list': get_table_column('b2c'),
+
+        f'{_b2c}_volume_sum_list': get_volume_sum_list(_b2c),
+        f'{_b2b}_volume_sum_list': get_volume_sum_list(_b2b),
+        f'{_industrial}_volume_sum_list': get_volume_sum_list(_industrial),
+
+        'b2c_volume_list': get_volumes_list(_b2c),
+        'b2b_volume_list': get_volumes_list('b2b'),
+        'industrial_volume_list': get_volumes_list('industrial'),
+        'b2c_column_list': get_table_column(_b2c),
         'industrial_column_list': get_table_column('industrial'),
         'b2b_column_list': get_table_column('b2b'),
         'depart': depart,

@@ -146,10 +146,22 @@
         let csrf = "{{ csrf_token }}"
         let volumes_sum_url = "{% url 'get_volumes_sum' %}"
         let depart = "{{ depart }}"
+        let director_depart = []
     </script>
+    {{ b2c_volume_sum_list | json_script:"b2c_volume_sum_list" }}
+    {{ b2b_volume_sum_list | json_script:"b2b_volume_sum_list" }}
+    {{ industrial_volume_sum_list | json_script:"industrial_volume_sum_list" }}
+
+    {{ b2c_volume_list | json_script:"b2c_volume_list" }}
+    {{ b2b_volume_list | json_script:"b2b_volume_list" }}
+    {{ industrial_volume_list | json_script:"industrial_volume_list" }}
+
+
     {{ b2c_column_list | json_script:"b2c_column_list" }}
     {{ industrial_column_list | json_script:"industrial_column_list" }}
     {{ b2b_column_list | json_script:"b2b_column_list" }}
+
+    <script src="{% static 'js/analytics/tables.js' %}"></script>
     <script src="{% static 'js/analytics/main.js' %}"></script>
     <script src="{% static 'js/analytics/report_1.js' %}"></script>
 {% endblock %}
