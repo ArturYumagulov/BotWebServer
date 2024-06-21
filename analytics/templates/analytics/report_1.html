@@ -103,17 +103,45 @@
     transform: scale(1,1);
     }
     }
+    {% if depart.name == 'director' %}
     #buttons {
         position: absolute;
         top: 50%;
         left: 50%;
     }
+    {% endif %}
     {#    -----------------------#}
+{% endblock %}
+
+{% block defer_js %}
+
+    {{ b2c_volume_sum_list | json_script:"b2c_volume_sum_list" }}
+    {{ b2b_volume_sum_list | json_script:"b2b_volume_sum_list" }}
+    {{ industrial_volume_sum_list | json_script:"industrial_volume_sum_list" }}
+
+    {{ b2c_volume_list | json_script:"b2c_volume_list" }}
+    {{ b2b_volume_list | json_script:"b2b_volume_list" }}
+    {{ industrial_volume_list | json_script:"industrial_volume_list" }}
+
+
+    {{ b2c_column_list | json_script:"b2c_column_list" }}
+    {{ industrial_column_list | json_script:"industrial_column_list" }}
+    {{ b2b_column_list | json_script:"b2b_column_list" }}
+    <script defer src="{% static 'js/analytics/tables.js' %}"></script>
+    {% if depart.name == 'director' %}
+        <script defer src="{% static 'js/analytics/director.js' %}"></script>
+        <script defer>
+            document.addEventListener('DOMContentLoaded', function () {
+                createTable(document.querySelector('.table'));
+            });
+        </script>
+    {% endif %}
+
 {% endblock %}
 
 {% block content %}
     <div class="m-3 d-flex justify-content-between align-items-center" id="main">
-        <div class="m-3" id="filters"></div>
+        <div class="m-3" id="filters" style="width: 70%"></div>
         <div class="d-flex align-items-center justify-content-center">
             <div class="m-3">
 {#                <a href="#" title="скачать в excel">#}
@@ -123,11 +151,11 @@
 {#                    </svg>#}
 {#                </a>#}
             </div>
-            <p class="text-secondary" id="update">Обновлено: {% if last_update.date is not None %}{{ last_update.date }}{% else %}Нет данных{% endif %}</p></div>
+            <p class="text-secondary" id="update" style="display: none">Обновлено: {% if last_update.date is not None %}{{ last_update.date }}{% else %}Нет данных{% endif %}</p></div>
     </div>
 
 
-    {% include 'analytics/dashboards/census_res_1.html' %}
+    {% include 'analytics/loader.html' %}
 
     <nav aria-label="Page navigation paginator">
         <ul class="pagination justify-content-center m-3">
@@ -145,23 +173,15 @@
         let get_length = "{% url 'get_len' %}"
         let csrf = "{{ csrf_token }}"
         let volumes_sum_url = "{% url 'get_volumes_sum' %}"
-        let depart = "{{ depart }}"
-        let director_depart = []
+
+        {% if depart.name == 'director' %}
+            let director_depart = []
+            let depart = ""
+        {% else %}
+            let depart = "{{ depart }}"
+        {% endif %}
     </script>
-    {{ b2c_volume_sum_list | json_script:"b2c_volume_sum_list" }}
-    {{ b2b_volume_sum_list | json_script:"b2b_volume_sum_list" }}
-    {{ industrial_volume_sum_list | json_script:"industrial_volume_sum_list" }}
-
-    {{ b2c_volume_list | json_script:"b2c_volume_list" }}
-    {{ b2b_volume_list | json_script:"b2b_volume_list" }}
-    {{ industrial_volume_list | json_script:"industrial_volume_list" }}
-
-
-    {{ b2c_column_list | json_script:"b2c_column_list" }}
-    {{ industrial_column_list | json_script:"industrial_column_list" }}
-    {{ b2b_column_list | json_script:"b2b_column_list" }}
-
-    <script src="{% static 'js/analytics/tables.js' %}"></script>
-    <script src="{% static 'js/analytics/main.js' %}"></script>
     <script src="{% static 'js/analytics/report_1.js' %}"></script>
+
+{#    {% endif %}#}
 {% endblock %}

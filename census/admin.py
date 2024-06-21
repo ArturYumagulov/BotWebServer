@@ -126,8 +126,6 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
 
 
-# PointVectorsSelectItem
-
 @admin.register(models.PointVectorsSelectItem)
 class PointVectorsSelectItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active',)

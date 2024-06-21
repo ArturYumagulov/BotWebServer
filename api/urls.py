@@ -22,7 +22,7 @@ router.register('worker_comment', task_views.WorkerCommentsViews, basename="work
 router.register('task-message-update', task_views.TaskMessageUpdateView, basename='task_message_update')
 # router.register('result', task_views.ResultListView, basename='result_list')
 # router.register('result-group', task_views.ResultGroupListView, basename='result_group_list')
-# router.register('result-data', task_views.ResultDataListView, basename='result_data_list')
+router.register('result-data', task_views.ResultDataListView, basename='result_data_list')
 # router.register('workers', task_views.WorkerViewSet)
 # router.register('supervisors', task_views.SupervisorViewSet, basename="supervisors_list")
 

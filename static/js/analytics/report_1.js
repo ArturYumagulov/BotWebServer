@@ -3,6 +3,7 @@ let filters_block = document.getElementById('filters')
 let loader = document.querySelector('.loader')
 let head_load = document.getElementById('head-load')
 let footer_load = document.getElementById('footer-load')
+let update = document.getElementById('update')
 
 
 function fetchVolume(url) {
@@ -22,18 +23,13 @@ let elements = []
 let limits = new Map()
 
 async function load_data(limit, skip) {
-  const [reports_data, volumes_data, length_data, volumes_sum_data] = await Promise.all([
+  const [reports_data, volumes_data, volumes_sum_data] = await Promise.all([
       fetch(`${report_1}?limit=100&skip=0`, {
           method: "POST",
           headers: {"X-CSRFToken": csrf},
           body: JSON.stringify({depart: depart}),
       }),
       fetch(volume_url, {
-          method: "POST",
-          headers: {"X-CSRFToken": csrf},
-          body: JSON.stringify({depart: depart}),
-      }),
-      fetch(get_length, {
           method: "POST",
           headers: {"X-CSRFToken": csrf},
           body: JSON.stringify({depart: depart}),
@@ -46,9 +42,8 @@ async function load_data(limit, skip) {
   ]);
   const reports = await reports_data.json();
   const volumes = await volumes_data.json();
-  const length = await length_data.json();
   const volumes_sum = await volumes_sum_data.json();
-  return [reports, volumes, length, volumes_sum];
+  return [reports, volumes, volumes_sum];
 }
 
 function create_filter_bottom(category_name, items) {
@@ -163,6 +158,7 @@ function create_volume_data(volumes, tr) {
 }
 
 function create_volume_sum(volumes, tr) {
+
     let volumes_sum = 0
 
     volumes.forEach((num) => {
@@ -411,7 +407,7 @@ function links_control(column_lists, volumes) {
 
 
 // Первоначальная загрузка
-load_data(100, 0).then(([reports, volumes, length, volumes_sum]) => {
+load_data(100, 0).then(([reports, volumes, volumes_sum]) => {
 
      if (window.location.search.length > 0) {
          let filter_mask = window.location.search.slice(1).split('&')
@@ -446,53 +442,30 @@ load_data(100, 0).then(([reports, volumes, length, volumes_sum]) => {
              }
          })
      } else {
-
-         if (depart === 'b2c') {
-             // filters_control(b2c_column_list)
-             create_filters(b2c_column_list, reports)
-             clean_duplicate_filters()
-             create_table_head(b2c_column_list, volumes)
-             reports.data.forEach((report) => {
-                 create_table_row(report, b2c_column_list, volumes, volumes_sum)
-             })
-             // create_paginator(length.count, 100)
-             filters_control(b2c_column_list, reports)
-         } else if (depart === 'industrial' || depart === 'b2b') {
-             create_filters(industrial_column_list, reports)
-             clean_duplicate_filters()
-             create_table_head(industrial_column_list, volumes)
-             reports.data.forEach((report) => {
-                 create_table_row(report, industrial_column_list, volumes, volumes_sum)
-             })
-             // create_paginator(length.count, 100)
-             filters_control(industrial_column_list, reports)
-             links_control(industrial_column_list, volumes)
-
-         } else if (depart === 'director') {
-
-            create_director_buttons()
-
-            let buttons = document.querySelectorAll('.btn')
-            let main = document.getElementById('main')
-            let div = document.getElementById('buttons')
-            buttons.forEach((button) => {
-                button.addEventListener('click', ()=>{
-                    table.innerHTML = ''
-                    div.style.position = 'relative'
-                    div.style.top = '0'
-                    div.style.left = '0'
-                    if (button.id === 'b2c') {
-                        create_director_report_1(button.id, b2c_column_list, b2c_volume_list)
-                    }
-                    else if (button.id === 'b2b') {
-                        create_director_report_1(button.id, b2b_column_list, b2b_volume_list)
-                    } else if (button.id === 'industrial') {
-                        create_director_report_1(button.id, industrial_column_list, industrial_volume_list)
-                    }
-                })
-            })
-
+         if (reports.data.length === 0 && depart !== "") {
+             table.innerHTML = '<p class="text-center text-secondary m-5">Нет данных</p>'
+         } else {
+             update.style.display = 'block'
+             if (depart === 'b2c') {
+                 create_filters(b2c_column_list, reports)
+                 clean_duplicate_filters()
+                 create_table_head(b2c_column_list, volumes)
+                 reports.data.forEach((report) => {
+                     create_table_row(report, b2c_column_list, volumes, volumes_sum)
+                 })
+                 filters_control(b2c_column_list, reports)
+             } else if (depart === 'industrial' || depart === 'b2b') {
+                 create_filters(industrial_column_list, reports)
+                 clean_duplicate_filters()
+                 create_table_head(industrial_column_list, volumes)
+                 reports.data.forEach((report) => {
+                     create_table_row(report, industrial_column_list, volumes, volumes_sum)
+                 })
+                 filters_control(industrial_column_list, reports)
+                 links_control(industrial_column_list, volumes)
+             }
          }
+
      }
 }).finally(() => {
     head_load.style.height = '0'

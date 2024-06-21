@@ -27,7 +27,7 @@ _industrial = env('INDUSTRIAL')
 
 
 @login_required
-def index(request):
+def report_1(request):
     usr = User.objects.get(pk=request.user.pk)
     depart = usr.usercodedepartment.department
 
@@ -56,7 +56,14 @@ def report_2(request):
     return render(request, 'analytics/report_2.html', {'depart': depart})
 
 
-def report_1(request):
+@login_required
+def report_3(request):
+    usr = User.objects.get(pk=request.user.pk)
+    depart = usr.usercodedepartment.department
+    return render(request, 'analytics/report_3.html', {'depart': depart})
+
+
+def get_report_1(request):
     if request.method == "POST":
         limit = request.GET['limit']
         skip = request.GET['skip']
@@ -145,3 +152,11 @@ def get_report_2(requests):
     result_list = create_report_2(dep_name)
 
     return JsonResponse({'data': result_list}, safe=False)
+
+
+def get_report_3(requests):
+
+    dep_name = json.loads(requests.body).get('depart')
+    # result_list = create_report_2(dep_name)
+
+    return JsonResponse({'data': 'write report_3 views'}, safe=False)

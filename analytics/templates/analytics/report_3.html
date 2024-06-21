@@ -1,0 +1,123 @@
+{% extends 'analytics/base.html' %}
+{% load static %}
+{% block styles %}
+    {% if depart.name == 'director' %}
+    #buttons {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+    }
+    {% endif %}
+{% endblock %}
+{% block defer_js %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            createTable(document.querySelector('.table'));
+        });
+    </script>
+{% endblock %}
+{% block content %}
+
+
+<table class="table table-sm">
+    <div class="d-flex justify-content-between align-items-center m-3" id="main">
+
+        <div class="m-3" id="filters"></div>
+        <div class="d-flex align-items-center justify-content-center">
+{#            <div class="m-3">#}
+{#                <a href="#" title="скачать в excel">#}
+{#                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"#}
+{#                     class="bi bi-file-earmark-excel-fill" viewBox="0 0 16 16">#}
+{#                    <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M5.884 6.68 8 9.219l2.116-2.54a.5.5 0 1 1 .768.641L8.651 10l2.233 2.68a.5.5 0 0 1-.768.64L8 10.781l-2.116 2.54a.5.5 0 0 1-.768-.641L7.349 10 5.116 7.32a.5.5 0 1 1 .768-.64"/>#}
+{#                </svg></a>#}
+{##}
+{#            </div>#}
+            <p class="text-secondary" id="update"></p></div>
+    </div>
+
+    <thead>
+    <tr>
+        <th scope="col" rowspan="2">#</th>
+        <th scope="col" rowspan="2">ИНН</th>
+        <th scope="col" rowspan="2">Автор</th>
+        <th scope="col" rowspan="2">Наименование ТТ</th>
+        <th class="text-center" scope="col" colspan="4">Категория - Масло</th>
+    </tr>
+          <tr>
+              <th scope="col">Лукойл</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Лукойл</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Лукойл</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Лукойл</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Motul</th>
+              <th scope="col">Лукойл</th>
+
+          </tr>
+  </thead>
+  <tbody class="table-group-divider">
+    <tr>
+        <td rowspan="2">number</td>
+        <td rowspan="2">inn</td>
+        <td rowspan="2">author</td>
+        <td rowspan="2">point_name</td>
+        <td rowspan="2">luk_1</td>
+        <td rowspan="2">mot_2</td>
+        <td rowspan="2">number</td>
+        <td rowspan="2">inn</td>
+        <td rowspan="2">author</td>
+        <td rowspan="2">point_name</td>
+        <td rowspan="2">luk_1</td>
+        <td rowspan="2">mot_2</td>
+        <td rowspan="2">number</td>
+        <td rowspan="2">inn</td>
+        <td rowspan="2">author</td>
+        <td rowspan="2">point_name</td>
+        <td rowspan="2">luk_1</td>
+        <td rowspan="2">mot_2</td>
+        <td rowspan="2">number</td>
+        <td rowspan="2">inn</td>
+        <td rowspan="2">author</td>
+        <td rowspan="2">point_name</td>
+        <td rowspan="2">luk_1</td>
+        <td rowspan="2">mot_2</td>
+        <td rowspan="2">number</td>
+        <td rowspan="2">number</td>
+    </tr>
+  </tbody>
+</table>
+
+{% endblock %}
+{% block scripts %}
+    <script>
+        let csrf = "{{ csrf_token }}"
+        let report_3_url = "{% url 'get_report_3' %}"
+        let table_column_list = [
+            {'id': 'id', 'name': '#', 'filter': false},
+            {'id': 'inn', 'name': 'ИНН', 'filter': false},
+            {'id': 'addresses', 'name': 'Наименование ТТ', filter: false},
+            {'id': 'worker', 'name': 'Категория', 'filter': true},
+        ]
+        let depart = '{{ depart }}'
+        let user_id = "{{ user.pk }}"
+    </script>
+    {% if depart.name == 'director' %}
+        <script src="{% static 'js/analytics/director.js' %}"></script>
+    {% endif %}
+    <script src="{% static 'js/analytics/report_3.js' %}"></script>
+{% endblock %}

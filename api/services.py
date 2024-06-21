@@ -27,9 +27,13 @@ def send_message_bot(request):
                f"{worker_comment.comment}"
 
     if base.group.code == ResultGroup.objects.get(name="Сенсус").code:  # Если "Разработка контрагента"
-
-        author_comment_clean = author_comment.comment.split('_')[0]
-        link_url = author_comment.comment.split('_')[1]
+        print(author_comment.comment.find("_"))
+        if author_comment.comment.find("_") != "-1":
+            author_comment_clean = author_comment.comment.split('_')[0]
+            link_url = author_comment.comment.split('_')[1]
+        else:
+            author_comment_clean = "Транзит-Ойл"
+            link_url = "https://tranzit-oil.com/"
 
         message = f"{task_header['text']} от " \
                   f"{date}\n\n" \

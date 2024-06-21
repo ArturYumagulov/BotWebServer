@@ -154,7 +154,10 @@ def create_report_1(depart):
         dif = sum_we_oils - sum_we_oils_join
 
         def create_potential():
-            count = round((dif / (all_volume_count - pot)) * 100)
+            try:
+                count = round((dif / (all_volume_count - pot)) * 100)
+            except ZeroDivisionError:
+                count = 0
             if 20 < count > 70:
                 return 1
             elif 20 < count > 10:

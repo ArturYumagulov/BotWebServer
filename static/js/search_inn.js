@@ -105,7 +105,7 @@ function LoadInnSearchBlock(url, event) {
                                 contragent.value = item.getAttribute('data-inn')
                                 contragent.classList.add('is-valid')
                                 contragent.setAttribute('required', '')
-                                inn.value = ''
+                                // inn.value = ''
                                 inn.removeAttribute('required')
                                 inn.classList.remove('is-valid')
                                 innDiv.style.display = 'none'
