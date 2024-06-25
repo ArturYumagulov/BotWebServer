@@ -6,6 +6,11 @@ from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 import pandas as pd
 import numpy as np
+import urllib.parse
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
 
 
 # ------------------------Report 1------------------------
@@ -80,10 +85,17 @@ def create_index_dict(dataframe_items):
 
 
 class ReportDataOnMongoDB:
-    def __init__(self, host="localhost", port=27017):
-        self.client = client = MongoClient(host, port)
-        self.db = client['test']
-        self.series_collection = self.db['census']
+
+    def __init__(self):
+        self.username = urllib.parse.quote_plus(env('MONGO_USERNAME'))
+        self.password = urllib.parse.quote_plus(env('MONGO_PASS'))
+
+        self.client = client = MongoClient(
+            host=f"mongodb://{self.username}:{self.password}@{env('MONGO_HOST')}",
+            port=int(env('MONGO_PORT')))
+
+        self.db = client['census_db']
+        self.series_collection = self.db['census_collection']
 
     def insert_many_document(self, data: list):
         if len(data) > 0:
