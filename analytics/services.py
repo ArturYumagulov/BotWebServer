@@ -149,12 +149,13 @@ def create_report_1(depart):
         census_we_oils_include_join = [float(x.value) for x in census.volumeitem_set.exclude(volume__name="Общий")]
         try:
             if depart == 'industrial' or depart == 'b2b':
-                sum_we_oils = int(census.others.all_volume)
+                try:
+                    sum_we_oils = int(census.others.all_volume)
+                except AttributeError:
+                    sum_we_oils = 0
             else:
                 sum_we_oils = int(census.volumeitem_set.get(volume__name="Общий").value)
         except VolumeItem.DoesNotExist:
-            sum_we_oils = 0
-        except AttributeError:
             sum_we_oils = 0
         sum_we_oils_join = sum(census_we_oils_include_join)
 
