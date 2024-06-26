@@ -23,13 +23,8 @@ let elements = []
 let limits = new Map()
 
 async function load_data(limit, skip) {
-  const [reports_data, volumes_data, volumes_sum_data] = await Promise.all([
+  const [reports_data, volumes_sum_data] = await Promise.all([
       fetch(`${report_1}?limit=100&skip=0`, {
-          method: "POST",
-          headers: {"X-CSRFToken": csrf},
-          body: JSON.stringify({depart: depart}),
-      }),
-      fetch(volume_url, {
           method: "POST",
           headers: {"X-CSRFToken": csrf},
           body: JSON.stringify({depart: depart}),
@@ -41,9 +36,8 @@ async function load_data(limit, skip) {
       })
   ]);
   const reports = await reports_data.json();
-  const volumes = await volumes_data.json();
   const volumes_sum = await volumes_sum_data.json();
-  return [reports, volumes, volumes_sum];
+  return [reports, volumes_sum];
 }
 
 function create_filter_bottom(category_name, items) {
@@ -344,7 +338,7 @@ function create_filters_table(filter_item, column_lists) {
             reports.data.forEach((report) => {
                 create_table_row(report, column_lists, volumes)
             })
-            filters_control(column_lists, reports)
+            filters_control(column_lists)
         })
     })
 }
@@ -393,7 +387,7 @@ function links_control(column_lists, volumes) {
                     data.data.forEach((report) => {
                         create_table_row(report, column_lists, volumes)
                     })
-                    filters_control(column_lists, data)
+                    filters_control(column_lists, volumes)
                 })
             } else {
                 console.log('click')
@@ -425,18 +419,27 @@ load_data(100, 0).then(([reports, volumes, volumes_sum]) => {
              if (dep === 'b2c') {
                  // create_filters(b2c_column_list, data)
                  // clean_duplicate_filters()
-                 create_table_head(b2c_column_list, volumes)
+                 console.log(volumes_sum)
+                 create_table_head(b2c_column_list, b2c_volume_list)
                  data.data.forEach((report) => {
-                     create_table_row(report, b2c_column_list, volumes, volumes_sum)
+                     create_table_row(report, b2c_column_list, b2c_volume_list, volumes_sum)
                  })
                  // filters_control(b2c_column_list, reports)
 
-             } else if (depart === 'industrial' || depart === 'b2b' || 'director') {
+             } else if (depart === 'b2b' || 'director') {
                  // create_filters(industrial_column_list, data)
                  // clean_duplicate_filters()
-                 create_table_head(industrial_column_list, volumes)
+                 create_table_head(b2b_column_list, b2b_volume_list)
                  data.data.forEach((report) => {
-                     create_table_row(report, industrial_column_list, volumes, volumes_sum)
+                     create_table_row(report, b2b_column_list, b2b_volume_list, volumes_sum)
+                 })
+                 // filters_control(industrial_column_list, reports)
+             } else if (depart === 'industrial' || 'director') {
+                 // create_filters(industrial_column_list, data)
+                 // clean_duplicate_filters()
+                 create_table_head(industrial_column_list, industrial_volume_list)
+                 data.data.forEach((report) => {
+                     create_table_row(report, industrial_column_list, industrial_volume_list, volumes_sum)
                  })
                  // filters_control(industrial_column_list, reports)
              }
@@ -449,20 +452,29 @@ load_data(100, 0).then(([reports, volumes, volumes_sum]) => {
              if (depart === 'b2c') {
                  create_filters(b2c_column_list, reports)
                  clean_duplicate_filters()
-                 create_table_head(b2c_column_list, volumes)
+                 create_table_head(b2c_column_list, b2c_volume_list)
                  reports.data.forEach((report) => {
-                     create_table_row(report, b2c_column_list, volumes, volumes_sum)
+                     create_table_row(report, b2c_column_list, b2c_volume_list, volumes_sum)
                  })
-                 filters_control(b2c_column_list, reports)
-             } else if (depart === 'industrial' || depart === 'b2b') {
+                 filters_control(b2c_column_list)
+             } else if (depart === 'b2b') {
+                 create_filters(b2b_column_list, reports)
+                 clean_duplicate_filters()
+                 create_table_head(b2b_column_list, b2b_volume_list)
+                 reports.data.forEach((report) => {
+                     create_table_row(report, b2b_column_list, b2b_volume_list, volumes_sum)
+                 })
+                 filters_control(b2b_column_list)
+                 links_control(b2b_column_list, b2b_volume_list)
+             } else if (depart === 'industrial') {
                  create_filters(industrial_column_list, reports)
                  clean_duplicate_filters()
-                 create_table_head(industrial_column_list, volumes)
+                 create_table_head(industrial_column_list, industrial_volume_list)
                  reports.data.forEach((report) => {
-                     create_table_row(report, industrial_column_list, volumes, volumes_sum)
+                     create_table_row(report, industrial_column_list, industrial_volume_list, volumes_sum)
                  })
-                 filters_control(industrial_column_list, reports)
-                 links_control(industrial_column_list, volumes)
+                 filters_control(industrial_column_list)
+                 links_control(industrial_column_list, industrial_volume_list)
              }
          }
 

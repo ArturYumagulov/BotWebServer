@@ -289,7 +289,9 @@ def create_report_2(dep_name):
                     potential_clients = censuses.filter(working__isnull=True).count()
                     all_worker_task_count = author_tasks.count()
                     active_tasks = author_tasks.filter(status='Новая').count()
-                    ready_tasks = author_tasks.filter(status='Выполнено').count()
+                    ready_count_task = int(author_tasks.filter(status='Выполнено').count())
+                    load_count_task = int(author_tasks.filter(status='Загружено').count())
+                    ready_tasks = ready_count_task + load_count_task
                     partners = [x.working.code for x in active_clients if x.working.contract is not None]
 
                     result['department'] = dep_name
