@@ -59,7 +59,8 @@ INSTALLED_APPS = [
     'core',
     'analytics',
     'users',
-    'sales'
+    'sales',
+    'send_message',
 ]
 
 MIDDLEWARE = [

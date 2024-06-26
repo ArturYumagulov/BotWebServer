@@ -1,4 +1,7 @@
 import logging
+import environ
+import requests
+
 from django.utils.timezone import make_aware
 
 from datetime import datetime, timedelta
@@ -8,10 +11,14 @@ from analytics import services
 from analytics.models import ReportUpdateModel
 from analytics.services import create_report_1
 from census.services import DataInnOnRedis, unix_to_date
-from tasks.models import Task, WorkerComments, AuthorComments, Department
+from tasks.models import Task, WorkerComments, AuthorComments, Department, Worker
 from census.models import CensusFiles, CompanyDatabase
+from send_message.models import SendMessage
 
 logger = logging.getLogger(__name__)
+
+env = environ.Env()
+token = env.str("BOT_TOKEN")
 
 
 @shared_task
@@ -139,3 +146,19 @@ def update_reports_data():
                 new_status.save()
         return True
     return False
+
+
+@shared_task
+def send_message_to_telegram(addresses_list, message):
+    sending = []
+    dont_send = []
+    for address in addresses_list:
+        url = f'https://api.telegram.org/bot{token}/sendMessage?chat_id={address}&text={message}'
+        result = requests.get(url).json()
+        if result['ok']:
+            sending.append(Worker.objects.get(chat_id=address).name)
+        else:
+            dont_send.append(Worker.objects.get(chat_id=address).name)
+    SendMessage.objects.update_or_create(message=message, send_list=f"{sending}".replace('[', '').replace(']', ''),
+                                         dont_send_list=f"{dont_send}".replace('[', '').replace(']', ''))
+    return True
