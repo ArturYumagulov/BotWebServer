@@ -4,6 +4,7 @@ from analytics import views
 
 urlpatterns = [
     # ---------------REPORT-1------------------------------------------
+    # path('save-data/', views.save_on_mongo),
     path('', views.report_1, name='analytics'),
     path('report-1/', views.get_report_1, name="report_1"),
     path('filter-report-1/', views.filter_report_1, name="filter_report_1"),

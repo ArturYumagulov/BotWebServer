@@ -151,6 +151,8 @@ def create_report_1(depart):
             if depart == 'industrial' or depart == 'b2b':
                 try:
                     sum_we_oils = int(census.others.all_volume)
+                except TypeError:
+                    sum_we_oils = 0
                 except AttributeError:
                     sum_we_oils = 0
             else:
