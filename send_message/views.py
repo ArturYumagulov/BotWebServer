@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 
@@ -8,6 +9,7 @@ from tasks.models import Worker
 # Create your views here.
 
 
+@login_required
 def send_message_temp(request):
     trades_list = Worker.objects.filter(chat_id__isnull=False)
     context = {'trades_list': trades_list}

@@ -154,7 +154,10 @@ def create_report_1(depart):
                 sum_we_oils = int(census.volumeitem_set.get(volume__name="Общий").value)
         except VolumeItem.DoesNotExist:
             sum_we_oils = 0
+        except AttributeError:
+            sum_we_oils = 0
         sum_we_oils_join = sum(census_we_oils_include_join)
+
         try:
             potential = int((sum_we_oils_join / pot) * 100)
             if potential == 0:

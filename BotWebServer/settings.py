@@ -106,27 +106,27 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 #     }
 # }
 #
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": env('database'),
-#         'USER': env('user'),
-#         'HOST': env('host'),
-#         'PORT': env('port'),
-#         'PASSWORD': env('password'),
-#         }
-# }
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": 'census',
-        'USER': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5433',
-        'PASSWORD': 'postgres',
+        "NAME": env('database'),
+        'USER': env('user'),
+        'HOST': env('host'),
+        'PORT': env('port'),
+        'PASSWORD': env('password'),
         }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": 'census',
+#         'USER': 'postgres',
+#         'HOST': 'localhost',
+#         'PORT': '5433',
+#         'PASSWORD': 'postgres',
+#         }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
