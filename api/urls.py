@@ -23,7 +23,7 @@ router.register('task-message-update', task_views.TaskMessageUpdateView, basenam
 # router.register('result', task_views.ResultListView, basename='result_list')
 # router.register('result-group', task_views.ResultGroupListView, basename='result_group_list')
 router.register('result-data', task_views.ResultDataListView, basename='result_data_list')
-# router.register('workers', task_views.WorkerViewSet)
+router.register('workers', task_views.WorkerViewSet)
 # router.register('supervisors', task_views.SupervisorViewSet, basename="supervisors_list")
 
 # ----------------------CENSUS-------------------------------------------------
