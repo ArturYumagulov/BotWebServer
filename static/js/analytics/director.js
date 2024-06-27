@@ -189,8 +189,17 @@
 
                 let data = DirectorFilterReport(filter_report_1, limits.limit, limits.skip, Array.from(elements), depart)
                 data.then((reports) => {
+
                     clean_duplicate_filters()
-                    create_table_head(column_lists, b2c_volume_list)
+
+                    if (depart === 'b2c') {
+                        create_table_head(column_lists, b2c_volume_list)
+                    } else if (depart === 'b2b') {
+                        create_table_head(column_lists, b2b_volume_list)
+                    } else if (depart === 'industrial') {
+                        create_table_head(column_lists, industrial_volume_list)
+                    }
+
                     reports.data.forEach((report) => {
                             create_director_table_row(report, column_lists, depart)
                         })

@@ -23,21 +23,15 @@ let elements = []
 let limits = new Map()
 
 async function load_data(limit, skip) {
-  const [reports_data, volumes_sum_data] = await Promise.all([
+  const [reports_data] = await Promise.all([
       fetch(`${report_1}?limit=100&skip=0`, {
           method: "POST",
           headers: {"X-CSRFToken": csrf},
           body: JSON.stringify({depart: depart}),
       }),
-      fetch(volumes_sum_url, {
-          method: "POST",
-          headers: {"X-CSRFToken": csrf},
-          body: JSON.stringify({depart: depart}),
-      })
   ]);
   const reports = await reports_data.json();
-  const volumes_sum = await volumes_sum_data.json();
-  return [reports, volumes_sum];
+  return [reports];
 }
 
 function create_filter_bottom(category_name, items) {
@@ -223,13 +217,33 @@ function create_table_row(report, columns_list) {
                 td.style.textAlign = 'center'
                 tr.append(td)
             }
-        } else {
+        } else if (depart === 'b2b') {
             if (i < 7) {
                 td.setAttribute('rowspan', eq_rowspan_len)
                 td.innerHTML = report[`${columns_list[i].id}`]
                 td.style.textAlign = 'center'
                 tr.append(td)
             } else if (i === 7 ){
+                td.innerHTML = report[`${columns_list[i].id}`][0]
+                td.style.textAlign = 'center'
+                tr.append(td)
+            }   else if (i === 8) {  // volumes
+                create_volume_data(report.volumes, tr)
+            } else {
+                td.setAttribute('rowspan', eq_rowspan_len)
+                td.innerHTML = report[`${columns_list[i].id}`]
+                td.style.textAlign = 'center'
+                tr.append(td)
+            }
+        } else if (depart === 'industrial') {
+            if (i < 7) {
+                td.setAttribute('rowspan', eq_rowspan_len)
+                td.innerHTML = report[`${columns_list[i].id}`]
+                td.style.textAlign = 'center'
+                tr.append(td)
+            }
+            else if (i === 7 ){
+                console.log(report)
                 td.innerHTML = report[`${columns_list[i].id}`][0]
                 td.style.textAlign = 'center'
                 tr.append(td)
@@ -401,7 +415,7 @@ function links_control(column_lists, volumes) {
 
 
 // Первоначальная загрузка
-load_data(100, 0).then(([reports, volumes, volumes_sum]) => {
+load_data(100, 0).then(([reports, volumes_sum]) => {
 
      if (window.location.search.length > 0) {
          let filter_mask = window.location.search.slice(1).split('&')
@@ -419,10 +433,10 @@ load_data(100, 0).then(([reports, volumes, volumes_sum]) => {
              if (dep === 'b2c') {
                  // create_filters(b2c_column_list, data)
                  // clean_duplicate_filters()
-                 console.log(volumes_sum)
+                 console.log(b2c_volume_sum_list)
                  create_table_head(b2c_column_list, b2c_volume_list)
                  data.data.forEach((report) => {
-                     create_table_row(report, b2c_column_list, b2c_volume_list, volumes_sum)
+                     create_table_row(report, b2c_column_list, b2c_volume_list, b2c_volume_sum_list)
                  })
                  // filters_control(b2c_column_list, reports)
 
@@ -431,7 +445,7 @@ load_data(100, 0).then(([reports, volumes, volumes_sum]) => {
                  // clean_duplicate_filters()
                  create_table_head(b2b_column_list, b2b_volume_list)
                  data.data.forEach((report) => {
-                     create_table_row(report, b2b_column_list, b2b_volume_list, volumes_sum)
+                     create_table_row(report, b2b_column_list, b2b_volume_list, b2b_volume_sum_list)
                  })
                  // filters_control(industrial_column_list, reports)
              } else if (depart === 'industrial' || 'director') {
@@ -439,7 +453,7 @@ load_data(100, 0).then(([reports, volumes, volumes_sum]) => {
                  // clean_duplicate_filters()
                  create_table_head(industrial_column_list, industrial_volume_list)
                  data.data.forEach((report) => {
-                     create_table_row(report, industrial_column_list, industrial_volume_list, volumes_sum)
+                     create_table_row(report, industrial_column_list, industrial_volume_list, industrial_volume_sum_list)
                  })
                  // filters_control(industrial_column_list, reports)
              }
@@ -454,7 +468,7 @@ load_data(100, 0).then(([reports, volumes, volumes_sum]) => {
                  clean_duplicate_filters()
                  create_table_head(b2c_column_list, b2c_volume_list)
                  reports.data.forEach((report) => {
-                     create_table_row(report, b2c_column_list, b2c_volume_list, volumes_sum)
+                     create_table_row(report, b2c_column_list, b2c_volume_list, b2c_volume_sum_list)
                  })
                  filters_control(b2c_column_list)
              } else if (depart === 'b2b') {
@@ -462,7 +476,7 @@ load_data(100, 0).then(([reports, volumes, volumes_sum]) => {
                  clean_duplicate_filters()
                  create_table_head(b2b_column_list, b2b_volume_list)
                  reports.data.forEach((report) => {
-                     create_table_row(report, b2b_column_list, b2b_volume_list, volumes_sum)
+                     create_table_row(report, b2b_column_list, b2b_volume_list, b2b_volume_sum_list)
                  })
                  filters_control(b2b_column_list)
                  links_control(b2b_column_list, b2b_volume_list)
@@ -471,7 +485,7 @@ load_data(100, 0).then(([reports, volumes, volumes_sum]) => {
                  clean_duplicate_filters()
                  create_table_head(industrial_column_list, industrial_volume_list)
                  reports.data.forEach((report) => {
-                     create_table_row(report, industrial_column_list, industrial_volume_list, volumes_sum)
+                     create_table_row(report, industrial_column_list, industrial_volume_list, industrial_volume_sum_list)
                  })
                  filters_control(industrial_column_list)
                  links_control(industrial_column_list, industrial_volume_list)
