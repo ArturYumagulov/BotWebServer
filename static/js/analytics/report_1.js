@@ -242,7 +242,6 @@ function create_table_row(report, columns_list) {
                 tr.append(td)
             }
             else if (i === 7 ){
-                console.log(report)
                 td.innerHTML = report[`${columns_list[i].id}`][0]
                 td.style.textAlign = 'center'
                 tr.append(td)
@@ -313,7 +312,6 @@ function create_table_row_sub(report, columns_list, depart) {
                 tr.append(td)
             }
             else if (i === 7 ){
-                console.log(report)
                 td.innerHTML = report[`${columns_list[i].id}`][0]
                 td.style.textAlign = 'center'
                 tr.append(td)
@@ -442,7 +440,6 @@ function links_control(column_lists, volumes) {
 
     links.forEach((link => {
         link.addEventListener('click', () => {
-            console.log(elements)
             if (link.getAttribute('id') !== 'next') {
                 link.parentNode.classList.add('active')
                 let limit = link.getAttribute('limit')
@@ -504,25 +501,21 @@ load_data(100, 0).then(([reports]) => {
 
              let director_buttons = document.getElementById('buttons')
              director_buttons.style.display = 'none'
-             console.log(dep)
              response.then((res) => res.json()).then((data) => {
              if (dep === 'b2c') {
                  create_table_head(b2c_column_list, b2c_volume_list)
-                 console.log(data)
                  console.log(b2c_column_list, b2c_volume_list, b2c_volume_sum_list)
                  data.data.forEach((report) => {
                      create_table_row_sub(report, b2c_column_list, dep)
                  })
              } else if (dep === 'b2b') {
                  create_table_head(b2b_column_list, b2b_volume_list)
-                 console.log(data)
                  console.log(b2b_column_list, b2b_volume_list, b2b_volume_sum_list)
                  data.data.forEach((report) => {
                      create_table_row_sub(report, b2b_column_list, dep)
                  })
              } else if (dep === 'industrial') {
                  create_table_head(industrial_column_list, industrial_volume_list)
-                 console.log(data)
                  console.log(industrial_column_list, industrial_volume_list, industrial_volume_sum_list)
                  data.data.forEach((report) => {
                      create_table_row_sub(report, industrial_column_list, dep)
@@ -534,7 +527,6 @@ load_data(100, 0).then(([reports]) => {
 
              response.then((res) => res.json()).then((data) => {
                  if (dep === 'b2c') {
-                     console.log(depart.length)
                      // create_filters(b2c_column_list, data)
                      // clean_duplicate_filters()
                      create_table_head(b2c_column_list, b2c_volume_list)

@@ -1,5 +1,9 @@
 (function() {
 
+    let loader = document.querySelector('.loader')
+    let head_load = document.getElementById('head-load')
+    let footer_load = document.getElementById('footer-load')
+
     function create_volume_data(volumes, tr) {
     volumes.forEach((volume) => {
         let td = document.createElement('td')
@@ -84,7 +88,6 @@
 
 
         // filters.style.display = 'none'
-        console.log(update)
         update.style.display = 'none'
 
         // div.classList.add()
@@ -181,7 +184,6 @@
         let filters_list = document.querySelectorAll('.filter')
         filters_list.forEach((filter_item) => {
             filter_item.addEventListener('click', () => {
-                console.log(depart, 'dep')
                 table.innerHTML = ''
 
                 let new_set = new Map()
@@ -251,6 +253,10 @@
                 })
                 filters_control_director(column_list, depart)
             }
+        }).finally(() => {
+            head_load.style.height = '0'
+            footer_load.style.height = '0'
+            loader.style.display = 'none'
         })
     }
 
@@ -261,6 +267,7 @@
         let buttons = document.querySelectorAll('.btn')
         let main = document.getElementById('main')
         let div = document.getElementById('buttons')
+        loader.style.display = 'none'
         buttons.forEach((button) => {
             button.addEventListener('click', () => {
                 update.style.display = 'block'

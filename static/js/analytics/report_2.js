@@ -1,5 +1,7 @@
 (function() {
-
+    let loader = document.querySelector('.loader')
+    let head_load = document.getElementById('head-load')
+    let footer_load = document.getElementById('footer-load')
 
     async function create_director_buttons() {
         let main = document.getElementById('main')
@@ -7,14 +9,7 @@
         let b2c_but = document.createElement("button")
         let b2b_but = document.createElement("button")
         let industrial_but = document.createElement("button")
-        let filters = document.getElementById('filters')
-        let update = document.getElementById('update')
 
-
-        // filters.style.display = 'none'
-        // update.style.display = 'none'
-
-        // div.classList.add()
         div.id = 'buttons'
         window.addEventListener('resize', () => {
 
@@ -64,10 +59,8 @@
                     "user_id": user_id
                 })
             }),
-            // fetch('/categories')
         ]);
         return await report_2.json();
-        // const categories = await categoriesResponse.json();
     }
 
     async function create_director_report_2(depart, table) {
@@ -93,16 +86,25 @@
                 table.append(tbody)
             }
 
+        }).finally(()=> {
+            if (depart.length >= 0) {
+                head_load.style.height = '0'
+                footer_load.style.height = '0'
+                loader.style.display = 'none'
+            }
         })
     }
 
     async function createTable(table) {
+        console.log(depart)
         if (depart === 'director') {
+            loader.style.display = 'none'
             await create_director_buttons()
             let buttons = document.querySelectorAll('.btn')
             let div = document.getElementById('buttons')
             buttons.forEach((button) => {
                 button.addEventListener('click', ()=>{
+                    loader.style.display = 'block'
                     table.innerHTML = ''
                     div.style.position = 'relative'
                     div.style.top = '0'
