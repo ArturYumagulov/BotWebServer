@@ -154,8 +154,10 @@
             <p class="text-secondary" id="update" style="display: none">Обновлено: {% if last_update.date is not None %}{{ last_update.date }}{% else %}Нет данных{% endif %}</p></div>
     </div>
 
-
-    {% include 'analytics/loader.html' %}
+    <table class="table-responsive mt-3 report-1-div">
+        {% include 'analytics/loader.html' %}
+        <table class="table table-sm report-1"></table>
+    </table>
 
     <nav aria-label="Page navigation paginator">
         <ul class="pagination justify-content-center m-3">
@@ -175,7 +177,6 @@
         let volumes_sum_url = "{% url 'get_volumes_sum' %}"
 
         {% if depart.name == 'director' %}
-            let director_depart = []
             let depart = ""
         {% else %}
             let depart = "{{ depart }}"

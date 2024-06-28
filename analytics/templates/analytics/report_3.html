@@ -20,10 +20,50 @@
 {% block content %}
 
 
-<table class="table table-sm">
+<table class="table table-striped">
     <div class="d-flex justify-content-between align-items-center m-3" id="main">
 
-        <div class="m-3" id="filters"></div>
+        <div class="m-3" id="filters">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    Автор
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Автор 1</a></li>
+                    <li><a class="dropdown-item" href="#">Автор 2</a></li>
+                    <li><a class="dropdown-item" href="#">Автор 3</a></li>
+                </ul>
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    Категория
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Категория</a></li>
+                    <li><a class="dropdown-item" href="#">Категория</a></li>
+                    <li><a class="dropdown-item" href="#">Категория</a></li>
+                </ul>
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    Бренды
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Бренды</a></li>
+                    <li><a class="dropdown-item" href="#">Бренды</a></li>
+                    <li><a class="dropdown-item" href="#">Бренды</a></li>
+                </ul>
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    Продажи
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Продажи</a></li>
+                    <li><a class="dropdown-item" href="#">Продажи</a></li>
+                    <li><a class="dropdown-item" href="#">Продажи</a></li>
+                </ul>
+            </div>
+
+        </div>
         <div class="d-flex align-items-center justify-content-center">
 {#            <div class="m-3">#}
 {#                <a href="#" title="скачать в excel">#}
@@ -38,11 +78,11 @@
 
     <thead>
     <tr>
-        <th scope="col" rowspan="2">#</th>
-        <th scope="col" rowspan="2">ИНН</th>
-        <th scope="col" rowspan="2">Автор</th>
-        <th scope="col" rowspan="2">Наименование ТТ</th>
-        <th class="text-center" scope="col" colspan="4">Категория - Масло</th>
+{#        <th scope="col" rowspan="2">#</th>#}
+        <th scope="col" rowspan="2" style="text-align: center; top: 50%">ИНН</th>
+        <th scope="col" rowspan="2" style="text-align: center">Автор</th>
+        <th scope="col" rowspan="2" style="text-align: center">Наименование торговой точки</th>
+        <th class="text-center" scope="col" colspan="22">Категория - Масло</th>
     </tr>
           <tr>
               <th scope="col">Лукойл</th>
@@ -67,37 +107,64 @@
               <th scope="col">Motul</th>
               <th scope="col">Motul</th>
               <th scope="col">Лукойл</th>
-
           </tr>
   </thead>
   <tbody class="table-group-divider">
-    <tr>
-        <td rowspan="2">number</td>
-        <td rowspan="2">inn</td>
-        <td rowspan="2">author</td>
-        <td rowspan="2">point_name</td>
-        <td rowspan="2">luk_1</td>
-        <td rowspan="2">mot_2</td>
-        <td rowspan="2">number</td>
-        <td rowspan="2">inn</td>
-        <td rowspan="2">author</td>
-        <td rowspan="2">point_name</td>
-        <td rowspan="2">luk_1</td>
-        <td rowspan="2">mot_2</td>
-        <td rowspan="2">number</td>
-        <td rowspan="2">inn</td>
-        <td rowspan="2">author</td>
-        <td rowspan="2">point_name</td>
-        <td rowspan="2">luk_1</td>
-        <td rowspan="2">mot_2</td>
-        <td rowspan="2">number</td>
-        <td rowspan="2">inn</td>
-        <td rowspan="2">author</td>
-        <td rowspan="2">point_name</td>
-        <td rowspan="2">luk_1</td>
-        <td rowspan="2">mot_2</td>
-        <td rowspan="2">number</td>
-        <td rowspan="2">number</td>
+<tr>
+{#        <td>1</td>#}
+        <td>inn</td>
+        <td>author</td>
+        <td>point_name</td>
+        <td>luk_1</td>
+        <td>mot_2</td>
+        <td>number</td>
+        <td>inn</td>
+        <td>author</td>
+        <td>point_name</td>
+        <td>luk_1</td>
+        <td>mot_2</td>
+        <td>number</td>
+        <td>inn</td>
+        <td>author</td>
+        <td>point_name</td>
+        <td>luk_1</td>
+        <td>mot_2</td>
+        <td>number</td>
+        <td>inn</td>
+        <td>author</td>
+        <td>point_name</td>
+        <td>luk_1</td>
+        <td>mot_2</td>
+        <td>number</td>
+        <td>number</td>
+    </tr>
+      <tr>
+{#        <td>2</td>#}
+        <td>inn</td>
+        <td>author</td>
+        <td>point_name</td>
+        <td>luk_1</td>
+        <td>mot_2</td>
+        <td>number</td>
+        <td>inn</td>
+        <td>author</td>
+        <td>point_name</td>
+        <td>luk_1</td>
+        <td>mot_2</td>
+        <td>number</td>
+        <td>inn</td>
+        <td>author</td>
+        <td>point_name</td>
+        <td>luk_1</td>
+        <td>mot_2</td>
+        <td>number</td>
+        <td>inn</td>
+        <td>author</td>
+        <td>point_name</td>
+        <td>luk_1</td>
+        <td>mot_2</td>
+        <td>number</td>
+        <td>number</td>
     </tr>
   </tbody>
 </table>
@@ -116,8 +183,8 @@
         let depart = '{{ depart }}'
         let user_id = "{{ user.pk }}"
     </script>
-    {% if depart.name == 'director' %}
-        <script src="{% static 'js/analytics/director.js' %}"></script>
-    {% endif %}
+{#    {% if depart.name == 'director' %}#}
+{#        <script src="{% static 'js/analytics/director.js' %}"></script>#}
+{#    {% endif %}#}
     <script src="{% static 'js/analytics/report_3.js' %}"></script>
 {% endblock %}

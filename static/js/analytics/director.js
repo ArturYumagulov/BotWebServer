@@ -84,6 +84,7 @@
 
 
         // filters.style.display = 'none'
+        console.log(update)
         update.style.display = 'none'
 
         // div.classList.add()
@@ -236,7 +237,6 @@
             headers: {"X-CSRFToken": csrf},
             body: JSON.stringify({depart: depart}),
         }).then((res) => res.json()).then((data) => {
-            console.log(data.data.length)
             if (data.data.length === 0) {
                 update.style.display = 'none'
                 console.log(table)
