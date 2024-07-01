@@ -2,11 +2,14 @@
 {% load static %}
 {% block styles %}
     {% if depart.name == 'director' %}
-    #buttons {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-    }
+        <style>
+            #buttons {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+            }
+        </style>
+
     {% endif %}
 {% endblock %}
 {% block defer_js %}

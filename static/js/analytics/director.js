@@ -3,6 +3,7 @@
     let loader = document.querySelector('.loader')
     let head_load = document.getElementById('head-load')
     let footer_load = document.getElementById('footer-load')
+    let load_to_excel = document.getElementById('load_to_excel')
 
     function create_volume_data(volumes, tr) {
     volumes.forEach((volume) => {
@@ -241,7 +242,6 @@
         }).then((res) => res.json()).then((data) => {
             if (data.data.length === 0) {
                 update.style.display = 'none'
-                console.log(table)
                 table.innerHTML = '<p class="text-center text-secondary m-5">Нет данных</p>'
             }
             else {
@@ -268,9 +268,11 @@
         let main = document.getElementById('main')
         let div = document.getElementById('buttons')
         loader.style.display = 'none'
+        load_to_excel.style.display = 'none'
         buttons.forEach((button) => {
             button.addEventListener('click', () => {
                 update.style.display = 'block'
+                load_to_excel.style.display = 'block'
                 table.innerHTML = ''
                 filters_block.innerHTML = ''
                 div.style.position = 'relative'

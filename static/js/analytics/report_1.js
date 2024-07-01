@@ -123,7 +123,7 @@ function create_table_head(column_list, volumes) {
         th.setAttribute('id', column.id)
         th.setAttribute('scope', 'col')
         th.innerHTML = column.name
-        if (column.id !== 'volume_census') {
+        if (column.id !== 'volumes') {
             th.setAttribute('rowspan', '2')
         } else {
             th.setAttribute('colspan', `${volumes.length}`)
@@ -482,7 +482,8 @@ function links_control(column_lists, volumes) {
 
 // Первоначальная загрузка
 load_data(100, 0).then(([reports]) => {
-
+    console.log(b2c_column_list)
+    console.log(b2c_volume_list)
      if (window.location.search.length > 0) {
          update.style.display = 'block'
          let filter_mask = window.location.search.slice(1).split('&')
