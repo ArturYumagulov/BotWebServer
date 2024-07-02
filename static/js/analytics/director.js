@@ -1,23 +1,21 @@
-(function() {
-
+(function () {
+    let elements = new Set()
+    let limits = new Map()
+    let update = document.getElementById('update')
     let loader = document.querySelector('.loader')
     let head_load = document.getElementById('head-load')
     let footer_load = document.getElementById('footer-load')
     let load_to_excel = document.getElementById('load_to_excel')
+    let get_depart = ''
 
     function create_volume_data(volumes, tr) {
-    volumes.forEach((volume) => {
-        let td = document.createElement('td')
-        td.innerHTML = volume.value
-        td.style.textAlign = 'center'
-        tr.append(td)
-    })
-}
-
-    let elements = new Set()
-    let limits = new Map()
-    let update = document.getElementById('update')
-
+        volumes.forEach((volume) => {
+            let td = document.createElement('td')
+            td.innerHTML = volume.value
+            td.style.textAlign = 'center'
+            tr.append(td)
+        })
+    }
 
     function create_volume_sum(volumes, tr) {
         let volumes_sum = 0
@@ -190,7 +188,7 @@
                 let new_set = new Map()
                 new_set.set('filter_category', filter_item.getAttribute('category'))
                 elements.add(`${filter_item.getAttribute('category')}_${filter_item.innerHTML}`)
-
+                console.log(elements)
                 let data = DirectorFilterReport(filter_report_1, limits.limit, limits.skip, Array.from(elements), depart)
                 data.then((reports) => {
 
@@ -205,8 +203,8 @@
                     }
 
                     reports.data.forEach((report) => {
-                            create_director_table_row(report, column_lists, depart)
-                        })
+                        create_director_table_row(report, column_lists, depart)
+                    })
                 })
             })
         })
@@ -243,8 +241,7 @@
             if (data.data.length === 0) {
                 update.style.display = 'none'
                 table.innerHTML = '<p class="text-center text-secondary m-5">Нет данных</p>'
-            }
-            else {
+            } else {
                 create_director_filters(column_list, data)
                 clean_duplicate_director_filters()
                 create_table_head(column_list, volume_list)
@@ -280,13 +277,43 @@
                 div.style.flexDirection = 'column'
                 div.style.top = '0'
                 div.style.left = '0'
+                console.log(elements)
+                elements.clear()
                 if (button.id === 'b2c') {
+                    get_depart = button.id
                     create_director_report_1(button.id, b2c_column_list, b2c_volume_list)
                 } else if (button.id === 'b2b') {
+                    get_depart = button.id
                     create_director_report_1(button.id, b2b_column_list, b2b_volume_list)
                 } else if (button.id === 'industrial') {
+                    get_depart = button.id
                     create_director_report_1(button.id, industrial_column_list, industrial_volume_list)
                 }
+            })
+        })
+
+
+        let load = document.getElementById('load_to_excel')
+        load.addEventListener('click', () => {
+            fetch(load_to_excel_url, {
+                headers: {"X-CSRFToken": csrf},
+                method: "POST",
+                body: JSON.stringify({
+                    'filters': Array.from(elements),
+                    'depart': get_depart,
+                    'volumes_list': b2c_volume_list,
+                    'column_list': b2c_column_list,
+                })
+            }).then((res) => {
+                res.json().then(data => {
+                    if (data.data) {
+                        createNotification(
+                            'Ссылка на скачивание',
+                            `<a href="${data.body}">Скачать файл</a>`,
+                            imgUrl
+                        )
+                    }
+                })
             })
         })
     }

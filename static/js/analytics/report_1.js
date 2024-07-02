@@ -19,7 +19,6 @@ function fetchVolume(url) {
 
 
 let volumes = fetchVolume(volume_url)
-let elements = []
 let limits = new Map()
 
 async function load_data(limit, skip) {
@@ -402,8 +401,7 @@ function filterReport(url, limit=100, skip=0, filters) {
 function create_filters_table(filter_item, column_lists) {
     let new_set = new Map()
     new_set.set('filter_category', filter_item.getAttribute('category'))
-
-    elements.push(`${filter_item.getAttribute('category')}_${filter_item.innerHTML}`)
+    elements.add(`${filter_item.getAttribute('category')}_${filter_item.innerHTML}`)
     if (depart === 'director') {
         let data = filterReport(filter_report_1, limits.limit, limits.skip, elements)
     }
@@ -482,8 +480,6 @@ function links_control(column_lists, volumes) {
 
 // Первоначальная загрузка
 load_data(100, 0).then(([reports]) => {
-    console.log(b2c_column_list)
-    console.log(b2c_volume_list)
      if (window.location.search.length > 0) {
          update.style.display = 'block'
          let filter_mask = window.location.search.slice(1).split('&')
@@ -505,19 +501,16 @@ load_data(100, 0).then(([reports]) => {
              response.then((res) => res.json()).then((data) => {
              if (dep === 'b2c') {
                  create_table_head(b2c_column_list, b2c_volume_list)
-                 console.log(b2c_column_list, b2c_volume_list, b2c_volume_sum_list)
                  data.data.forEach((report) => {
                      create_table_row_sub(report, b2c_column_list, dep)
                  })
              } else if (dep === 'b2b') {
                  create_table_head(b2b_column_list, b2b_volume_list)
-                 console.log(b2b_column_list, b2b_volume_list, b2b_volume_sum_list)
                  data.data.forEach((report) => {
                      create_table_row_sub(report, b2b_column_list, dep)
                  })
              } else if (dep === 'industrial') {
                  create_table_head(industrial_column_list, industrial_volume_list)
-                 console.log(industrial_column_list, industrial_volume_list, industrial_volume_sum_list)
                  data.data.forEach((report) => {
                      create_table_row_sub(report, industrial_column_list, dep)
                  })

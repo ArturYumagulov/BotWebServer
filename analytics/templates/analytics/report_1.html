@@ -17,6 +17,81 @@
         table {
             margin: 0 auto;
         }
+        .excel {
+            cursor: pointer;
+        }
+
+        .notification-container {
+            display: flex;
+            flex-direction: column;
+        / / Ensure this is 'column', not 'column-reverse' align-items: flex-end;
+            position: fixed;
+            top: 90%;
+            right: 20px;
+            width: 350px;
+        }
+
+
+        .notification {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            margin-bottom: 15px; /* Space between notifications */
+            transform: translateX(100%);
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+        }
+
+        .notification.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        .notification:not(.hidden) {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .innernoti {
+            padding: 10px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            border-radius: 7px;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+        }
+
+        .text-content {
+            flex-grow: 1;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .notification-title {
+            font-weight: bold;
+        }
+
+        .close-btn {
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 1.2rem;
+        }
     </style>
     {% if depart.name == 'director' %}
         <style>
@@ -31,7 +106,6 @@
 {% endblock %}
 
 {% block defer_js %}
-
     {{ b2c_volume_sum_list | json_script:"b2c_volume_sum_list" }}
     {{ b2b_volume_sum_list | json_script:"b2b_volume_sum_list" }}
     {{ industrial_volume_sum_list | json_script:"industrial_volume_sum_list" }}
@@ -59,14 +133,14 @@
 {% block content %}
     <div class="m-3 d-flex justify-content-between align-items-center" id="main">
         <div class="m-3" id="filters" style="width: 70%"></div>
-        <div class="d-flex align-items-center justify-content-center">
-            <div class="m-3">
-                <a href="#" title="скачать в excel" id="load_to_excel">
+        <div class="d-flex flex-column-reverse justify-content-center m-3">
+            <div class="d-flex justify-content-end">
+                <div class="excel" title="скачать в excel" id="load_to_excel">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                          class="bi bi-file-earmark-excel-fill" viewBox="0 0 16 16">
                         <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M5.884 6.68 8 9.219l2.116-2.54a.5.5 0 1 1 .768.641L8.651 10l2.233 2.68a.5.5 0 0 1-.768.64L8 10.781l-2.116 2.54a.5.5 0 0 1-.768-.641L7.349 10 5.116 7.32a.5.5 0 1 1 .768-.64"/>
                     </svg>
-                </a>
+                </div>
             </div>
             <p class="text-secondary" id="update" style="display: none">Обновлено: {% if last_update.date is not None %}{{ last_update.date }}{% else %}Нет данных{% endif %}</p></div>
     </div>
@@ -83,6 +157,9 @@
             </li>
         </ul>
     </nav>
+     <div class="notification-container">
+        <!-- Notifications will be injected here -->
+    </div>
 {% endblock %}
 {% block scripts %}
     <script>
@@ -92,6 +169,8 @@
         let get_length = "{% url 'get_len' %}"
         let csrf = "{{ csrf_token }}"
         let volumes_sum_url = "{% url 'get_volumes_sum' %}"
+        let load_to_excel_url = "{% url 'load_to_excel_report_1' %}"
+        let imgUrl = "{% static 'images/file-excel.svg' %}"
 
         {% if depart.name == 'director' %}
             let depart = ""
@@ -100,6 +179,6 @@
         {% endif %}
     </script>
     <script src="{% static 'js/analytics/report_1.js' %}"></script>
-
+    <script src="{% static 'js/filegen/notifications.js' %}"></script>
 {#    {% endif %}#}
 {% endblock %}

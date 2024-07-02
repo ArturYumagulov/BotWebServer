@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('census/', include('census.urls')),
     path('analytics/', include('analytics.urls')),
+    path('load-to-excel/', include('filegen.urls')),
     path('api/v1/', include('api.urls')),
     path('send-message/', include('send_message.urls')),
     path("accounts/", include("django.contrib.auth.urls")),

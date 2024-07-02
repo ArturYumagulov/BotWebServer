@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'users',
     'sales',
     'send_message',
+    'filegen',
 ]
 
 MIDDLEWARE = [
