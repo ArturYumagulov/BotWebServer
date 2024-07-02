@@ -4,6 +4,8 @@ let loader = document.querySelector('.loader')
 let head_load = document.getElementById('head-load')
 let footer_load = document.getElementById('footer-load')
 let update = document.getElementById('update')
+let load_to_excel = document.getElementById('load_to_excel')
+let elements = new Set()
 
 
 function fetchVolume(url) {
@@ -71,7 +73,6 @@ function create_filter_bottom(category_name, items) {
     button.classList.add('btn', 'btn-secondary', 'dropdown-toggle')
     button.setAttribute('type', 'button')
     button.setAttribute('data-bs-toggle', 'dropdown')
-    // button.setAttribute('data-bs-auto-close', 'false')
     button.setAttribute('aria-expanded', 'false')
     button.innerHTML = category_name.name
     button_div.append(button)
@@ -402,10 +403,10 @@ function create_filters_table(filter_item, column_lists) {
     let new_set = new Map()
     new_set.set('filter_category', filter_item.getAttribute('category'))
     elements.add(`${filter_item.getAttribute('category')}_${filter_item.innerHTML}`)
-    if (depart === 'director') {
-        let data = filterReport(filter_report_1, limits.limit, limits.skip, elements)
-    }
-    let data = filterReport(filter_report_1, limits.limit, limits.skip, elements)
+    // if (depart === 'director') {
+    //     let data = filterReport(filter_report_1, limits.limit, limits.skip, elements)
+    // }
+    let data = filterReport(filter_report_1, limits.limit, limits.skip, Array.from(elements))
     table.innerHTML = ''
     filters_block.innerHTML = ''
     console.log(elements)
@@ -518,9 +519,10 @@ load_data(100, 0).then(([reports]) => {
              })
 
          } else {  // не директор
-
+            load_to_excel.style.display = 'none'
              response.then((res) => res.json()).then((data) => {
                  if (dep === 'b2c') {
+
                      // create_filters(b2c_column_list, data)
                      // clean_duplicate_filters()
                      create_table_head(b2c_column_list, b2c_volume_list)
@@ -585,7 +587,37 @@ load_data(100, 0).then(([reports]) => {
              }
          }
 
+
      }
+     if (depart.length > 0) {
+         let load = document.getElementById('load_to_excel')
+         load.addEventListener('click', () => {
+             console.log('click')
+             console.log(depart)
+             fetch(load_to_excel_url, {
+                 headers: {"X-CSRFToken": csrf},
+                 method: "POST",
+                 body: JSON.stringify({
+                     'filters': Array.from(elements),
+                     'depart': depart,
+                     'volumes_list': b2c_volume_list,
+                     'column_list': b2c_column_list,
+                 })
+             }).then((res) => {
+                 res.json().then(data => {
+                     if (data.data) {
+                         createNotification(
+                             'Ссылка на скачивание',
+                             `<a href="${data.body}">Скачать файл</a>`,
+                             imgUrl
+                         )
+                     }
+                 })
+             })
+         })
+     }
+
+
 }).finally(() => {
     head_load.style.height = '0'
     footer_load.style.height = '0'

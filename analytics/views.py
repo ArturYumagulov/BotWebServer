@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 from analytics import services
 from analytics.services import create_report_2, create_report_1, get_volumes_list, get_volume_sum_list
 from census.models import Volume
+from filegen.models import ReportDownloadFile
 from tasks.models import Department
 from .services import get_table_column
 from .models import ReportUpdateModel
@@ -32,6 +33,7 @@ _industrial = env('INDUSTRIAL')
 def report_1(request):
     usr = User.objects.get(pk=request.user.pk)
     depart = usr.usercodedepartment.department
+    user_reports = ReportDownloadFile.objects.order_by('-created_date').filter(user=usr)[:5]
 
     context = {
 
@@ -46,7 +48,8 @@ def report_1(request):
         'industrial_column_list': get_table_column('industrial'),
         'b2b_column_list': get_table_column('b2b'),
         'depart': depart,
-        'last_update': ReportUpdateModel.objects.last()
+        'last_update': ReportUpdateModel.objects.last(),
+        'user_reports': user_reports
     }
     return render(request, 'analytics/report_1.html', context)
 

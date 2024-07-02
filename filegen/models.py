@@ -12,7 +12,7 @@ User = get_user_model()
 class ReportDownloadFile(models.Model):
     elements = models.JSONField(null=True, verbose_name="Фильтрация")
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
-    created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    created_date = models.DateTimeField(verbose_name="Дата создания", auto_now_add=True)
     file = models.FileField(upload_to='reports/%Y/%m/%d/')
 
     def __str__(self):
