@@ -23,9 +23,9 @@ token = env.str("BOT_TOKEN")
 
 @shared_task
 def del_task():
-    date = datetime.now() - timedelta(days=90)
+    date = datetime.now() - timedelta(days=14)
     del_date = make_aware(date)
-    tasks = Task.objects.exclude(status="Новая").filter(deadline__lte=del_date)
+    tasks = Task.objects.exclude(base__group__name="Сенсус").exclude(status="Новая").filter(deadline__lte=del_date)
     worker_comments = WorkerComments.objects.exclude(pk=2).filter(created_date__lte=del_date)
     worker_comments_length = len(worker_comments)
     if worker_comments_length > 0:

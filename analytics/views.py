@@ -168,11 +168,12 @@ def get_report_3(requests):
     return JsonResponse({'data': 'write report_3 views'}, safe=False)
 
 
+@login_required()
 def census_detail(requests, address_id):
     census = Census.objects.get(address_id=address_id)
     try:
         task = Task.objects.get(number=census.task)
-        comment = WorkerComments.objects.get(pk=task.worker_comment.pk)
+        comment = WorkerComments.objects.get(pk=task.worker_comment.pk).comment
     except Task.DoesNotExist:
         comment = None
     except WorkerComments.DoesNotExist:
@@ -184,7 +185,7 @@ def census_detail(requests, address_id):
         'category': mongo_census['category'],
         'result': mongo_census['result'],
         'potential': mongo_census['potential'],
-        'comment': comment.comment,
+        'comment': comment,
     }
     return render(requests, 'analytics/census_detail.html', context=context)
 
