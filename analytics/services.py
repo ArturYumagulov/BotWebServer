@@ -280,7 +280,7 @@ def create_report_2(dep_name):
 
     workers_set = set(worker.code for worker in
                       Worker.objects.filter(department__name=dep_name))
-    tasks = Task.objects.filter(base__group__name='Сенсус')
+    tasks = Task.objects.filter(base__group__name='Сенсус').exclude(status='ЗагруженаПереадресованная')
     author_lists = set(task.author.pk for task in tasks)
 
     for code in workers_set:
