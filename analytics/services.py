@@ -189,7 +189,7 @@ def create_report_1(depart):
         res['depart'] = census.department.name
         res['worker'] = census.worker
         res['inn'] = census.inn
-        res['name'] = census.name.replace('%20', ' ')
+        res['name'] = f'<a href="/analytics/detail/{census.address_id}">{census.name.replace("%20", "" "")}</a>'
         res['result'] = census.task_result
         res['elevators'] = str(census.elevators_count)
         res['equipments'] = create_equipment_list(census.equipmentitem_set.all())

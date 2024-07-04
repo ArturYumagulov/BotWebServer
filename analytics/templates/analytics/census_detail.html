@@ -1,0 +1,309 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/owlcarousel/owl.carousel.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owlcarousel/owl.theme.default.min.css' %}">
+
+    <title>Census Detail</title>
+    <style>
+        .column_category {
+            display: flex;
+            flex-direction: column;
+            padding-left: 25px;
+        }
+
+        .result,
+        .potential,
+        .category {
+            display: flex;
+            align-items: center;
+            align-content: center;
+            justify-content: center;
+            width: 350px;
+            height: 40px;
+            text-align: center;
+            border-radius: 10px;
+            color: white;
+            margin: 10px 0;
+        }
+
+        .column_category {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .result.red,
+        .potential.red,
+        .category.red {
+            background: red;
+        }
+
+        .result.grey,
+        .potential.grey,
+        .category.grey {
+            background: grey;
+        }
+
+        .result.green,
+        .potential.green,
+        .category.green {
+            background: green;
+        }
+
+        .census-result {
+            text-align: center;
+        }
+
+        .census-result .title {
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: center;
+        }
+
+        .photos {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin: 35px 0;
+        }
+
+        .slider .item {
+            width: 100%;
+            height: 100%;
+            padding: 0 10px;
+        }
+
+        .contact thead {
+            background: #212529;
+            color: white;
+            text-align: center;
+        }
+
+        .vectors {
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .vector-item {
+            margin: 0 15px;
+        }
+
+        .map {
+            display: flex;
+            justify-content: center;
+        }
+        .worker {
+            display: flex;
+            justify-content: space-between;
+            margin-left: 25px;
+        }
+        .worker .worker-name span,
+        .worker .worker-data span
+        {
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=65c2d6fb-b558-4d2c-9982-ccbd7b5a47b1&lang=ru_RU"></script>
+</head>
+<body>
+<nav class="navbar navbar-light bg-dark">
+    <div class="container">
+        <span class="navbar-brand text-white">Census Detail</span>
+    </div>
+</nav>
+
+{#---------------------CONTENT------------------------#}
+<div class="container">
+    <main class="main d-flex flex-column justify-content-center m-3">
+        <div class="worker">
+            <p class="worker-name"><span>Исполнитель:</span> {{ census.worker }}</p>
+            <p class="worker-data"><span>Дата проведения:</span> {{ census.created_date }}</p>
+        </div>
+        <div class="column_category mt-3">
+            <div class="category {% if category == 'A' %}green{% elif category == 'B' %}green{% else %}red{% endif %}">
+                <span>Категория {{ category }}</span>
+            </div>
+            <div class="potential {% if category == '1' %}green{% elif category == '2' %}green{% else %}red{% endif %}">
+                <span>Потенциал {{ potential }}</span>
+            </div>
+            <div class="census-result">
+                {#                <div class="title">РЕЗУЛЬТАТ</div>#}
+                <div class="result grey">{{ result }}</div>
+            </div>
+        </div>
+        <div class="wrapper">
+            <div class="data mt-3">
+                <dl class="row m-3">
+                    <dt class="col-sm-3">Название в 2ГИС</dt>
+                    <dd class="col-sm-9">{{ census.name }}</dd>
+
+                    <dt class="col-sm-3">Название организации</dt>
+                    <dd class="col-sm-9">{{ census.dadata.full_with_opf }}</dd>
+
+
+                    <dt class="col-sm-3">Адрес</dt>
+                    <dd class="col-sm-9">{{ census.address }}</dd>
+
+                    <dt class="col-sm-3">ИНН</dt>
+                    <dd class="col-sm-9">{{ census.inn }}</dd>
+
+                    <dt class="col-sm-3">Вывеска</dt>
+                    <dd class="col-sm-9">{{ census.point_name }}</dd>
+
+                    <dt class="col-sm-3">Категория</dt>
+                    <dd class="col-sm-9">{{ census.category }}</dd>
+
+                    <dt class="col-sm-3">Сеть</dt>
+                    <dd class="col-sm-9">{% if census.nets %}Да{% else %}Нет{% endif %}</dd>
+
+                    <dt class="col-sm-3">Тип</dt>
+                    <dd class="col-sm-9">{{ census.point_type }}</dd>
+                </dl>
+            </div>
+            <table class="table contact mt-3">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col" colspan="2">Контактное лицо</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">Должность</th>
+                    <td>{{ census.decision.function }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Имя</th>
+                    <td>{{ census.decision.lastname }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Фамилия</th>
+                    <td>{{ census.decision.firstname }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Отчество</th>
+                     <td>{{ census.decision.surname }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Email</th>
+                    <td>{{ census.decision.email }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Телефон</th>
+                    <td>{{ census.decision.phone }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        {#        Фотографии#}
+        <dl class="row m-3">
+            <dt class="col-sm-3">Фотографии</dt>
+            <div class="photos">
+                <div class="owl-carousel owl-theme slider">
+                    {% for file in census.files.all %}
+                    <div class="item">
+                        <img src="{{ file.file.url }}" alt="">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </dl>
+        <div class="figures">
+            <div class="col m-3">
+                <table class="table">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th class="text-center" scope="col" colspan="2">Продукт</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for volume in census.volume.all %}
+                    <tr>
+                        <th scope="row">{{ volume.volume }}</th>
+                        <td>{{ volume.value }} л.</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="col-sm-12 mt-5 text-center fw-bold vector">Направления точки</div>
+                <div class="vectors d-flex flex-row"></div>
+
+
+                <div class="col-sm-12 mt-5 text-center fw-bold">Поставщики</div>
+                <div class="providers">
+                    <ul class="list-group list-group-flush">
+                        {% for provider in census.providers.all %}
+                            <li class="list-group-item">{{ provider.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="col-sm-12 mt-5 text-center fw-bold">Место проведения сенсуса</div>
+
+                <div id="map" class="map mt-3" style="width:auto; height:400px"></div>
+
+                <dl class="row mt-5">
+                    <dt class="col-sm-3">Комментарий к задаче</dt>
+                    <dd class="col-sm-9">{{ comment }}</dd>
+                </dl>
+
+            </div>
+        </div>
+    </main>
+</div>
+{# end container #}
+
+<script>
+    let census_id = "{{ census.address_id }}"
+    let csrf = "{{ csrf_token }}"
+    let get_vector_url = "{% url 'get_vectors' %}"
+    let position = [{{ census.position }}]
+    let point_data = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature", "id": 100,
+                "geometry": {"type": "Point", "coordinates": position},
+                "properties": {"hintContent": "<strong>Текст  <s>подсказки</s></strong>"}
+            }
+        ]
+    }
+</script>
+
+<script src="{% static 'js/jquery/jquery.slim.min.js' %}"></script>
+<script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/owlcarousel/owl.carousel.min.js' %}"></script>
+<script src="{% static 'js/analytics/map.js' %}"></script>
+
+<script>
+    $('.slider').owlCarousel({
+        loop: true,
+        margin: 20,
+        nav: true,
+        responsive: {
+            0: {
+                items: 1
+            },
+            600: {
+                items: 3
+            },
+            1000: {
+                items: 5
+            }
+        }
+    })
+</script>
+</body>
+</html>

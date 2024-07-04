@@ -10,9 +10,10 @@ from django.contrib.auth import get_user_model
 
 from analytics import services
 from analytics.services import create_report_2, create_report_1, get_volumes_list, get_volume_sum_list
-from census.models import Volume
+from api.serializers.census import PointVectorItemsSerializer
+from census.models import Volume, Census, CensusFiles, VolumeItem, PointVectorsItem
 from filegen.models import ReportDownloadFile
-from tasks.models import Department
+from tasks.models import Department, Task, WorkerComments
 from .services import get_table_column
 from .models import ReportUpdateModel
 
@@ -165,3 +166,42 @@ def get_report_3(requests):
     # result_list = create_report_2(dep_name)
 
     return JsonResponse({'data': 'write report_3 views'}, safe=False)
+
+
+def census_detail(requests, address_id):
+    census = Census.objects.get(address_id=address_id)
+    try:
+        task = Task.objects.get(number=census.task)
+        comment = WorkerComments.objects.get(pk=task.worker_comment.pk)
+    except Task.DoesNotExist:
+        comment = None
+    except WorkerComments.DoesNotExist:
+        comment = None
+
+    mongo_census = services.ReportDataOnMongoDB().find_document(elements={'_id': census.pk})
+    context = {
+        'census': census,
+        'category': mongo_census['category'],
+        'result': mongo_census['result'],
+        'potential': mongo_census['potential'],
+        'comment': comment.comment,
+    }
+    return render(requests, 'analytics/census_detail.html', context=context)
+
+
+def census_vector_data(request):
+    if request.method == 'POST':
+        result = []
+        census_id = json.loads(request.body).get('census_id')
+        vectors = PointVectorsItem.objects.filter(census__address_id=census_id)
+        vec_dict = {}
+        for item in vectors:
+            vec_dict['vectors'] = item.vectors.name
+            for value in item.value.all():
+                vec_dict['value'] = []
+                vec_dict['value'].append(value.name)
+            new_dict = vec_dict.copy()
+            result.append(new_dict)
+            vec_dict.clear()
+        return JsonResponse({'data': result}, safe=False)
+    return JsonResponse({'data': False}, safe=False)

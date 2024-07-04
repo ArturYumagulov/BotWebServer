@@ -11,7 +11,9 @@ urlpatterns = [
     path('get-volumes/', views.get_volumes, name="get_volumes"),
     path('get-lenght/', views.get_length, name="get_len"),
     path('get-volume-sum/', views.get_volumes_sum, name="get_volumes_sum"),
-
+    # ---------------Census-detail------------------------------------------
+    path('detail/<int:address_id>', views.census_detail, name="census_detail"),
+    path('get_vectors/', views.census_vector_data, name="get_vectors"),
     # ---------------REPORT-2------------------------------------------
     path('report-2/', views.report_2, name="report_2"),
     path('get-report-2/', views.get_report_2, name="get_report_2"),
