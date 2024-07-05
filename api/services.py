@@ -8,6 +8,15 @@ env = environ.Env()
 environ.Env.read_env('BotWebServer/.env')
 
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
 def send_message_bot(request):
     task = Task.objects.get(number=request['number'])
     worker = Worker.objects.get(code=request['worker'])

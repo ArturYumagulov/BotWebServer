@@ -11,7 +11,7 @@ from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 
 from census.models import Census
-from api.services import send_message_bot
+from api.services import send_message_bot, get_client_ip
 from tasks import models
 from api.serializers import tasks as serializers
 
@@ -57,7 +57,7 @@ class TaskViewSet(ModelViewSet):
 
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):  # noqa
@@ -69,7 +69,7 @@ class TaskViewSet(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - saving data - "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - saving data - "
                         f"{status.HTTP_201_CREATED}")
             send_message = send_message_bot(data)
             if send_message['result']:
@@ -77,7 +77,7 @@ class TaskViewSet(ModelViewSet):
             else:
                 logger.error(f"Сообщение {data} не отправлено - {send_message['description']}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - не сохранено - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - не сохранено - "
                      f"serializer_error:{serializer.errors} {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
@@ -88,12 +88,12 @@ class TaskViewSet(ModelViewSet):
 
         try:
             serializer = self.serializer_class(data=data, instance=self.queryset.get(number=data['number']))
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - data_have - "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - data_have - "
                         f"{status.HTTP_200_OK}")
 
             if serializer.is_valid():
                 serializer.save()
-                logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - saving data - "
+                logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - saving data - "
                             f"{status.HTTP_201_CREATED}")
 
                 if serializer.data['status'] == "Новая":
@@ -125,11 +125,11 @@ class TaskViewSet(ModelViewSet):
                         logger.error(f"Сообщение {task.number} из чата {task.worker.name} не удалено - {r.json()['description']}")
                         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
-            logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - не сохранено - "
+            logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - не сохранено - "
                          f"serializer_error:{serializer.errors} - {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
             return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         except self.model.DoesNotExist:
-            logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                          f"serializer_error:{'Данная задача не существует'} - {status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
             return Response({'detail': 'Данная задача не существует'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -154,7 +154,7 @@ class BaseViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request): # noqa
@@ -166,16 +166,16 @@ class BaseViewSet(ModelViewSet):
 
             if serializer.is_valid():
                 serializer.save()
-                logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+                logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                             f"saving data - {status.HTTP_201_CREATED}")
                 return Response(data=serializer.data, status=status.HTTP_201_CREATED)
             else:
-                logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+                logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                              f"не сохранено - serializer_error:{serializer.errors} "
                              f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
                 return Response(data=serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         else:
-            logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+            logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                          "{'detail': 'ожидался массив данных'} - "
                          f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
             return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -192,15 +192,15 @@ class BaseViewSet(ModelViewSet):
 
                 if serializer.is_valid():
                     serializer.save()
-                    logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+                    logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                                 f"- saving data - {status.HTTP_201_CREATED}")
                 else:
-                    logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+                    logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                                  f"- не сохранено - serializer_error:{serializer.errors} "
                                  f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
                     return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         else:
-            logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+            logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                          "{'detail': 'ожидался массив данных'} - "
                          f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
             return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -227,7 +227,7 @@ class PartnersViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request): # noqa
@@ -241,7 +241,7 @@ class PartnersViewSet(ModelViewSet):
                 return Response(data=serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+            logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                          "{'detail': 'ожидался массив данных'} - "
                          f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
             return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -258,10 +258,10 @@ class PartnersViewSet(ModelViewSet):
 
                 if serializer.is_valid():
                     serializer.save()
-                    logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+                    logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                                 f"- saving data - {status.HTTP_201_CREATED}")
         else:
-            logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+            logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                          "{'detail': 'ожидался массив данных'} - "
                          f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
             return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -280,7 +280,7 @@ class PartnersWorkerViewSet(ModelViewSet):
     def list(self, request):  # noqa
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request): # noqa
@@ -291,11 +291,11 @@ class PartnersWorkerViewSet(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -309,7 +309,7 @@ class WorkerViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request): # noqa
@@ -321,12 +321,12 @@ class WorkerViewSet(ModelViewSet):
 
             if serializer.is_valid():
                 serializer.save()
-                logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+                logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                             f"- saving data - {status.HTTP_201_CREATED}")
                 return Response(data=serializer.data, status=status.HTTP_201_CREATED)
             return Response(data=serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         else:
-            logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+            logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                          "{'detail': 'ожидался массив данных'} - "
                          f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
             return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -341,15 +341,15 @@ class WorkerViewSet(ModelViewSet):
                                                    instance=self.queryset.get(code=i['code']), data=i)
                 if serializer.is_valid():
                     serializer.save()
-                    logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+                    logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                                 f"- saving data - {status.HTTP_201_CREATED}")
                 else:
-                    logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+                    logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                                  f"- saving data - {status.HTTP_201_CREATED}")
                     return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
             return Response({'detail': 'Данные успешно обновлены'}, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      "{'detail': 'ожидался массив данных'} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -363,7 +363,7 @@ class SupervisorViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request): # noqa
@@ -376,12 +376,12 @@ class SupervisorViewSet(ModelViewSet):
 
             if serializer.is_valid():
                 serializer.save()
-                logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+                logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                             f"- saving data - {status.HTTP_201_CREATED}")
                 return Response(data=serializer.data, status=status.HTTP_201_CREATED)
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+            logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                          "{'detail': 'ожидался массив данных'} - "
                          f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
             return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -396,12 +396,12 @@ class SupervisorViewSet(ModelViewSet):
                                                    instance=self.queryset.get(code=i['code']), data=i)
                 if serializer.is_valid():
                     serializer.save()
-                    logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+                    logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                                 f"- saving data - {status.HTTP_201_CREATED}")
                 else:
                     return Response(serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
             return Response({'detail': 'Данные успешно обновлены'}, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      "{'detail': 'ожидался массив данных'} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response({'detail': 'ожидался массив данных'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -415,7 +415,7 @@ class AuthorCommentsViews(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -427,10 +427,10 @@ class AuthorCommentsViews(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(data=serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -444,7 +444,7 @@ class WorkerCommentsViews(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -456,10 +456,10 @@ class WorkerCommentsViews(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(data=serializer.errors, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -475,7 +475,7 @@ class TaskViewListSet(ModelViewSet):
 
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 #
 #
@@ -501,7 +501,7 @@ class ResultListView(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -513,10 +513,10 @@ class ResultListView(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -529,10 +529,10 @@ class ResultListView(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -546,7 +546,7 @@ class ResultGroupListView(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -558,10 +558,10 @@ class ResultGroupListView(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -574,10 +574,10 @@ class ResultGroupListView(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -591,7 +591,7 @@ class ResultDataListView(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -603,10 +603,10 @@ class ResultDataListView(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -619,10 +619,10 @@ class ResultDataListView(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -641,10 +641,10 @@ class AllTasksUpdateView(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -657,10 +657,10 @@ class AllTasksUpdateView(ModelViewSet):
 
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} "
+            logger.info(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} "
                         f"- saving data - {status.HTTP_201_CREATED}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"{request.method} - {request.path} - {data} - {request.META.get('REMOTE_ADDR')} - "
+        logger.error(f"{request.method} - {request.path} - {data} - {get_client_ip(request)} - "
                      f"{serializer.errors} - "
                      f"{status.HTTP_415_UNSUPPORTED_MEDIA_TYPE}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -680,7 +680,7 @@ class WorkerForwardViewSet(ModelViewSet):
     def list(self, request, code):  # noqa
         queryset = self.queryset.filter(chat_id__isnull=False).exclude(code=code)
         serializer = self.serializer_class(queryset, many=True)
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -730,7 +730,7 @@ class TaskMessageUpdateView(ModelViewSet):
         serializer = self.serializer_class(data=data, instance=self.queryset.get(number=data['number']))
         if serializer.is_valid():
             serializer.save()
-        logger.info(f"{request.method} - {request.path} - {request.META.get('REMOTE_ADDR')} - {status.HTTP_200_OK}")
+        logger.info(f"{request.method} - {request.path} - {get_client_ip(request)} - {status.HTTP_200_OK}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
