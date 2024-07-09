@@ -363,3 +363,19 @@ def valid_data(request):
         del_ready_task(request, task)
 
         return True
+
+
+def clean_address(address):
+    headers: dict = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": f"Token {env('DADATA_API_KEY')}",
+        "X-Secret": env('DADATA_SECRET'),
+    }
+    data = json.dumps([address])
+    r = requests.post(url=env('DADATA_CLEAN_ADDRESS_URL'), headers=headers, data=data)
+    if r.status_code == 200:
+        return r.json()[0]['result']
+    else:
+        return None
+

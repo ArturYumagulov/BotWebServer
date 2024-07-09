@@ -1,0 +1,8 @@
+    <div class="mb-3" id="stoTypeDiv" style="display: none;">
+        <label for="stoTypeId" class="form-label">Тип СТО?</label>
+        <select class="form-select mb-3" style="color: grey" name="sto_type" selected="" id="stoTypeId"
+                aria-describedby="stoTypeIdFeedback" data-url="{% url 'sto_types' %}">
+            <option selected disabled value="">Выберите тип СТО...</option>
+        </select>
+        <div id="stoTypeIdFeedback" class="invalid-feedback">Выберите тип СТО</div>
+    </div>

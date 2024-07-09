@@ -2,12 +2,13 @@ import json
 from django.db.models.functions import Lower
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from core.tasks import save_organizations
 from tasks.models import Partner, ResultData, PartnerWorker
 from . import models
 from .models import CompanyDatabase
-from .services import valid_data, DataInnOnRedis
+from .services import valid_data, DataInnOnRedis, clean_address
 
 # Create your views here.
 
@@ -76,6 +77,24 @@ def census(request, pk):
             return render(request, 'census/b2c.html', context)
         else:
             return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
+
+
+def full_census(request):
+    depart = request.GET['depart']
+    if depart == 'b2c':
+        products = models.PointVectors.objects \
+            .filter(is_active=True) \
+            .filter(department__name=_b2c)
+
+        volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
+
+        context = {
+            'depart': depart,
+            'volumes': volumes,
+            'products': products
+        }
+        return render(request, 'census/b2c_census_template.html', context=context)
+    return JsonResponse({'detail': 'add_template'})
 
 
 def load_data(request):
@@ -351,3 +370,9 @@ def get_vectors_items(request, slug):
         return JsonResponse(list(result), safe=False, status=200)
     return JsonResponse({'result': 'vectors_item not found'}, safe=False, status=404)
 
+
+@csrf_exempt
+def clean_address_view(request):
+    data = json.loads(request.body).get('address')
+    # result = clean_address(data)
+    return JsonResponse({'result': data}, safe=False)

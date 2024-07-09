@@ -34,7 +34,7 @@ DEBUG = True
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['192.168.80.224', 'localhost']
+    ALLOWED_HOSTS = ['service.tranzit-oil.com', '5.35.82.122']
 
 # Application definition
 
@@ -179,20 +179,22 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
-REST_FRAMEWORK = {
-
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ],
-    # 'DEFAULT_AUTHENTICATION_CLASSES': [
-    #     'rest_framework.authentication.TokenAuthentication',
-    # ],
-
-    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
-    'UNICODE_JSON': True
-
-}
+if DEBUG:
+    REST_FRAMEWORK = {
+        'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+        'UNICODE_JSON': True
+    }
+else:
+    REST_FRAMEWORK = {
+        'DEFAULT_PERMISSION_CLASSES': [
+            'rest_framework.permissions.IsAuthenticated',
+        ],
+        'DEFAULT_AUTHENTICATION_CLASSES': [
+            'rest_framework.authentication.TokenAuthentication',
+        ],
+        'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+        'UNICODE_JSON': True
+    }
 
 
 LOGGING = {
@@ -236,12 +238,21 @@ LOGGING = {
     'loggers': {
         '': {
             'level': 'DEBUG',
-            'handlers': ['console', 'info_file', 'error_file']
+            'handlers': ['console', 'info_file', 'error_file', 'telegram']
         }
     }
 }
+if DEBUG:
+    CORS_ORIGIN_ALLOW_ALL = True
+else:
+    CORS_ORIGIN_ALLOW_ALL = False
+    CORS_ORIGIN_WHITELIST = (
+        'https://service.tranzit-oil.com',
+    )
+    CSRF_TRUSTED_ORIGINS = [
+        'https://service.tranzit-oil.com',
+    ]
 
-CORS_ORIGIN_ALLOW_ALL = True
 
 REDIS_PORT = "6379"
 REDIS_HOST = "localhost"

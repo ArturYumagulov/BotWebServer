@@ -1,0 +1,13 @@
+    {% for volume in volumes %}
+        {% if volume.name != "Другое" %}
+            <div class="form-floating mb-3 volume" id="volume_{{ volume.pk }}_div" style="display: none;">
+                <input class="form-control" id="volume_{{ volume.pk }}_input" name="volume_{{ volume.pk }}" type="text"
+                       placeholder="пролив масла {{ volume.name }} в месяц в литрах"
+                       aria-describedby="volume_{{ volume.pk }}_feedback">
+                <label for="volume_{{ volume.pk }}_input">пролив масла {{ volume.name }} в месяц в литрах</label>
+                <div type="number" id="volume_{{ volume.pk }}_feedback" class="invalid-feedback">Укажите пролив
+                    масла {{ volume.name }} в месяц в литрах
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}

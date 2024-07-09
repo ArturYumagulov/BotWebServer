@@ -27,7 +27,6 @@ def generate_excel_file_report_1(user, data, volumes_list, column_list, elements
     for row, data_item in enumerate(data):
         for col in range(len(columns_list) - len(volumes_list) + 1):
             if col < 8:
-                # print(row + 1, col, data_item[column_list[col]['id']])
                 worksheet.write(row + 1, col, data_item[column_list[col]['id']])
             elif col == 8:
                 if data_item[column_list[col]['id']] is not None:
@@ -42,10 +41,8 @@ def generate_excel_file_report_1(user, data, volumes_list, column_list, elements
                     worksheet.write(row + 1, col, "")
             elif col == 9:
                 for vol in range(len(data_item[column_list[col]['id']])):
-                    # print(row + 1, col + vol, data_item[column_list[col]['id']][vol]['value'])
                     worksheet.write(row + 1, col + vol, data_item[column_list[col]['id']][vol]['value'])
             elif col > 9:
-                # print(row + 1, len(volumes_list) + col - 1, data_item[column_list[col]['id']])
                 worksheet.write(row + 1, len(volumes_list) + col - 1, data_item[column_list[col]['id']])
 
     workbook.close()  # Close the workbook

@@ -1,0 +1,103 @@
+{% extends 'census/base.html' %}
+{% block css %}
+    <style>
+        .address-result {
+            max-height: 10rem;
+            overflow: auto;
+            border: solid 1px #ced4da;
+            margin: 0 3px;
+            display: none;
+            position: absolute;
+            z-index: 10;
+            width: 100%;
+        }
+    </style>
+
+{% endblock %}
+{% block content %}
+    {% include 'census/utils/checkbox.html' %}
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="address-input" placeholder="name@example.com">
+        <label for="floatingInput">Адрес</label>
+        <ul class="list-group address-result">
+            <li class="list-group-item active" aria-current="true">An active item</li>
+            <li class="list-group-item">A second item</li>
+            <li class="list-group-item">A third item</li>
+            <li class="list-group-item">A fourth item</li>
+            <li class="list-group-item">And a fifth one</li>
+            <li class="list-group-item">A third item</li>
+            <li class="list-group-item">A fourth item</li>
+            <li class="list-group-item">And a fifth one</li>
+        </ul>
+    </div>
+    <script>
+
+        function closeAnotherClick(not_include_class) {
+            window.onclick = function (e) {
+                if (!Array.from(e.target.classList).includes(not_include_class)) {
+                    result_list.style.display = 'none'
+                }
+            }
+        }
+
+        let result_list = document.querySelector('.address-result')
+        let address_input = document.getElementById('address-input')
+        address_input.addEventListener('keyup', (e) => {
+            console.log(e.target.value)
+            let clean_address = fetch("{% url 'clean_address' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': "{{ csrf_token }}"
+                },
+                body: JSON.stringify({
+                    "address": e.target.value
+                })
+            })
+
+            clean_address.then((res) => res.json().then((data) => {
+                console.log(data)
+                if (data.result.length > 0) {
+                    result_list.style.display = 'block'
+                } else {
+                    result_list.style.display = 'none'
+                }
+            }))
+
+            closeAnotherClick('list-group-item')
+        })
+    </script>
+    {% include 'census/utils/inn_not_req.html' %}
+
+    {% include 'census/utils/board.html' %}
+
+    <p class="text-center" style="margin-top: 41px ">Сведения о торговой точке</p>
+
+    {#        Точка является сетью? -----------------------#}
+    {% include 'census/b2c/nets.html' %}
+    {#        Категория точки? -----------------------#}
+    {% include 'census/b2c/category.html' %}
+    {#        Тип торговой точки? -----------------------#}
+    {% include 'census/b2c/type.html' %}
+        {#        Тип СТО? -----------------------#}
+    {% include 'census/b2c/sto_type.html' %}
+
+            {#    Количество подъемников#}
+    {% include 'census/b2c/elevators.html' %}
+
+    <p class="text-center" style="margin-top: 41px ">Сведения о потребляемых продуктах</p>
+
+    {% include 'census/utils/products.html' %}
+
+    {% include 'census/b2c/volumes.html' %}
+
+    {% include 'census/b2c/akb.html' %}
+
+    {% include 'census/utils/contact_person.html' %}
+
+    {% include 'census/b2c/cars.html' %}
+
+    {% include 'census/utils/providers.html' %}
+
+    {% include 'census/utils/other_provider.html' %}
+
+{% endblock %}

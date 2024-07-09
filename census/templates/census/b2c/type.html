@@ -1,0 +1,9 @@
+    <div class="mb-3">
+{#        <label for="pointTypeID" class="form-label">Тип торговой точки?</label>#}
+        <select class="form-select mb-3" style="color: grey" name="point_type" selected="" id="pointTypeID"
+                data-url="{% url 'point_names' %}"
+                aria-describedby="pointTypeIDFeedback" required>>
+            <option selected disabled value="">Выберите тип торговой точки ...</option>
+        </select>
+        <div id="pointTypeIDFeedback" class="invalid-feedback">Выберите тип торговой точки</div>
+    </div>

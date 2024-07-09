@@ -7,6 +7,8 @@ from . import views
 
 urlpatterns = [
     path('f/<int:pk>', views.census, name='b2c_census'),
+    path('census-template/', views.full_census, name='census_template'),
+    path('clean-address/', views.clean_address_view, name='clean_address'),
     path('load/', views.load_data, name='census_load'),
     path('test/', views.template_test),
     path('partner-search/', views.get_partners, name='partners'),
