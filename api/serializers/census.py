@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from census import models as census_models
+from tasks import models as task_models
 from .tasks import ResultSerializer
 
 
@@ -114,6 +115,7 @@ class CensusSerializer(serializers.ModelSerializer):
             'tender',
             'working',
             'task',
+            'worker',
             'basics',
             'category',
             'decision',

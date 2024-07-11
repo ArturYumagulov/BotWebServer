@@ -76,7 +76,7 @@
     {% else %}
         <p class="text-center mb-3"><span class="fw-bold">Адрес: </span>{{ city }}, {{ street }}, {{ house }}</p>
     {% endif %}
-    <form class="m-3" action="{% url 'census_load' %}" method="post" enctype="multipart/form-data">
+    <form class="m-3" action="{% if request.path == full_census %}{% url 'full_census_load' %}{% else %}{% url 'census_load' %}{% endif %}" method="post" enctype="multipart/form-data">
     {% block content %}{% endblock %}
 
     {% include 'census/utils/control.html' %}

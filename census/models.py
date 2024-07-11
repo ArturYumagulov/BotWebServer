@@ -304,7 +304,7 @@ class Decision(models.Model):
 
 class Census(models.Model):
 
-    address_id = models.PositiveBigIntegerField(verbose_name="ID адреса в 1С")
+    address_id = models.PositiveBigIntegerField(verbose_name="ID адреса в 1С", blank=True, null=True, default=None)
     department = models.ForeignKey(Department, verbose_name="Подразделение", on_delete=models.PROTECT, default=None)
     task_author = models.CharField(verbose_name="Автор", max_length=300, blank=True, null=True)
     worker = models.CharField(verbose_name="Исполнитель", max_length=300, blank=True, null=True)

@@ -169,8 +169,8 @@ def get_report_3(requests):
 
 
 @login_required()
-def census_detail(requests, address_id):
-    census = Census.objects.get(address_id=address_id)
+def census_detail(requests, pk):
+    census = Census.objects.get(pk=pk)
     try:
         task = Task.objects.get(number=census.task)
         comment = WorkerComments.objects.get(pk=task.worker_comment.pk).comment

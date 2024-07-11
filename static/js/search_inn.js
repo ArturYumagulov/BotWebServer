@@ -77,8 +77,10 @@ function LoadInnSearchBlock(url, event) {
         method: "POST",
     }).then((res) => res.json()).then(
         (data) => {
-            LengthValue(inn, event, data)
-            if (data.length > 0) {
+            if (window.location.pathname !== '/census/census-template/') {  // Выключил проверку ИНН
+                LengthValue(inn, event, data)
+            } else {
+                if (data.length > 0) {
                 data.forEach((item) => {
                     if (item.source === "out") {
                         HideSearchBlock(false)
@@ -134,6 +136,9 @@ function LoadInnSearchBlock(url, event) {
                     }
                 })
             }
+            }
+            // LengthValue(inn, event, data)
+
         })
 }
 
@@ -184,6 +189,15 @@ function loadValidPartners() {
                                 ii.style.display = 'none'
                             })
                         })
+
+                        // закрытие окна при клике не в поле окна
+                        window.onclick = function (e) {
+                            if (!Array.from(e.target.classList).includes('list-group-item')) {
+                                dataList.style.display = 'none'
+                                dataList.innerHTML = '';
+                            }
+                        }
+
                     }
                 })
         } else {

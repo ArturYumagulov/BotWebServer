@@ -10,6 +10,7 @@ urlpatterns = [
     path('census-template/', views.full_census, name='census_template'),
     path('clean-address/', views.clean_address_view, name='clean_address'),
     path('load/', views.load_data, name='census_load'),
+    path('full-load/', views.full_load_data, name='full_census_load'),
     path('test/', views.template_test),
     path('partner-search/', views.get_partners, name='partners'),
     path('partner-search-inn/', views.get_partners_inn, name='partners_inn'),

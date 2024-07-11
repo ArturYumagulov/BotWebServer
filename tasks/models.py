@@ -49,10 +49,18 @@ class Result(models.Model):
         ('postmail', "Почтовое письмо"),
         ('other', "Прочее")]
 
-    base = models.ForeignKey('Basics', verbose_name="Основание", on_delete=models.CASCADE, related_name='result_bases')
+    base = models.ForeignKey('Basics', verbose_name="Основание", on_delete=models.CASCADE,
+                             related_name='result_bases',
+                             blank=True,
+                             null=True,
+                             default=None)
     type = models.CharField(choices=TYPES, max_length=1000, default='other')
     result = models.CharField(max_length=1000)
-    task_number = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='result_task')
+    task_number = models.ForeignKey('Task', on_delete=models.CASCADE,
+                                    related_name='result_task',
+                                    blank=True,
+                                    null=True,
+                                    default=None)
     contact_person = models.CharField(max_length=500)
     control_date = models.DateField(blank=True, null=True)
 

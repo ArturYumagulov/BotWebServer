@@ -8,7 +8,7 @@ from core.tasks import save_organizations
 from tasks.models import Partner, ResultData, PartnerWorker
 from . import models
 from .models import CompanyDatabase
-from .services import valid_data, DataInnOnRedis, clean_address
+from .services import valid_data, DataInnOnRedis, clean_address, valid_full_data
 
 # Create your views here.
 
@@ -80,20 +80,31 @@ def census(request, pk):
 
 
 def full_census(request):
+
     depart = request.GET['depart']
+    worker = request.GET['worker']
+
+    products = models.PointVectors.objects \
+        .filter(is_active=True) \
+        .filter(department__name=depart)
+
+    volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
+
+    context = {
+        'depart': depart,
+        'volumes': volumes,
+        'products': products,
+        'worker': worker
+    }
+
     if depart == 'b2c':
-        products = models.PointVectors.objects \
-            .filter(is_active=True) \
-            .filter(department__name=_b2c)
 
-        volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
-
-        context = {
-            'depart': depart,
-            'volumes': volumes,
-            'products': products
-        }
         return render(request, 'census/b2c_census_template.html', context=context)
+
+    elif depart == _b2b or depart == _industrial:
+
+        return render(request, 'census/b2b_census_template.html', context=context)
+
     return JsonResponse({'detail': 'add_template'})
 
 
@@ -113,6 +124,20 @@ def load_data(request):
                 return render(request, 'census/ready_census.html')
             else:
                 return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
+
+    return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
+
+
+def full_load_data(request):
+    """Запись результатов Сенсуса"""
+
+    if request.method == "POST":
+        form = valid_full_data(request)
+
+        if form:
+            return render(request, 'census/ready_census.html')
+        else:
+            return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
 
     return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
 

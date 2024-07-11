@@ -1,23 +1,12 @@
 {% extends 'census/base.html' %}
+{% load static %}
 {% block css %}
-    <style>
-        .address-result {
-            max-height: 10rem;
-            overflow: auto;
-            border: solid 1px #ced4da;
-            margin: 0 3px;
-            display: none;
-            position: absolute;
-            z-index: 10;
-            width: 100%;
-        }
-    </style>
-
+    <link rel="stylesheet" href="{% static 'css/census/style.css' %}">
 {% endblock %}
 {% block content %}
     {% include 'census/utils/checkbox.html' %}
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="address-input" placeholder="name@example.com">
+        <input type="text" name="full_address" class="form-control" id="address-input" placeholder="name@example.com">
         <label for="floatingInput">Адрес</label>
         <ul class="list-group address-result">
             <li class="list-group-item active" aria-current="true">An active item</li>
@@ -32,10 +21,11 @@
     </div>
     <script>
 
-        function closeAnotherClick(not_include_class) {
+        function closeAnotherClick(not_include_class, close_object) {
             window.onclick = function (e) {
+                console.log(e.target.classList)
                 if (!Array.from(e.target.classList).includes(not_include_class)) {
-                    result_list.style.display = 'none'
+                    close_object.style.display = 'none'
                 }
             }
         }
@@ -63,8 +53,9 @@
                 }
             }))
 
-            closeAnotherClick('list-group-item')
+            closeAnotherClick('list-group-item', result_list)
         })
+
     </script>
     {% include 'census/utils/inn_not_req.html' %}
 
