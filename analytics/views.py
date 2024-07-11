@@ -183,7 +183,7 @@ def census_detail(requests, pk):
     context = {
         'census': census,
         'category': mongo_census['category'],
-        'result': mongo_census['result'],
+        'result': str(mongo_census['result'])[27:-4].split('>')[1],
         'potential': mongo_census['potential'],
         'comment': comment,
     }
