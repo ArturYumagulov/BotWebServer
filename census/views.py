@@ -399,5 +399,5 @@ def get_vectors_items(request, slug):
 @csrf_exempt
 def clean_address_view(request):
     data = json.loads(request.body).get('address')
-    # result = clean_address(data)
-    return JsonResponse({'result': data}, safe=False)
+    result = clean_address(data)
+    return JsonResponse(result, safe=False)

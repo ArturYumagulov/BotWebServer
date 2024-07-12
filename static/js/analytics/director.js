@@ -240,6 +240,7 @@
         }).then((res) => res.json()).then((data) => {
             if (data.data.length === 0) {
                 update.style.display = 'none'
+                load_to_excel.style.display = 'none'
                 table.innerHTML = '<p class="text-center text-secondary m-5">Нет данных</p>'
             } else {
                 create_director_filters(column_list, data)

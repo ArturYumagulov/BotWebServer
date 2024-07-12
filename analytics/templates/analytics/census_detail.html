@@ -114,13 +114,45 @@
         {
             font-weight: bold;
         }
+
+        .census-modal {
+            opacity: 1;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1055;
+            display: block;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            outline: 0;
+        }
+        .previous, .next {
+            cursor: pointer;
+            position: absolute;
+            width: auto;
+            padding: 16px;
+            margin-top: -50px;
+            color: #090909;
+            font-weight: bold;
+            font-size: 20px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .next {
+            right: 0;
+            
+        }
     </style>
     <script src="https://api-maps.yandex.ru/2.1/?apikey=65c2d6fb-b558-4d2c-9982-ccbd7b5a47b1&lang=ru_RU"></script>
 </head>
 <body>
 <nav class="navbar navbar-light bg-dark">
     <div class="container">
-        <span class="navbar-brand text-white">Census Detail</span>
+        <a class="navbar-brand text-white" href="{% url 'analytics' %}">Census Detail</a>
     </div>
 </nav>
 
@@ -261,6 +293,35 @@
 
             </div>
         </div>
+
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+            Launch demo modal
+        </button>
+
+        <!-- Modal -->
+        <div class="census-modal" id="exampleModalCenter" tabindex="-1" role="dialog"
+             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <img src="/media/uploads/STP_Axf912R.jpeg" alt="">
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <div class="previous"><</div>
+                        <div class="next">></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 </div>
 {# end container #}

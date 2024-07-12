@@ -375,7 +375,8 @@ def clean_address(address):
     data = json.dumps([address])
     r = requests.post(url=env('DADATA_CLEAN_ADDRESS_URL'), headers=headers, data=data)
     if r.status_code == 200:
-        return r.json()[0]['result']
+        return r.json()
+        # return r.json()[0]['result']
     else:
         return None
 

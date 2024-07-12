@@ -3,60 +3,14 @@
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/census/style.css' %}">
 {% endblock %}
+{% block js %}
+    <script defer src="{% static 'js/census/clean_address.js' %}"></script>
+{% endblock %}
 {% block content %}
     {% include 'census/utils/checkbox.html' %}
-    <div class="form-floating mb-3">
-        <input type="text" name="full_address" class="form-control" id="address-input" placeholder="name@example.com">
-        <label for="floatingInput">Адрес</label>
-        <ul class="list-group address-result">
-            <li class="list-group-item active" aria-current="true">An active item</li>
-            <li class="list-group-item">A second item</li>
-            <li class="list-group-item">A third item</li>
-            <li class="list-group-item">A fourth item</li>
-            <li class="list-group-item">And a fifth one</li>
-            <li class="list-group-item">A third item</li>
-            <li class="list-group-item">A fourth item</li>
-            <li class="list-group-item">And a fifth one</li>
-        </ul>
-    </div>
-    <script>
 
-        function closeAnotherClick(not_include_class, close_object) {
-            window.onclick = function (e) {
-                console.log(e.target.classList)
-                if (!Array.from(e.target.classList).includes(not_include_class)) {
-                    close_object.style.display = 'none'
-                }
-            }
-        }
+    {% include 'census/utils/clean_address.html' %}
 
-        let result_list = document.querySelector('.address-result')
-        let address_input = document.getElementById('address-input')
-        address_input.addEventListener('keyup', (e) => {
-            console.log(e.target.value)
-            let clean_address = fetch("{% url 'clean_address' %}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': "{{ csrf_token }}"
-                },
-                body: JSON.stringify({
-                    "address": e.target.value
-                })
-            })
-
-            clean_address.then((res) => res.json().then((data) => {
-                console.log(data)
-                if (data.result.length > 0) {
-                    result_list.style.display = 'block'
-                } else {
-                    result_list.style.display = 'none'
-                }
-            }))
-
-            closeAnotherClick('list-group-item', result_list)
-        })
-
-    </script>
     {% include 'census/utils/inn_not_req.html' %}
     {% include 'census/utils/board.html' %}
 
