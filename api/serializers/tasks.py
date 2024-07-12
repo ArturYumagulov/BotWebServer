@@ -60,6 +60,7 @@ class AllWorkerSerializer(serializers.ModelSerializer):
 
 
 class WorkerSerializer(serializers.ModelSerializer):
+    department = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
         model = task_models.Worker
