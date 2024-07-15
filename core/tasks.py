@@ -23,7 +23,7 @@ token = env.str("BOT_TOKEN")
 
 @shared_task
 def del_task():
-    date = datetime.now() - timedelta(days=14)
+    date = datetime.now() - timedelta(days=90)
     del_date = make_aware(date)
     exclude_census = Task.objects.exclude(base__group__name="Сенсус")
     exclude_new = exclude_census.exclude(status="Новая")
