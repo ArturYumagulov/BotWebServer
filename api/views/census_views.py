@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 
 class CensusUpdate(ModelViewSet):
     serializer_class = serializers.CensusUpdateSerializer
-    queryset = Census.objects.all()
+    queryset = Census.objects.filter(load_to_1c=False)
 
     def put(self, request):  # noqa
-        """Изменение существующей задачи"""
+        """Изменение существующего сенсуса"""
 
         data = request.data
 
-        serializer = self.serializer_class(data=data, instance=self.queryset.get(pk=data['census_id']))
+        serializer = self.serializer_class(data=data, instance=self.queryset.get(pk=data['id']))
         logger.info(f"{request.method} - {request.path} - {data} - {request.META['REMOTE_ADDR']} - data_have - "
                     f"{status.HTTP_200_OK}")
         if serializer.is_valid():

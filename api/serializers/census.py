@@ -98,7 +98,8 @@ class CensusSerializer(serializers.ModelSerializer):
             'closing',
             'not_communicate',
             'edited',
-            'loaded',
+            # 'loaded',
+            'load_to_1c',
             'inn',
             'point_name',
             'address',
@@ -137,10 +138,10 @@ class CensusUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = census_models.Census
-        fields = ('loaded',)
+        fields = ('id', 'load_to_1c',)
 
     def update(self, instance, validated_data):
-        instance.loaded = validated_data.get('loaded', instance.loaded)
+        instance.load_to_1c = validated_data.get('load_to_1c', instance.loaded)
         instance.save()
 
         return instance

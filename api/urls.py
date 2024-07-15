@@ -29,7 +29,7 @@ router.register('workers', task_views.WorkerViewSet)
 # ----------------------CENSUS-------------------------------------------------
 router.register('census', census_views.CensusView, basename='census')
 router.register('address-count', census_views.AddressesCountView, basename='address_count')
-# router.register('census-update', views.CensusUpdate, basename='census_update')
+router.register('census-update', census_views.CensusUpdate, basename='census_update')
 
 
 # ----------------------SALES-------------------------------------------------

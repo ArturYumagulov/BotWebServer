@@ -401,3 +401,9 @@ def clean_address_view(request):
     data = json.loads(request.body).get('address')
     result = clean_address(data)
     return JsonResponse(result, safe=False)
+
+
+def get_session(request):
+    print(request.session)
+    request.session["has_commented"] = False
+    return HttpResponse('ok')

@@ -348,6 +348,7 @@ class Census(models.Model):
                                related_name='census_others')
     basics = models.CharField(verbose_name='Номер основания', null=True, blank=True, max_length=1000)
     loaded = models.BooleanField('Загружено', default=False)
+    load_to_1c = models.BooleanField('Загружено', default=False)
 
     class Meta:
         verbose_name = "Сенсус"

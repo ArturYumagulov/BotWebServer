@@ -26,7 +26,12 @@ def generate_excel_file_report_1(user, data, volumes_list, column_list, elements
 
     for row, data_item in enumerate(data):
         for col in range(len(columns_list) - len(volumes_list) + 1):
-            if col < 8:
+            if col < 6:
+                worksheet.write(row + 1, col, data_item[column_list[col]['id']])
+            elif col == 6:
+                print(data_item[column_list[col]['id']][32:-4])
+                worksheet.write(row + 1, col, data_item[column_list[col]['id']][32:-4])
+            elif col == 7:
                 worksheet.write(row + 1, col, data_item[column_list[col]['id']])
             elif col == 8:
                 if data_item[column_list[col]['id']] is not None:

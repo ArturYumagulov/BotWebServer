@@ -3,6 +3,8 @@ import requests
 import json
 import logging
 import environ
+import jwt
+from django.conf import settings
 
 from redis.commands.json.path import Path
 from datetime import datetime
@@ -633,3 +635,11 @@ def valid_full_data(request):
         # del_ready_task(request, task)
 
         return True
+
+
+ALGORITHM = "HS256"
+
+
+def token_generator(user):
+    return jwt.encode(user, settings.SECRET_KEY, algorithm=ALGORITHM)
+
