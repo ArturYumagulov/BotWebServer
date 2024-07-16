@@ -30,5 +30,5 @@ urlpatterns = [
     path('get-volume-data/', views.get_volume_data, name='get_volume_data'),
     path('get-quipment-park/', views.get_equipment_park, name='get_equipment_park'),
     path('get-vector-item/<slug:slug>', views.get_vectors_items, name='get_vectors_items'),
-    path('get-token/', views.create_secret, name='session')
+    # path('get-token/', views.create_secret, name='session')
 ]

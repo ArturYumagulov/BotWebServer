@@ -419,9 +419,9 @@ def clean_address_view(request):
     return JsonResponse(result, safe=False)
 
 
-def create_secret(request):
-    workers = Worker.objects.all()
-    for worker in workers:
-        worker.secret = create_worker_secret(token_len=44, algorithm='HS256')
-        worker.save()
-    return HttpResponse('ok')
+# def create_secret(request):
+#     workers = Worker.objects.all()
+#     for worker in workers:
+#         worker.secret = create_worker_secret(token_len=44, algorithm='HS256')
+#         worker.save()
+#     return HttpResponse('ok')
