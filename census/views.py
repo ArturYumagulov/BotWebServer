@@ -91,7 +91,6 @@ def full_census(request):
     secret, algorithm = worker_data.secret.split('_')
 
     try:
-
         encode_worker_code = jwt.decode(token, secret, algorithms=algorithm)
 
         if worker_data.code == encode_worker_code['code']:
@@ -115,6 +114,8 @@ def full_census(request):
             elif depart == _b2b or depart == _industrial:
 
                 return render(request, 'census/b2b_census_template.html', context=context)
+            else:
+                return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
 
         else:
             return HttpResponse('census/errors/error_secret_code.html')
