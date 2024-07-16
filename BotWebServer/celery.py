@@ -21,6 +21,10 @@ app.conf.beat_schedule = {
     'update-every-15-minutes.': {
         'task': 'core.tasks.update_reports_data',
         'schedule': crontab(minute='*/15')
+    },
+    'create_worker_secret.': {
+        'task': 'core.tasks.create_secret',
+        'schedule': crontab(minute='*/30')
     }
 
 }

@@ -14,6 +14,7 @@ from census.services import DataInnOnRedis, unix_to_date
 from tasks.models import Task, WorkerComments, AuthorComments, Department, Worker
 from census.models import CensusFiles, CompanyDatabase
 from send_message.models import SendMessage
+from tasks.services import create_worker_secret
 
 logger = logging.getLogger(__name__)
 
@@ -163,4 +164,13 @@ def send_message_to_telegram(addresses_list, message):
             dont_send.append(Worker.objects.get(chat_id=address).name)
     SendMessage.objects.update_or_create(message=message, send_list=f"{sending}".replace('[', '').replace(']', ''),
                                          dont_send_list=f"{dont_send}".replace('[', '').replace(']', ''))
+    return True
+
+
+@shared_task
+def create_secret():
+    workers = Worker.objects.all()
+    for worker in workers:
+        worker.secret = create_worker_secret(token_len=44, algorithm='HS256')
+        worker.save()
     return True

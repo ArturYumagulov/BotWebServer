@@ -121,6 +121,7 @@ class WorkersAdmin(admin.ModelAdmin):
         'controller',
         'supervisor'
     ]
+    exclude = ('secret',)
     list_per_page = 20
 
     def get_worker_urlencode(self, object):

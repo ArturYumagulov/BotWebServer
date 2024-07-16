@@ -1,5 +1,7 @@
 from django.db import models
 
+from tasks.services import create_worker_secret
+
 
 class Department(models.Model):
     is_active = models.BooleanField(verbose_name="Активность", default=False)
@@ -129,6 +131,7 @@ class Worker(models.Model):
     controller = models.BooleanField(default=False)
     partner = models.CharField(max_length=11, blank=True, null=True)
     department = models.ForeignKey(Department, blank=True, null=True, on_delete=models.PROTECT)
+    secret = models.CharField(max_length=50, default=create_worker_secret)
 
     def __str__(self):
         return f"{self.name}"
@@ -137,6 +140,7 @@ class Worker(models.Model):
         verbose_name = "05. Агент"
         verbose_name_plural = "05. Агенты"
         ordering = ['name']
+
 
 
 class Head(models.Model):

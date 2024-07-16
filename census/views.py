@@ -1,11 +1,14 @@
 import json
+
+import jwt
 from django.db.models.functions import Lower
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from core.tasks import save_organizations
-from tasks.models import Partner, ResultData, PartnerWorker
+from tasks.models import Partner, ResultData, PartnerWorker, Worker
+from tasks.services import create_worker_secret
 from . import models
 from .models import CompanyDatabase
 from .services import valid_data, DataInnOnRedis, clean_address, valid_full_data
@@ -83,29 +86,41 @@ def full_census(request):
 
     depart = request.GET['depart']
     worker = request.GET['worker']
+    token = request.GET['token']
+    worker_data = Worker.objects.get(chat_id=worker)
+    secret, algorithm = worker_data.secret.split('_')
 
-    products = models.PointVectors.objects \
-        .filter(is_active=True) \
-        .filter(department__name=depart)
+    try:
 
-    volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
+        encode_worker_code = jwt.decode(token, secret, algorithms=algorithm)
 
-    context = {
-        'depart': depart,
-        'volumes': volumes,
-        'products': products,
-        'worker': worker
-    }
+        if worker_data.code == encode_worker_code['code']:
+            products = models.PointVectors.objects \
+                .filter(is_active=True) \
+                .filter(department__name=depart)
 
-    if depart == 'b2c':
+            volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
 
-        return render(request, 'census/b2c_census_template.html', context=context)
+            context = {
+                'depart': depart,
+                'volumes': volumes,
+                'products': products,
+                'worker': worker
+            }
 
-    elif depart == _b2b or depart == _industrial:
+            if depart == 'b2c':
 
-        return render(request, 'census/b2b_census_template.html', context=context)
+                return render(request, 'census/b2c_census_template.html', context=context)
 
-    return JsonResponse({'detail': 'add_template'})
+            elif depart == _b2b or depart == _industrial:
+
+                return render(request, 'census/b2b_census_template.html', context=context)
+
+        else:
+            return HttpResponse('census/errors/error_secret_code.html')
+
+    except jwt.InvalidSignatureError:
+        return render(request, 'census/errors/error_secret_code.html')
 
 
 def load_data(request):
@@ -403,7 +418,9 @@ def clean_address_view(request):
     return JsonResponse(result, safe=False)
 
 
-def get_session(request):
-    print(request.session)
-    request.session["has_commented"] = False
+def create_secret(request):
+    workers = Worker.objects.all()
+    for worker in workers:
+        worker.secret = create_worker_secret(token_len=44, algorithm='HS256')
+        worker.save()
     return HttpResponse('ok')
