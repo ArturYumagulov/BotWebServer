@@ -22,6 +22,7 @@ class Product(models.Model):
     access_category = models.CharField(verbose_name="Категория товара", max_length=1000, blank=True, null=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
+    is_active = models.BooleanField(verbose_name='Активность', default=False)
 
     def __str__(self):
         return self.name
@@ -79,9 +80,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    name = models.CharField(max_length=2000, verbose_name="Наименование")
-    article = models.CharField(max_length=100, verbose_name="Артикул", blank=True, null=True)
-    access_category = models.CharField(verbose_name="Категория товара", max_length=1000)
+    item_code = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="Товар")
     price = models.DecimalField(verbose_name="Цена", decimal_places=2, default=0, max_length=100, max_digits=10)
     quantity = models.PositiveIntegerField()
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
