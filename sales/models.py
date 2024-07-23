@@ -90,7 +90,7 @@ class OrderItem(models.Model):
         verbose_name_plural = 'Позиции в реализации'
 
     def __str__(self):
-        return f"{self.order.number} - {self.name}"
+        return f"{self.order.number} - {self.item_code.name}"
 
     def get_cost(self):
         return self.price * self.quantity
