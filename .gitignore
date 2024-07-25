@@ -446,6 +446,7 @@ static/images
 static/js/bootstrap
 static/js/datepicker
 static/js/select2
+static/admin
 static/js/analytics/Chart.min.js
 static/js/analytics/dashboard.js
 celerybeat-schedule.dat
