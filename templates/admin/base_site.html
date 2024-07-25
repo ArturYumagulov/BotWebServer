@@ -36,7 +36,7 @@
             {% endblock %}
             {% block userlinks %}
                 {% if site_url %}
-                    <a href="/api/v1">Перейти на сайт</a> /
+                    <a href="{% url 'analytics' %}">Перейти на сайт</a> /
                 {% endif %}
                 {% if user.is_active and user.is_staff %}
                     {% url 'django-admindocs-docroot' as docsroot %}

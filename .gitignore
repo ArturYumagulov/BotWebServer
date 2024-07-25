@@ -437,7 +437,11 @@ $RECYCLE.BIN/
 .idea
 logs
 
-static/css
+static/css/bootstrap
+static/css/datepicker
+static/css/fonts
+static/css/owlcarousel
+static/css/select2
 static/images
 static/js/bootstrap
 static/js/datepicker
