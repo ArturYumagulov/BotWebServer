@@ -47,22 +47,11 @@
 </head>
 <body>
 
-<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="{% url 'analytics' %}">Tranzit-Oil Analytics</a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
-            aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="w-100" type="text" aria-label="Search"></div>>
-    <div class="navbar-nav">
-        <div class="nav-item text-nowrap">
-            {% if user.is_authenticated %}
-                  <a class="nav-link px-3" href="{% url 'logout' %}">Выйти</a>
-            {% endif %}
-        </div>
-    </div>
-</header>
+<nav class="navbar bg-dark bg-body-tertiary text-white">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1">Navbar</span>
+  </div>
+</nav>
 
 <div class="container-fluid">
     <div class="row">
@@ -99,35 +88,33 @@
                     </li>
                     {% endfor %}
 
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link" href="#">#}
-{#                            <span data-feather="file-text"></span>#}
-{#                            Last quarter#}
-{#                        </a>#}
-{#                    </li>#}
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link" href="#">#}
-{#                            <span data-feather="file-text"></span>#}
-{#                            Social engagement#}
-{#                        </a>#}
-{#                    </li>#}
-{#                    <li class="nav-item">#}
-{#                        <a class="nav-link" href="#">#}
-{#                            <span data-feather="file-text"></span>#}
-{#                            Year-end sale#}
-{#                        </a>#}
-{#                    </li>#}
                 </ul>
             {% endif %}
             </div>
         </nav>
 
-        <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4">
+            <main class="col">
+
             {% block content %}{% endblock %}
         </main>
+    <div type="button" id="sidebarBut" class="btn btn-outline-secondary collapse-btn">>></div>
     </div>
 </div>
 
+<script>
+    let collapse_btn = document.querySelector('.collapse-btn')
+    let collapse_menu = document.querySelector('.collapse')
+    collapse_btn.addEventListener('click', () => {
+        collapse_menu.classList.add('show')
+
+        window.addEventListener('click', (event)=> {
+            console.log(event.target.id)
+            if (event.target.id !== 'sidebarMenu' && event.target.id !== 'sidebarBut') {
+                collapse_menu.classList.remove('show')
+            }
+        })
+    })
+</script>
 
 <script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
 
@@ -137,7 +124,7 @@
 {#<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"#}
 {#        integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha"#}
 {#        crossorigin="anonymous"></script>#}
-<script src="{% static 'js/analytics/Chart.min.js' %}"></script>
+{#<script src="{% static 'js/analytics/Chart.min.js' %}"></script>#}
 {#<script src="dashboard.js"></script>#}
 {#<script src="{% static 'js/analytics/dashboard.js' %}"></script>#}
 {% block scripts %}{% endblock %}

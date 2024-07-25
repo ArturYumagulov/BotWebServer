@@ -99,9 +99,9 @@
             }
 
         })
-        b2b_but.classList.add('btn', 'btn-outline-secondary', 'me-1', 'mb-1')
-        b2c_but.classList.add('btn', 'btn-outline-secondary', 'me-1', 'mb-1')
-        industrial_but.classList.add('btn', 'btn-outline-secondary', 'me-1', 'mb-1')
+        b2b_but.classList.add('btn', 'main', 'btn-outline-secondary', 'me-1', 'mb-1')
+        b2c_but.classList.add('btn', 'main', 'btn-outline-secondary', 'me-1', 'mb-1')
+        industrial_but.classList.add('btn', 'main', 'btn-outline-secondary', 'me-1', 'mb-1')
 
         b2b_but.setAttribute('id', 'b2b')
         b2c_but.setAttribute('id', 'b2c')
@@ -262,8 +262,8 @@
 
         await create_director_buttons()
 
-        let buttons = document.querySelectorAll('.btn')
-        let main = document.getElementById('main')
+        let buttons = document.querySelectorAll('.main')
+        // let main = document.getElementById('main')
         let div = document.getElementById('buttons')
         loader.style.display = 'none'
         load_to_excel.style.display = 'none'

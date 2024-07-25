@@ -19,9 +19,9 @@
             }
 
         })
-        b2b_but.classList.add('btn', 'btn-outline-secondary', 'me-1', 'mb-1')
-        b2c_but.classList.add('btn', 'btn-outline-secondary', 'me-1', 'mb-1')
-        industrial_but.classList.add('btn', 'btn-outline-secondary', 'me-1', 'mb-1')
+        b2b_but.classList.add('btn', 'main', 'btn-outline-secondary', 'me-1', 'mb-1')
+        b2c_but.classList.add('btn', 'main', 'btn-outline-secondary', 'me-1', 'mb-1')
+        industrial_but.classList.add('btn', 'main', 'btn-outline-secondary', 'me-1', 'mb-1')
 
         b2b_but.setAttribute('id', 'b2b')
         b2c_but.setAttribute('id', 'b2c')
@@ -100,7 +100,7 @@
         if (depart === 'director') {
             loader.style.display = 'none'
             await create_director_buttons()
-            let buttons = document.querySelectorAll('.btn')
+            let buttons = document.querySelectorAll('.main')
             let div = document.getElementById('buttons')
             buttons.forEach((button) => {
                 button.addEventListener('click', ()=>{
