@@ -242,13 +242,23 @@
         <dl class="row m-3">
             <dt class="col-sm-3">Фотографии</dt>
             <div class="photos">
-                <div class="owl-carousel owl-theme slider">
-                    {% for file in census.files.all %}
-                    <div class="item">
-                        <img src="{{ file.file.url }}" alt="">
+                {% if census.files.all|length == 1 %}
+                    <div class="item" style="width: 100%">
+                        <img src="{{ census.files.first.file.url }}" alt="" style="width: 100%">
                     </div>
-                    {% endfor %}
-                </div>
+                {% elif census.files.all|length == 0 %}
+                    <div>
+                        <p>Нет фото</p>
+                    </div>
+                    {% else %}
+                    <div class="owl-carousel owl-theme slider">
+                        {% for file in census.files.all %}
+                            <div class="item">
+                                <img src="{{ file.file.url }}" alt="">
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
         </dl>
         <div class="figures">
