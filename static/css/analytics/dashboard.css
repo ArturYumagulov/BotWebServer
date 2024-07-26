@@ -83,6 +83,10 @@ body {
 .navbar {
   z-index: 1000;
 }
+.navbar a {
+  text-decoration: none;
+  color: #FFFFFF;
+}
 
 .form-control-dark {
   color: #fff;
