@@ -54,6 +54,7 @@ function create_filter_bottom(category_name, items) {
                     item_a.classList.add('dropdown-item', 'filter')
                     item_a.setAttribute('category', category_name.id)
                     item_a.innerHTML = item[i]
+                    // console.log(item[i])
                     item_li.append(item_a)
                     dropdown_menu.append(item_li)
                 }
@@ -62,7 +63,13 @@ function create_filter_bottom(category_name, items) {
                 let item_a = document.createElement('a')
                 item_a.classList.add('dropdown-item', 'filter')
                 item_a.setAttribute('category', category_name.id)
-                item_a.innerHTML = item
+                // console.log(item.indexOf('href'))
+                if (item.indexOf('href') === -1) {
+                    item_a.innerHTML = item
+                } else {
+                    item_a.innerHTML = item.split('>')[1].slice(0, -3)
+                }
+
                 item_li.append(item_a)
                 dropdown_menu.append(item_li)
             }
@@ -501,16 +508,19 @@ load_data(100, 0).then(([reports]) => {
              director_buttons.style.display = 'none'
              response.then((res) => res.json()).then((data) => {
              if (dep === 'b2c') {
+                 clean_duplicate_filters()
                  create_table_head(b2c_column_list, b2c_volume_list)
                  data.data.forEach((report) => {
                      create_table_row_sub(report, b2c_column_list, dep)
                  })
              } else if (dep === 'b2b') {
+                 clean_duplicate_filters()
                  create_table_head(b2b_column_list, b2b_volume_list)
                  data.data.forEach((report) => {
                      create_table_row_sub(report, b2b_column_list, dep)
                  })
              } else if (dep === 'industrial') {
+                 clean_duplicate_filters()
                  create_table_head(industrial_column_list, industrial_volume_list)
                  data.data.forEach((report) => {
                      create_table_row_sub(report, industrial_column_list, dep)
@@ -524,7 +534,7 @@ load_data(100, 0).then(([reports]) => {
                  if (dep === 'b2c') {
 
                      // create_filters(b2c_column_list, data)
-                     // clean_duplicate_filters()
+                     clean_duplicate_filters()
                      create_table_head(b2c_column_list, b2c_volume_list)
                      data.data.forEach((report) => {
                          create_table_row(report, b2c_column_list, b2c_volume_list, b2c_volume_sum_list)
@@ -533,7 +543,7 @@ load_data(100, 0).then(([reports]) => {
 
                  } else if (dep === 'b2b') {
                      // create_filters(industrial_column_list, data)
-                     // clean_duplicate_filters()
+                     clean_duplicate_filters()
                      create_table_head(b2b_column_list, b2b_volume_list)
                      data.data.forEach((report) => {
                          create_table_row(report, b2b_column_list, b2b_volume_list, b2b_volume_sum_list)
@@ -541,7 +551,7 @@ load_data(100, 0).then(([reports]) => {
                      // filters_control(industrial_column_list, reports)
                  } else if (dep === 'industrial') {
                      // create_filters(industrial_column_list, data)
-                     // clean_duplicate_filters()
+                     clean_duplicate_filters()
                      create_table_head(industrial_column_list, industrial_volume_list)
                      data.data.forEach((report) => {
                          create_table_row(report, industrial_column_list, industrial_volume_list, industrial_volume_sum_list)

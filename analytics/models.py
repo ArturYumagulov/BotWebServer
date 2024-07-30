@@ -3,7 +3,7 @@ from census.models import Department
 
 
 class ReportOneFields(models.Model):
-    mid = models.CharField(max_length=2000, verbose_name='id')
+    mid = models.CharField(max_length=2000, verbose_name="id")
     name = models.CharField(max_length=2000)
     filter_field = models.BooleanField(default=False)
 
@@ -17,13 +17,15 @@ class ReportOneTable(models.Model):
     fields = models.ForeignKey(ReportOneFields, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.depart} - {self.fields}'
+        return f"{self.depart} - {self.fields}"
 
 
 class ReportUpdateModel(models.Model):
     name = models.CharField(max_length=200, verbose_name="Отчет")
     date = models.DateTimeField(auto_now=True)
-    depart = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name="Подразделение")
+    depart = models.ForeignKey(
+        Department, on_delete=models.CASCADE, verbose_name="Подразделение"
+    )
 
     def __str__(self):
-        return f'{self.depart} - {self.date}'
+        return f"{self.depart} - {self.date}"

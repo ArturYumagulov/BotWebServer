@@ -15,6 +15,7 @@ environ.Env.read_env()
 
 # ------------------------Report 1------------------------
 
+
 class Paginator:
     def __init__(self, items, items_per_page):
         self.items = items
@@ -41,7 +42,10 @@ def create_equipment_list(model):
 
 
 def create_volume_list(model, depart):
-    volumes = [vol.name for vol in Volume.objects.filter(is_active=True).filter(department__name=depart)]
+    volumes = [
+        vol.name
+        for vol in Volume.objects.filter(is_active=True).filter(department__name=depart)
+    ]
     volume_items = [v.volume.name for v in model]
     if model is not None:
         result = []
@@ -50,11 +54,11 @@ def create_volume_list(model, depart):
 
             if volume in volume_items:
                 vol = model.get(volume__name=volume)
-                item['volume'] = volume
-                item['value'] = vol.value
+                item["volume"] = volume
+                item["value"] = vol.value
             else:
-                item['volume'] = volume
-                item['value'] = "0"
+                item["volume"] = volume
+                item["value"] = "0"
             result.append(item)
         return result
     else:
@@ -62,10 +66,10 @@ def create_volume_list(model, depart):
 
 
 def create_volume_sum(volumes_list):
-    item = {key['volume']: 0 for key in volumes_list}
+    item = {key["volume"]: 0 for key in volumes_list}
     for i in volumes_list:
-        item[i['volume']] += float(i['value'])
-    return {'volumes': item}
+        item[i["volume"]] += float(i["value"])
+    return {"volumes": item}
 
 
 def create_volumes(queryset):
@@ -87,15 +91,16 @@ def create_index_dict(dataframe_items):
 class ReportDataOnMongoDB:
 
     def __init__(self):
-        self.username = urllib.parse.quote_plus(env('MONGO_USERNAME'))
-        self.password = urllib.parse.quote_plus(env('MONGO_PASS'))
+        self.username = urllib.parse.quote_plus(env("MONGO_USERNAME"))
+        self.password = urllib.parse.quote_plus(env("MONGO_PASS"))
 
         self.client = client = MongoClient(
             host=f"mongodb://{self.username}:{self.password}@{env('MONGO_HOST')}",
-            port=int(env('MONGO_PORT')))
+            port=int(env("MONGO_PORT")),
+        )
 
-        self.db = client['census_db']
-        self.series_collection = self.db['census_collection']
+        self.db = client["census_db"]
+        self.series_collection = self.db["census_collection"]
 
     def insert_many_document(self, data: list):
         if len(data) > 0:
@@ -104,51 +109,66 @@ class ReportDataOnMongoDB:
         else:
             return False
 
-    def find_document(self, elements: dict | str = "", multiple: bool = False, all_item: bool = False,
-                      summary=False, limit=100, skip=100) -> list:
+    def find_document(
+        self,
+        elements: dict | str = "",
+        multiple: bool = False,
+        all_item: bool = False,
+        summary=False,
+        limit=100,
+        skip=100,
+    ) -> list:
         if all_item:
-            results = self.series_collection.find({}, {'_id': 0})
+            results = self.series_collection.find({}, {"_id": 0})
             return [r for r in results]
         elif multiple:
-            results = self.series_collection.find(elements, {'_id': 0}).limit(limit).skip(skip)
+            results = (
+                self.series_collection.find(elements, {"_id": 0})
+                .limit(limit)
+                .skip(skip)
+            )
             res = [r for r in results]
             return res
         elif summary:
-            results = self.series_collection.find(elements, {'_id': 0})
+            results = self.series_collection.find(elements, {"_id": 0})
             res = [r for r in results]
             return res
         else:
-            return self.series_collection.find_one(elements, {'_id': 0})
+            return self.series_collection.find_one(elements, {"_id": 0})
 
     def get_count(self, depart):
-        return self.series_collection.count_documents(filter={'depart': depart})
+        return self.series_collection.count_documents(filter={"depart": depart})
 
     def volume_sum(self, depart):
         all_volume = []
-        result = self.find_document(elements={'depart': depart, 'volumes.value': {'$gt': '0'}}, summary=True)
+        result = self.find_document(
+            elements={"depart": depart, "volumes.value": {"$gt": "0"}}, summary=True
+        )
         volumes = [name.name for name in Volume.objects.filter(department__name=depart)]
         data = {key: 0 for key in volumes}
         for i in result:
-            for ii in range(0, len(i['volumes'])):
-                data[i['volumes'][ii]['volume']] += float(i['volumes'][ii]['value'])
-                all_volume.append(float(i['volumes'][ii]['value']))
-        return {'all_sum': sum(all_volume), 'defer': data}
+            for ii in range(0, len(i["volumes"])):
+                data[i["volumes"][ii]["volume"]] += float(i["volumes"][ii]["value"])
+                all_volume.append(float(i["volumes"][ii]["value"]))
+        return {"all_sum": sum(all_volume), "defer": data}
 
 
 def create_report_1(depart):
     data = []
     censuses = Census.objects.filter(department__name=depart).filter(loaded=False)
-    all_volumes = [x.volumeitem_set.filter(volume__name='Общий') for x in censuses]
-    we_oils = [x.volumeitem_set.exclude(volume__name='Общий') for x in censuses]
+    all_volumes = [x.volumeitem_set.filter(volume__name="Общий") for x in censuses]
+    we_oils = [x.volumeitem_set.exclude(volume__name="Общий") for x in censuses]
     all_volume_count = create_volumes(all_volumes)
     pot = create_volumes(we_oils)
     sub_pot_dict = {}
-    pd.set_option('display.float_format', '{:.2f}'.format)
+    pd.set_option("display.float_format", "{:.2f}".format)
 
     for census in censuses:
-        census_we_oils_include_join = [float(x.value) for x in census.volumeitem_set.exclude(volume__name="Общий")]
+        census_we_oils_include_join = [
+            float(x.value) for x in census.volumeitem_set.exclude(volume__name="Общий")
+        ]
         try:
-            if depart == 'industrial' or depart == 'b2b':
+            if depart == "industrial" or depart == "b2b":
                 try:
                     sum_we_oils = int(census.others.all_volume)
                 except TypeError:
@@ -184,63 +204,80 @@ def create_report_1(depart):
                 return 3
 
         res: dict = dict()
-        res['_id'] = census.pk
-        res['author'] = census.task_author
-        res['depart'] = census.department.name
-        res['worker'] = census.worker
-        res['inn'] = census.inn
-        res['name'] = census.name.replace("%20", "" "")
-        res['result'] = f'<a href="/analytics/detail/{census.pk}">{census.task_result}</a>'
-        res['elevators'] = str(census.elevators_count)
-        res['equipments'] = create_equipment_list(census.equipmentitem_set.all())
-        res['volumes'] = create_volume_list(census.volumeitem_set.all(), census.department.name)
-        res['diff'] = dif
-        res['potential'] = str(create_potential())
-        res['cars'] = [car.name for car in census.cars.all()]
+        res["_id"] = census.pk
+        res["author"] = census.task_author
+        res["depart"] = census.department.name
+        res["worker"] = census.worker
+        res["inn"] = census.inn
+        res["name"] = census.name.replace("%20", "" "")
+        res["result"] = (
+            f'<a href="/analytics/detail/{census.pk}">{census.task_result}</a>'
+        )
+        res["elevators"] = str(census.elevators_count)
+        res["equipments"] = create_equipment_list(census.equipmentitem_set.all())
+        res["volumes"] = create_volume_list(
+            census.volumeitem_set.all(), census.department.name
+        )
+        res["diff"] = dif
+        res["potential"] = str(create_potential())
+        res["cars"] = [car.name for car in census.cars.all()]
 
         if census.category is None:
-            res['segment'] = None
+            res["segment"] = None
         else:
-            res['segment'] = census.category.name
+            res["segment"] = census.category.name
 
         if census.working is None:
-            res['working'] = "Нет"
+            res["working"] = "Нет"
         else:
-            res['working'] = "Да"
+            res["working"] = "Да"
 
         if census.decision is None:
-            res['contact'] = None
-            res['phone'] = None
+            res["contact"] = None
+            res["phone"] = None
         else:
-            res['contact'] = f"{census.decision.firstname} {census.decision.lastname} {census.decision.surname}"
-            res['phone'] = f"{census.decision.phone}"
+            res["contact"] = (
+                f"{census.decision.firstname} {census.decision.lastname} {census.decision.surname}"
+            )
+            res["phone"] = f"{census.decision.phone}"
 
         data.append(res)
         census.loaded = True
         census.save()
 
     # ABC
-    dataframe = pd.DataFrame(list(sub_pot_dict.items()), columns=['census_pk', 'category'])\
-        .sort_values(ascending=False, by=['category'])
-    dataframe['ABC'] = np.where(dataframe['category'] >= 70, 'A', np.where(dataframe['category'] >= 70, 'B', np.where(dataframe['category'] >= 20, 'B', "C")))
+    dataframe = pd.DataFrame(
+        list(sub_pot_dict.items()), columns=["census_pk", "category"]
+    ).sort_values(ascending=False, by=["category"])
+    dataframe["ABC"] = np.where(
+        dataframe["category"] >= 70,
+        "A",
+        np.where(
+            dataframe["category"] >= 70,
+            "B",
+            np.where(dataframe["category"] >= 20, "B", "C"),
+        ),
+    )
     dt = dataframe.to_dict()
 
-    indexes = create_index_dict(dt['census_pk'].items())
+    indexes = create_index_dict(dt["census_pk"].items())
 
     for i in data:
-        i['category'] = dataframe['ABC'][indexes[i['_id']]]
+        i["category"] = dataframe["ABC"][indexes[i["_id"]]]
 
     return data
 
 
 def get_table_column(depart):
     table = []
-    report_table = ReportOneTable.objects.filter(depart__name=depart).order_by('table_position')
+    report_table = ReportOneTable.objects.filter(depart__name=depart).order_by(
+        "table_position"
+    )
     for report in report_table:
         data_dict: dict = dict()
-        data_dict['id'] = report.fields.mid
-        data_dict['name'] = report.fields.name
-        data_dict['filter'] = report.fields.filter_field
+        data_dict["id"] = report.fields.mid
+        data_dict["name"] = report.fields.name
+        data_dict["filter"] = report.fields.filter_field
         clear_data = data_dict.copy()
         table.append(clear_data)
         data_dict.clear()
@@ -252,7 +289,7 @@ def get_volumes_list(depart):
     result = []
     volumes = Volume.objects.filter(is_active=True).filter(department__name=depart)
     for item in volumes:
-        data = {'id': item.pk, 'name': item.name, 'slug': item.slug}
+        data = {"id": item.pk, "name": item.name, "slug": item.slug}
         result.append(data)
     return result
 
@@ -278,9 +315,12 @@ def create_report_2(dep_name):
 
     result_list = []
 
-    workers_set = set(worker.code for worker in
-                      Worker.objects.filter(department__name=dep_name))
-    tasks = Task.objects.filter(base__group__name='Сенсус').exclude(status='ЗагруженаПереадресованная')
+    workers_set = set(
+        worker.code for worker in Worker.objects.filter(department__name=dep_name)
+    )
+    tasks = Task.objects.filter(base__group__name="Сенсус").exclude(
+        status="ЗагруженаПереадресованная"
+    )
     author_lists = set(task.author.pk for task in tasks)
 
     for code in workers_set:
@@ -294,33 +334,44 @@ def create_report_2(dep_name):
                     active_clients = censuses.filter(working__isnull=False)
                     potential_clients = censuses.filter(working__isnull=True).count()
                     all_worker_task_count = author_tasks.count()
-                    active_tasks = author_tasks.filter(status='Новая').count()
-                    ready_count_task = int(author_tasks.filter(status='Выполнено').count())
-                    load_count_task = int(author_tasks.filter(status='Загружено').count())
+                    active_tasks = author_tasks.filter(status="Новая").count()
+                    ready_count_task = int(
+                        author_tasks.filter(status="Выполнено").count()
+                    )
+                    load_count_task = int(
+                        author_tasks.filter(status="Загружено").count()
+                    )
                     ready_tasks = ready_count_task + load_count_task
-                    partners = [x.working.code for x in active_clients if x.working.contract is not None]
+                    partners = [
+                        x.working.code
+                        for x in active_clients
+                        if x.working.contract is not None
+                    ]
 
-                    result['department'] = dep_name
-                    result['author'] = task.author.name
-                    result['addresses'] = AddressesCount.objects.get(depart=dep_name).count
-                    result['worker'] = task.worker.name
-                    result['tasks'] = all_worker_task_count
-                    result['ready_task'] = ready_tasks
-                    result['active_task'] = active_tasks
-                    result['active_clients'] = active_clients.count()
+                    result["department"] = dep_name
+                    result["author"] = task.author.name
+                    result["addresses"] = AddressesCount.objects.get(
+                        depart=dep_name
+                    ).count
+                    result["worker"] = task.worker.name
+                    result["tasks"] = all_worker_task_count
+                    result["ready_task"] = ready_tasks
+                    result["active_task"] = active_tasks
+                    result["active_clients"] = active_clients.count()
 
                     if potential_clients <= 0:
-                        result['potential_clients'] = potential_clients
+                        result["potential_clients"] = potential_clients
                     else:
-                        result['potential_clients'] = \
-                            f'<a style="text-decoration: none" ' \
-                            f'href="/analytics/' \
-                            f'?worker={task.worker.name}' \
-                            f'&author={task.author.name}' \
+                        result["potential_clients"] = (
+                            f'<a style="text-decoration: none" '
+                            f'href="/analytics/'
+                            f"?worker={task.worker.name}"
+                            f"&author={task.author.name}"
                             f'&depart={dep_name}">{potential_clients}</a>'
+                        )
 
-                    result['contract'] = len(partners)
-                    result['amount_sum'] = amount_sum(partners)
+                    result["contract"] = len(partners)
+                    result["amount_sum"] = amount_sum(partners)
                     new_result = result.copy()
                     result_list.append(new_result)
                     workers_list.add(task.worker.code)
@@ -328,6 +379,6 @@ def create_report_2(dep_name):
     return result_list
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # gen_table_column('b2c')
     pass

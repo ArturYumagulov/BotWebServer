@@ -9,77 +9,93 @@ class PointVectorsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = census_models.PointVectors
-        fields = ('name',)
+        fields = ("name",)
 
 
 class CensusFilesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = census_models.CensusFiles
-        fields = ('file',)
+        fields = ("file",)
 
 
 class DadataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = census_models.CompanyDatabase
-        fields = '__all__'
+        fields = "__all__"
 
 
 class VolumeItemSerializer(serializers.ModelSerializer):
 
-    volume = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    volume = serializers.SlugRelatedField(slug_field="name", read_only=True)
 
     class Meta:
         model = census_models.VolumeItem
-        fields = ('volume', 'value')
+        fields = ("volume", "value")
 
 
 class PointVectorItemsSerializer(serializers.ModelSerializer):
 
-    value = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
-    vectors = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    value = serializers.SlugRelatedField(slug_field="name", read_only=True, many=True)
+    vectors = serializers.SlugRelatedField(slug_field="name", read_only=True)
 
     class Meta:
         model = census_models.PointVectorsItem
-        fields = ('vectors', 'value',)
+        fields = (
+            "vectors",
+            "value",
+        )
 
 
 class OtherSerializer(serializers.ModelSerializer):
     class Meta:
         model = census_models.Others
-        fields = ("equipment_name", "volume_name", "volume_value", 'vector', 'access_brand', 'providers', 'all_volume')
+        fields = (
+            "equipment_name",
+            "volume_name",
+            "volume_value",
+            "vector",
+            "access_brand",
+            "providers",
+            "all_volume",
+        )
 
 
 class DecisionSerializer(serializers.ModelSerializer):
     class Meta:
         model = census_models.Decision
-        fields = ('firstname', 'lastname', 'surname', 'email', 'phone', 'function')
+        fields = ("firstname", "lastname", "surname", "email", "phone", "function")
 
 
 class EquipmentSerializer(serializers.ModelSerializer):
 
-    equipment = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    equipment = serializers.SlugRelatedField(slug_field="name", read_only=True)
 
     class Meta:
         model = census_models.EquipmentItem
-        fields = ('equipment', 'value',)
+        fields = (
+            "equipment",
+            "value",
+        )
 
 
 class PartnerShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = census_models.Partner
-        fields = ('code', 'name', 'inn')
+        fields = ("code", "name", "inn")
 
 
 class CensusSerializer(serializers.ModelSerializer):
-    department = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    department = serializers.SlugRelatedField(slug_field="name", read_only=True)
     working = PartnerShortSerializer(read_only=True)
-    cars = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
-    providers = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
-    point_type = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    sto_type = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    cars = serializers.SlugRelatedField(slug_field="name", many=True, read_only=True)
+    providers = serializers.SlugRelatedField(
+        slug_field="name", many=True, read_only=True
+    )
+    point_type = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    sto_type = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    category = serializers.SlugRelatedField(slug_field="name", read_only=True)
     equipment = EquipmentSerializer(many=True)
     files = CensusFilesSerializer(many=True)
     result = ResultSerializer()
@@ -92,45 +108,45 @@ class CensusSerializer(serializers.ModelSerializer):
     class Meta:
         model = census_models.Census
         fields = [
-            'id',
-            'address_id',
-            'department',
-            'closing',
-            'not_communicate',
-            'edited',
+            "id",
+            "address_id",
+            "department",
+            "closing",
+            "not_communicate",
+            "edited",
             # 'loaded',
-            'load_to_1c',
-            'inn',
-            'point_name',
-            'address',
-            'edit_date',
-            'created_date',
-            'organizations_name',
-            'name',
-            'position',
-            'point_type',
-            'nets',
-            'sto_type',
-            'elevators_count',
-            'akb_specify',
-            'tender',
-            'working',
-            'task',
-            'worker',
-            'basics',
-            'category',
-            'decision',
-            'cars',
-            'equipment',
-            'point_type',
-            'sto_type',
-            'files',
-            'providers',
-            'result',
-            'volume',
-            'vectors',
-            'others',
-            'dadata',
+            "load_to_1c",
+            "inn",
+            "point_name",
+            "address",
+            "edit_date",
+            "created_date",
+            "organizations_name",
+            "name",
+            "position",
+            "point_type",
+            "nets",
+            "sto_type",
+            "elevators_count",
+            "akb_specify",
+            "tender",
+            "working",
+            "task",
+            "worker",
+            "basics",
+            "category",
+            "decision",
+            "cars",
+            "equipment",
+            "point_type",
+            "sto_type",
+            "files",
+            "providers",
+            "result",
+            "volume",
+            "vectors",
+            "others",
+            "dadata",
         ]
 
 
@@ -138,10 +154,13 @@ class CensusUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = census_models.Census
-        fields = ('id', 'load_to_1c',)
+        fields = (
+            "id",
+            "load_to_1c",
+        )
 
     def update(self, instance, validated_data):
-        instance.load_to_1c = validated_data.get('load_to_1c', instance.loaded)
+        instance.load_to_1c = validated_data.get("load_to_1c", instance.loaded)
         instance.save()
 
         return instance
@@ -151,4 +170,4 @@ class AddressesCountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = census_models.AddressesCount
-        fields = '__all__'
+        fields = "__all__"
