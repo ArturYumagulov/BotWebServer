@@ -49,21 +49,7 @@
             item.append(option)
         })
     }
-    // async function createControlOption(item_id) {
-    //
-    //     let item = document.getElementById(item_id)
-    //     let url = item.dataset.url
-    //     let data = await loadData(url)
-    //
-    //
-    //     data.forEach((i) => {
-    //         let option = document.createElement("option")
-    //         option.setAttribute('value', i.id)
-    //         option.dataset.control = i.control_data
-    //         option.innerHTML = i.name
-    //         item.append(option)
-    //     })
-    // }
+
     async function loadData(url){
 
         let response = await fetch(url, {
@@ -89,15 +75,6 @@
             alert("Ошибка: " + response.status);
         }
     }
-    // async function createMultiSelectOption(select, category_id, valuesList) {
-    //
-    //     valuesList.forEach((value) => {
-    //         let option = document.createElement('option')
-    //         option.setAttribute('value', value.id)
-    //         option.innerHTML = value.name
-    //         select.append(option)
-    //     })
-    // }
     function HideMultiSelectItem(access) {
         access.addEventListener('change', function () {
             let value = access.value
@@ -126,12 +103,7 @@
             $(`#category_${value}`).val(null).trigger('change')
             })
         }
-    // async function createSelectMulti(select_id) {
-    //     let select = document.getElementById(select_id)
-    //     let url = select.dataset.url
-    //     let data = await loadData(url)
-    //     await createMultiSelectOption(select, '', data)
-    // }
+
     async function validSelect(select_id) {
         let select = document.getElementById(select_id)
         select.addEventListener('change', function () {
@@ -201,6 +173,9 @@
         let otherVectorDiv = document.getElementById('otherVectorId')
         let otherVectorInput = document.getElementById('otherVectorInputId')
 
+        const package_div = document.getElementById('packagesMultiDiv')
+        const package_input = document.getElementById('packagesMulti')
+
 
         $('#vectorMulti').on('select2:select', function (e) {
 
@@ -235,6 +210,10 @@
                 });
                 select.parentNode.style.display = 'block'
                 select.setAttribute('required', '')
+
+                // Фасовка
+                package_div.style.display = 'block'
+                package_input.setAttribute('required', '')
             }
 
             else if(e.params.data.text === 'Другое') {
@@ -285,7 +264,7 @@
 
         $('#vectorMulti').on('select2:unselect', function (e) {
             let category = e.params.data.element.dataset.slug
-
+            console.log(e.params.data.text)
             if(e.params.data.text === 'Масло') {
                 let element = document.getElementById(`maslo_load`)
                 element.style.display = 'none'
@@ -309,6 +288,15 @@
                 }
                 select.style.display = 'none'
                 select.removeAttribute('required')
+
+                // Фасовка
+                package_div.style.display = 'none'
+                package_input.removeAttribute('required')
+
+                // Удаление фасовки
+                for (let i = 0; i < package_input.options.length; i++) {
+                    package_input.options[i].remove()
+                }
             }
             else if (e.params.data.text === 'АКБ'){
                 akbDiv.style.display = 'none'
@@ -340,6 +328,7 @@
             }
         })
     }
+
     function otherProviders(){
             // Другие поставщики
             $('#providers').on('select2:select', function (e) {
@@ -360,6 +349,19 @@
                     other_input.value = ''
                     other_input.classList.remove('is-valid', 'is-invalid')
                 }
+            })
+        }
+
+        function lukoil_brands(){
+            const lukoil_div = document.getElementById('lukoilMultiDiv')
+            $('#maslo').on('select2:select', function (e) {
+                let txt = e.params.data.text
+                if (txt === "ЛУКОЙЛ") {
+                    lukoil_div.style.display = 'block'
+                }
+            })
+            $('#maslo').on('select2:unselect', function (e) {
+                console.log(e.params.data.text)
             })
         }
 
@@ -435,8 +437,12 @@
         await createOption('stoTypeId')
         await createSelectMulti('cars')
         // await createControlOption('controlId')
+        await createSelectMulti('bonusMulti')
         await createSelectMulti('providers')
         await createSelectMulti('vectorMulti')
+        await createSelectMulti('lukoilMulti')
+        await createSelectMulti('packagesMulti')
+        await validSelect('kpp')
         await validSelect('typeId')
         await validSelect('shopCategoryId')
         await validSelect('pointTypeID')
@@ -472,19 +478,6 @@
             div.style.display = 'none'
         }
 
-        // let control = document.getElementById('controlId')
-        // let date = document.getElementById('dateDiv')
-        // let date_input = document.getElementById('date')
-        // control.addEventListener('change', function () {
-        //     if (control.options[control.selectedIndex].dataset.control === 'true') {
-        //         date.style.display = 'block'
-        //         date_input.setAttribute('required', '')
-        //     } else {
-        //         date.style.display = 'none'
-        //         date_input.removeAttribute('required')
-        //     }
-        // })
-
         let other_multi_selects = document.querySelectorAll('.multi')
         other_multi_selects.forEach((item) => {
             item.style.display = 'none'
@@ -493,6 +486,7 @@
         vectorHideBlock();
         otherProviders();
         delAddReqCheckbox();
+        lukoil_brands()
         FilesFormValid('formFileMultiple')
     }
     window.CreateApp = CreateApp;

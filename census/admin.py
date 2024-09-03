@@ -175,3 +175,21 @@ class PointVectorsSelectItemAdmin(admin.ModelAdmin):
 @admin.register(models.AddressesCount)
 class AddressesCountAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(models.LukoilBrands)
+class LukoilBrandsAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "is_active"
+    )
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(models.OilPackages)
+class OilPackagesAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "is_active"
+    )
+    prepopulated_fields = {'slug': ('name',)}

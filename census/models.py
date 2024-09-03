@@ -162,6 +162,7 @@ class PointVectorsSelectItem(models.Model):
     department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='point_vectors')
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+    bonuses = models.BooleanField(default=False, verbose_name="Бонусная программа")
 
     class Meta:
         verbose_name = "Выбираемый объем"
@@ -377,6 +378,7 @@ class AddressesCount(models.Model):
 
 
 class LukoilBrands(models.Model):
+    is_active = models.BooleanField(default=False)
     name = models.CharField(max_length=100, verbose_name="Название")
     slug = models.SlugField()
 
@@ -387,3 +389,17 @@ class LukoilBrands(models.Model):
         ordering = ['name']
         verbose_name = 'Бренды Лукойл'
         verbose_name_plural = "Бренды Лукойл"
+
+
+class OilPackages(models.Model):
+    is_active = models.BooleanField(default=False)
+    name = models.CharField(max_length=100, verbose_name="Название")
+    slug = models.SlugField()
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Фасовки масла'
+        verbose_name_plural = "Фасовки масла"

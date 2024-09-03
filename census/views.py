@@ -10,7 +10,7 @@ from core.tasks import save_organizations
 from tasks.models import Partner, ResultData, PartnerWorker, Worker
 from tasks.services import create_worker_secret
 from . import models
-from .models import CompanyDatabase
+from .models import CompanyDatabase, LukoilBrands, OilPackages
 from .services import valid_data, DataInnOnRedis, clean_address, valid_full_data
 
 # Create your views here.
@@ -425,3 +425,47 @@ def clean_address_view(request):
 #         worker.secret = create_worker_secret(token_len=44, algorithm='HS256')
 #         worker.save()
 #     return HttpResponse('ok')
+
+
+def lukoil_brands_view(request):
+    if request.method == "POST":
+        result = []
+        brands = LukoilBrands.objects.filter(is_active=True)
+        for brand in brands:
+            data = {
+                'id': brand.pk,
+                'name': brand.name,
+                'slug': brand.slug
+            }
+            result.append(data)
+        return JsonResponse(result, safe=False)
+
+
+def package_volume(request):
+    if request.method == "POST":
+        result = []
+        packages = OilPackages.objects.order_by('pk').filter(is_active=True)
+        for package in packages:
+            data = {
+                'id': package.pk,
+                'name': package.name,
+                'slug': package.slug
+            }
+            result.append(data)
+        return JsonResponse(result, safe=False)
+
+
+def get_vectors_bonus_items(request):
+    result = []
+    if request.method == "POST":
+        vectors_item = models.PointVectorsSelectItem.objects.order_by(Lower('name')).filter(bonuses=True).\
+            filter(department__name=json.loads(request.body)['department'])
+
+        for item in vectors_item:
+            data = {
+                'id': item.pk,
+                'name': item.name
+            }
+            result.append(data)
+        return JsonResponse(list(result), safe=False, status=200)
+    return JsonResponse({'result': 'bonus not found'}, safe=False, status=404)

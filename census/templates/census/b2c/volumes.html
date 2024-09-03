@@ -1,3 +1,22 @@
+        <div class="mb-3">
+    {#        <label for="typeId" class="form-label">Укажите, является ли торговая точка сетью?</label>#}
+            <select class="form-select mb-3" style="color: grey" name="kpp" id="kpp" aria-describedby="kppFeedback" required>
+                <option selected disabled value="">Можно ли заменить масло для двигателя или коробке?</option>
+                <option value="1">Да</option>
+                <option value="0">Нет</option>
+            </select>
+            <div id="kppFeedback" class="invalid-feedback">
+                Выберите корректный ответ.
+            </div>
+        </div>
+
+    <div class="mb-3 multi_res was-validated" id="packagesMultiDiv" style="display: none">
+        <p>В какой фасовке заинтересованы/продают?</p>
+        <select class="form-select multiple mb-3" name="packages" id="packagesMulti" required
+                data-placeholder="В какой фасовке заинтересованы/продают?" multiple data-url="{% url 'package_volume' %}">
+        </select>
+    </div>
+
     {% for volume in volumes %}
         {% if volume.name != "Другое" %}
             <div class="form-floating mb-3 volume" id="volume_{{ volume.pk }}_div" style="display: none;">

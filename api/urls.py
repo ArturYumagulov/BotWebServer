@@ -30,6 +30,7 @@ router.register('workers', task_views.WorkerViewSet)
 router.register('census', census_views.CensusView, basename='census')
 router.register('address-count', census_views.AddressesCountView, basename='address_count')
 router.register('census-update', census_views.CensusUpdate, basename='census_update')
+# router.register("lukoil-brands", census_views.LukoilBrandsView, basename="lukoil_brands")
 
 
 # ----------------------SALES-------------------------------------------------
