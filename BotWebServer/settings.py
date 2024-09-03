@@ -242,7 +242,7 @@ LOGGING = {
                 'console',
                 'info_file',
                 'error_file',
-                # 'telegram'
+                'telegram'
             ]
         }
     }

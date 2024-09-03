@@ -374,3 +374,16 @@ class AddressesCount(models.Model):
         ordering = ['created_date']
         verbose_name = 'Адреса из 2GIS'
         verbose_name_plural = "Адрес из 2GIS"
+
+
+class LukoilBrands(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+    slug = models.SlugField()
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Бренды Лукойл'
+        verbose_name_plural = "Бренды Лукойл"

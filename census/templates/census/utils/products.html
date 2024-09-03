@@ -25,3 +25,10 @@
             <label for="otherVectorInputId">Какие другие продукты?</label>
             <div id="otherVectorFeedback" class="invalid-feedback">Выберите другие продукты торговой точки</div>
         </div>
+
+
+        <div class="mb-3 multi_res was-validated" id="lukoilMultiDiv">
+            <select class="form-select multiple mb-3" name="vectors" id="lukoilMulti" required
+                    data-placeholder="Какие продукты Лукойл в наличии?" multiple data-url="{% url 'point_vectors' %}">
+            </select>
+        </div>

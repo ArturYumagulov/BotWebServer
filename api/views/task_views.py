@@ -18,7 +18,7 @@ from api.serializers import tasks as serializers
 logger = logging.getLogger(__name__)
 
 env = environ.Env()
-environ.Env.read_env("BotWebServer/.env")
+environ.Env.read_env("BotWebServer/..env")
 
 
 class TaskViewSet(ModelViewSet):

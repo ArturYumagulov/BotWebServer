@@ -5,7 +5,7 @@ import json
 from tasks.models import Worker, Basics, AuthorComments, WorkerComments, Partner, Task, ResultGroup  # noqa
 
 env = environ.Env()
-environ.Env.read_env('BotWebServer/.env')
+environ.Env.read_env('BotWebServer/..env')
 
 
 def get_client_ip(request):
