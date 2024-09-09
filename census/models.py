@@ -318,7 +318,8 @@ class Census(models.Model):
                                    default=None)
     nets = models.BooleanField(verbose_name="Сетевой", default=False)
     sto_type = models.ForeignKey(STOTypeList, on_delete=models.PROTECT, verbose_name="Тип СТО", blank=True, null=True)
-    category = models.ForeignKey(PointCategory, on_delete=models.PROTECT, verbose_name="Категория", blank=True, null=True)
+    category = models.ForeignKey(PointCategory, on_delete=models.PROTECT, verbose_name="Категория", blank=True,
+                                 null=True)
     cars = models.ManyToManyField(CarsList, verbose_name="Автомобили обслуживают", blank=True, default=None)
     providers = models.ManyToManyField(ProviderList, verbose_name="Основные поставщики", blank=True, default=None)
     elevators_count = models.PositiveIntegerField(verbose_name="Количество подъемников", default=0, null=True,
@@ -350,14 +351,17 @@ class Census(models.Model):
     basics = models.CharField(verbose_name='Номер основания', null=True, blank=True, max_length=1000)
     loaded = models.BooleanField('Загружено', default=False)
     load_to_1c = models.BooleanField('Загружено', default=False)
+    kpp = models.BooleanField(default=False, blank=True)
+    package = models.ManyToManyField("OilPackages", related_name="census_packages", blank=True, default=None)
+    lukoil_brands = models.ManyToManyField("LukoilBrands", related_name="lukoil_brands", blank=True, default=None)
+    federal = models.BooleanField(default=False, blank=True)
+    bonuses = models.ManyToManyField(ProviderList, verbose_name="В бонусных программах каких брендов участвуют?",
+                                     blank=True, default=None, related_name="census_bonuses")
 
     class Meta:
         verbose_name = "Сенсус"
         verbose_name_plural = "Сенсусы"
         ordering = ['-created_date']
-
-    # def save(self, commit=True, *args, **kwargs):
-    #     pass
 
     def __str__(self):
         return f"{self.address_id}"

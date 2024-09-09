@@ -117,6 +117,62 @@ def del_ready_task(request, task):
         return False
 
 
+def save_files(filelist, census_model):
+
+    for file in filelist.getlist("file"):
+        census_files = models.CensusFiles()
+        census_files.census = census_model
+        census_files.file = file
+        census_files.save()
+
+
+def save_tasks(task, worker_comment, result):
+
+    result = Result.objects.create(
+        base_id=task.base.number,
+        type="meet",
+        result=ResultData.objects.filter(group__code="000000004").get(name=result),
+        task_number=task,
+        contact_person="",
+        control_date=None,
+    )
+
+    Task.objects.filter(pk=task.pk).update(
+        status="Выполнено",
+        edited=True,
+        result=result,
+        worker_comment=worker_comment,
+    )
+
+    return result
+
+
+def return_data_on_dadata(inn):
+    if inn is not None:
+        try:
+            dadata = models.CompanyDatabase.objects.get(inn=inn)
+            return dadata
+        except models.CompanyDatabase.DoesNotExist:
+            return None
+    return None
+
+
+def create_decisions(request, census_model):
+
+    new_decisions = models.Decision.objects.create(
+        census=census_model,
+        firstname=request.get("firstname"),
+        lastname=request.get("lastname"),
+        surname=request.get("surname"),
+        email=request.get("decision_email"),
+        phone=request.get("decision_phone"),
+        function=request.get("decision_function"),
+    )
+
+    new_decisions.save()
+    return new_decisions
+
+
 def valid_data(request):
 
     _other_name = "Другое"
@@ -128,33 +184,16 @@ def valid_data(request):
     new_census.name = request.get("name")
     task = Task.objects.get(number=request.get("guid"))
     new_census.task = task.number
-    new_census.position = request.get("position")  # Координаты
+    new_census.position = request.get("position")
     new_census.address_id = request.get("address_id")
     new_census.basics = task.base.number
     new_census.inn = request.get("inn")
     new_census.task_author = task.author.name
     new_census.worker = task.worker.name
-    # new_census.edited = True
-
-    new_census.save()
-
-    if request_files:
-        for file in request_files.getlist("file"):
-            census_files = models.CensusFiles()
-            census_files.census = new_census
-            census_files.file = file
-            census_files.save()
-
-    try:
-        dadata = models.CompanyDatabase.objects.get(inn=request.get("inn"))
-        new_census.dadata = dadata
-    except models.CompanyDatabase.DoesNotExist:
-        new_census.dadata = None
+    new_census.edited = True
 
     if request.get("working"):
         new_census.working = Partner.objects.get(inn=str(request.get("working")))
-    else:
-        pass
 
     new_census.point_name = request.get("point_name")  # Вывеска
     worker_comment = WorkerComments.objects.create(
@@ -163,27 +202,14 @@ def valid_data(request):
 
     if request.get("closing") is not None:  # Если закрыто
 
-        result = Result.objects.create(
-            base_id=task.base.number,
-            type="meet",
-            result=ResultData.objects.get(name="АДРЕС НЕ АКТУАЛЕН"),
-            task_number=task,
-            contact_person="",
-            control_date=None,
-        )
-
+        result = save_tasks(task, worker_comment, "АДРЕС НЕ АКТУАЛЕН")
         new_census.result = result
         new_census.closing = True
         new_census.not_communicate = False
         new_census.task_result = result.result.name
         new_census.save()
 
-        Task.objects.filter(pk=task.pk).update(
-            status="Выполнено",
-            edited=True,
-            result=result,
-            worker_comment=worker_comment,
-        )
+        save_files(request_files, new_census)
 
         del_ready_task(request, task)
 
@@ -191,16 +217,7 @@ def valid_data(request):
 
     elif request.get("not_communicate"):  # Если нет коммуникации
 
-        result = Result.objects.create(
-            base_id=task.base.number,
-            type="meet",
-            result=ResultData.objects.get(code="000000067"),
-            task_number=task,
-            contact_person="",
-            control_date=None,
-        )
-
-        # new_census.result.objects.update(result=ResultData.objects.get(name="НЕТ КОНТАКТА"))
+        result = save_tasks(task, worker_comment, "НЕТ КОНТАКТА")
 
         new_census.not_communicate = True
         new_census.result = result
@@ -208,12 +225,7 @@ def valid_data(request):
         new_census.closing = False
         new_census.save()
 
-        Task.objects.filter(pk=task.pk).update(
-            status="Выполнено",
-            edited=True,
-            result=result,
-            worker_comment=worker_comment,
-        )
+        save_files(request_files, new_census)
 
         del_ready_task(request, task)
 
@@ -221,40 +233,24 @@ def valid_data(request):
 
     else:
 
+        new_census.dadata = return_data_on_dadata(request.get("inn"))
+        new_census.category = models.PointCategory.objects.get(
+            pk=request.get("category")
+        )
+
         # control_date = None
         #
         # if len(request.get('control_date')) > 0:
         #     control_date = datetime.strptime(request.get('control_date'), '%d-%m-%Y')  # Если есть контрольная дата
 
-        result = Result.objects.create(
-            base_id=task.base.number,
-            type="meet",
-            result=ResultData.objects.get(name="ДАННЫЕ АКТУАЛИЗИРОВАНЫ"),
-            task_number=task,
-            contact_person="",
-            control_date=None,
-        )
+        result = save_tasks(task, worker_comment, "ДАННЫЕ АКТУАЛИЗИРОВАНЫ")
+
         new_census.result = result
         new_census.task_result = result.result.name
 
         new_census.save()
 
-        new_decisions = models.Decision.objects.create(
-            census=new_census,
-            firstname=request.get("firstname"),
-            lastname=request.get("lastname"),
-            surname=request.get("surname"),
-            email=request.get("decision_email"),
-            phone=request.get("decision_phone"),
-            function=request.get("decision_function"),
-        )
-
-        new_decisions.save()
-        new_census.decision = new_decisions
-
-        new_census.category = models.PointCategory.objects.get(
-            pk=request.get("category")
-        )
+        new_census.decision = create_decisions(request, new_census)
 
         #  сохранение направления
         for vector in models.PointVectors.objects.filter(
@@ -332,12 +328,6 @@ def valid_data(request):
 
             new_census.save()
 
-            Task.objects.filter(pk=task.pk).update(
-                status="Выполнено",
-                edited=True,
-                result=result,
-                worker_comment=worker_comment,
-            )
             del_ready_task(request, task)
 
             return True
@@ -443,23 +433,23 @@ def valid_full_data(request):
     new_census.address = request.get("full_address")
     new_census.department = models.Department.objects.get(name=request.get("depart"))
     new_census.name = request.get("name")
-    # task = Task.objects.get(number=request.get('guid'))
-    # new_census.task = task.number
+    task = Task.objects.get(number=request.get('guid'))
+    new_census.task = task.number
     new_census.position = request.get("position")  # Координаты
-    # new_census.address_id = request.get('address_id')
-    # new_census.basics = task.base.number
+    new_census.address_id = request.get('address_id')
+    new_census.basics = task.base.number
     new_census.inn = request.get("inn")
-    # new_census.task_author = "Имя автора"
+    new_census.task_author = "Имя автора"
     worker = Worker.objects.get(chat_id=request.get("worker"))
     new_census.worker = worker.name
-    # new_census.edited = True
+    new_census.edited = True
 
-    new_census.save()
+    # new_census.save()
 
     if request_files:
         for file in request_files.getlist("file"):
             census_files = models.CensusFiles()
-            census_files.census = new_census
+            # census_files.census = new_census
             census_files.file = file
             census_files.save()
 
@@ -471,11 +461,9 @@ def valid_full_data(request):
 
     if request.get("working"):
         new_census.working = Partner.objects.get(inn=str(request.get("working")))
-    else:
-        pass
 
     new_census.point_name = request.get("point_name")  # Вывеска
-    WorkerComments.objects.create(comment=request.get("result_comment"), worker=worker)
+    worker_comment = WorkerComments.objects.create(comment=request.get("result_comment"), worker=worker)
 
     if request.get("closing") is not None:  # Если закрыто
 
@@ -494,10 +482,10 @@ def valid_full_data(request):
         new_census.task_result = result.result.name
         new_census.save()
 
-        # Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
-        #                                        worker_comment=worker_comment)
-        #
-        # del_ready_task(request, task)
+        Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
+                                               worker_comment=worker_comment)
+
+        del_ready_task(request, task)
 
         return True
 
@@ -520,10 +508,10 @@ def valid_full_data(request):
         new_census.closing = False
         new_census.save()
 
-        # Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
-        #                                        worker_comment=worker_comment)
-        #
-        # del_ready_task(request, task)
+        Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
+                                               worker_comment=worker_comment)
+
+        del_ready_task(request, task)
 
         return True
 
@@ -542,10 +530,15 @@ def valid_full_data(request):
             contact_person="",
             control_date=None,
         )
+
         new_census.result = result
         new_census.task_result = result.result.name
+        new_census.category = models.PointCategory.objects.get(
+            pk=request.get("category")
+        )
 
-        new_census.save()
+        # new_census.save()
+
 
         new_decisions = models.Decision.objects.create(
             census=new_census,
@@ -560,9 +553,6 @@ def valid_full_data(request):
         new_decisions.save()
         new_census.decision = new_decisions
 
-        new_census.category = models.PointCategory.objects.get(
-            pk=request.get("category")
-        )
 
         #  сохранение направления
         for vector in models.PointVectors.objects.filter(
@@ -587,6 +577,7 @@ def valid_full_data(request):
         if request.get("depart") == _b2c:  # B2C
 
             new_census.nets = request.get("nets")
+
             new_census.point_type = models.PointTypes.objects.get(
                 pk=request.get("point_type")
             )
@@ -597,15 +588,6 @@ def valid_full_data(request):
             else:
                 new_census.elevators_count = 0
 
-            m2m_save(
-                new_census.cars,
-                models.CarsList.objects.filter(pk__in=request.getlist("cars")),
-            )
-            m2m_save(
-                new_census.providers,
-                models.ProviderList.objects.filter(pk__in=request.getlist("providers")),
-            )
-
             if request.get("sto_type"):
                 new_census.sto_type = models.STOTypeList.objects.get(
                     pk=request.get("sto_type")
@@ -615,6 +597,31 @@ def valid_full_data(request):
 
             if request.get("akb_specify"):
                 new_census.akb_specify = int(request.get("akb_specify"))
+
+            new_others = models.Others.objects.create(census=new_census)
+            new_others.vector = request.get("other_vector")
+            new_others.providers = request.get("other_providers")
+
+            new_census.save()
+
+            m2m_save(
+                new_census.cars,
+                models.CarsList.objects.filter(pk__in=request.getlist("cars")),
+            )
+            m2m_save(
+                new_census.providers,
+                models.ProviderList.objects.filter(pk__in=request.getlist("providers")),
+            )
+
+            # if request.get("sto_type"):
+            #     new_census.sto_type = models.STOTypeList.objects.get(
+            #         pk=request.get("sto_type")
+            #     )
+            # else:
+            #     new_census.sto_type = None
+            #
+            # if request.get("akb_specify"):
+            #     new_census.akb_specify = int(request.get("akb_specify"))
 
             new_others = models.Others.objects.create(census=new_census)
             new_others.vector = request.get("other_vector")
@@ -640,9 +647,9 @@ def valid_full_data(request):
 
             new_census.save()
 
-            # Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
-            #                                        worker_comment=worker_comment)
-            # del_ready_task(request, task)
+            Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
+                                                   worker_comment=worker_comment)
+            del_ready_task(request, task)
 
             return True
 
@@ -710,10 +717,10 @@ def valid_full_data(request):
 
         new_census.save()
 
-        # Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
-        #                                        worker_comment=worker_comment)
-        #
-        # del_ready_task(request, task)
+        Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
+                                               worker_comment=worker_comment)
+
+        del_ready_task(request, task)
 
         return True
 

@@ -181,6 +181,7 @@
 
             let element = e.params.data
             let category = e.params.data.element.dataset.slug
+            const kpp = document.getElementById('kpp')
 
             if(e.params.data.text === 'Масло') {
 
@@ -214,6 +215,9 @@
                 // Фасовка
                 package_div.style.display = 'block'
                 package_input.setAttribute('required', '')
+                // Коробка
+                kpp.parentNode.style.display = "block";
+                kpp.setAttribute('required', '')
             }
 
             else if(e.params.data.text === 'Другое') {
@@ -297,6 +301,9 @@
                 for (let i = 0; i < package_input.options.length; i++) {
                     package_input.options[i].remove()
                 }
+                // Коробка
+                kpp.parentNode.style.display = "none";
+                kpp.removeAttribute('required')
             }
             else if (e.params.data.text === 'АКБ'){
                 akbDiv.style.display = 'none'
@@ -444,6 +451,7 @@
         await createSelectMulti('packagesMulti')
         await validSelect('kpp')
         await validSelect('typeId')
+        await validSelect('federal')
         await validSelect('shopCategoryId')
         await validSelect('pointTypeID')
         await validSelect('stoTypeId')
