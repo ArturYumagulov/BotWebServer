@@ -11,6 +11,7 @@ from datetime import datetime
 
 from . import models
 from tasks.models import Partner, Task, Result, ResultData, WorkerComments, Worker
+from .models import Census
 
 env = environ.Env()
 environ.Env.read_env()
@@ -173,238 +174,221 @@ def create_decisions(request, census_model):
     return new_decisions
 
 
-def valid_data(request):
+class CensusSave:
+    """Класс работы с моделью Сенсуса"""
+    def __init__(self, request):
 
-    _other_name = "Другое"
-    request_files = request.FILES
-    request = request.POST
-    new_census = models.Census()
-    new_census.address = request.get("address")
-    new_census.department = models.Department.objects.get(name=request.get("depart"))
-    new_census.name = request.get("name")
-    task = Task.objects.get(number=request.get("guid"))
-    new_census.task = task.number
-    new_census.position = request.get("position")
-    new_census.address_id = request.get("address_id")
-    new_census.basics = task.base.number
-    new_census.inn = request.get("inn")
-    new_census.task_author = task.author.name
-    new_census.worker = task.worker.name
-    new_census.edited = True
+        self._other_name = "Другое"
+        self.request = request.POST
+        self.request_files = request.FILES
 
-    if request.get("working"):
-        new_census.working = Partner.objects.get(inn=str(request.get("working")))
-
-    new_census.point_name = request.get("point_name")  # Вывеска
-    worker_comment = WorkerComments.objects.create(
-        comment=request.get("result_comment"), worker_id=task.worker.pk
-    )
-
-    if request.get("closing") is not None:  # Если закрыто
-
-        result = save_tasks(task, worker_comment, "АДРЕС НЕ АКТУАЛЕН")
-        new_census.result = result
-        new_census.closing = True
-        new_census.not_communicate = False
-        new_census.task_result = result.result.name
-        new_census.save()
-
-        save_files(request_files, new_census)
-
-        del_ready_task(request, task)
-
-        return True
-
-    elif request.get("not_communicate"):  # Если нет коммуникации
-
-        result = save_tasks(task, worker_comment, "НЕТ КОНТАКТА")
-
-        new_census.not_communicate = True
-        new_census.result = result
-        new_census.task_result = result.result.name
-        new_census.closing = False
-        new_census.save()
-
-        save_files(request_files, new_census)
-
-        del_ready_task(request, task)
-
-        return True
-
-    else:
-
-        new_census.dadata = return_data_on_dadata(request.get("inn"))
-        new_census.category = models.PointCategory.objects.get(
-            pk=request.get("category")
+        self.new_census = Census()
+        self.task = Task.objects.get(number=self.request.get("guid"))
+        self.new_census.address = self.request.get("address")
+        self.new_census.department = models.Department.objects.get(name=self.request.get("depart"))
+        self.new_census.name = self.request.get("name")
+        self.new_census.task = self.task.number
+        self.new_census.position = self.request.get("position")
+        self.new_census.address_id = self.request.get("address_id")
+        self.new_census.basics = self.task.base.number
+        self.new_census.inn = self.request.get("inn")
+        self.new_census.task_author = self.task.author.name
+        self.new_census.worker = self.task.worker.name
+        self.new_census.edited = True
+        self.worker_comment = WorkerComments.objects.create(
+            comment=self.request.get("result_comment"), worker_id=self.task.worker.pk
         )
+        if self.request.get("working"):
+            self.new_census.working = Partner.objects.get(inn=str(self.request.get("working")))
 
-        # control_date = None
-        #
-        # if len(request.get('control_date')) > 0:
-        #     control_date = datetime.strptime(request.get('control_date'), '%d-%m-%Y')  # Если есть контрольная дата
+    def closing_point(self, result_status):
+        result = save_tasks(self.task, self.worker_comment, result_status)
+        self.new_census.result = result
+        self.new_census.task_result = result.result.name
+        self.new_census.save()
 
-        result = save_tasks(task, worker_comment, "ДАННЫЕ АКТУАЛИЗИРОВАНЫ")
+        save_files(self.request_files, self.new_census)
 
-        new_census.result = result
-        new_census.task_result = result.result.name
+        del_ready_task(self.request, self.task)
 
-        new_census.save()
+    def not_communicate(self):
+        self.new_census.not_communicate = True
 
-        new_census.decision = create_decisions(request, new_census)
+    def point_closing(self):
+        self.new_census.closing = True
 
-        #  сохранение направления
+    def working_point(self):
+
+        self.new_census.dadata = return_data_on_dadata(self.request.get("inn"))
+        self.new_census.category = models.PointCategory.objects.get(
+            pk=self.request.get("category")
+        )
+        result = save_tasks(self.task, self.worker_comment, "ДАННЫЕ АКТУАЛИЗИРОВАНЫ")
+        self.new_census.result = result
+        self.new_census.task_result = result.result.name
+        self.new_census.save()
+
+        # Сохранение контактного лица
+        self.new_census.decision = create_decisions(self.request, self.new_census)
+
+        # Сохранение направления точки
         for vector in models.PointVectors.objects.filter(
-            pk__in=request.getlist("vectors")
+            pk__in=self.request.getlist("vectors")
         ):
-
-            if request.getlist(vector.slug):
+            if self.request.getlist(vector.slug):
                 new_vector_item = models.PointVectorsItem.objects.create(
-                    census=new_census,
+                    census=self.new_census,
                     vectors=vector,
                 )
-                for vector_pk in request.getlist(vector.slug):
+                for vector_pk in self.request.getlist(vector.slug):
                     new_value = models.PointVectorsSelectItem.objects.get(pk=vector_pk)
                     new_vector_item.value.add(new_value)
                 for new_vector in models.PointVectorsItem.objects.filter(
-                    census__pk=new_census.pk
+                    census__pk=self.new_census.pk
                 ):
-                    new_census.vectors.add(new_vector)
+                    self.new_census.vectors.add(new_vector)
 
-            new_census.save()
+            self.new_census.save()
 
-        if request.get("depart") == _b2c:  # B2C
+    def b2c_point(self):
+        """Если точка B2C"""
 
-            new_census.nets = request.get("nets")
-            new_census.point_type = models.PointTypes.objects.get(
-                pk=request.get("point_type")
+        self.new_census.nets = self.request.get("nets")
+        self.new_census.point_type = models.PointTypes.objects.get(
+                pk=self.request.get("point_type")
             )
-            new_census.other_brand = request.get("other_brand")
+        self.new_census.other_brand = self.request.get("other_brand")
 
-            if request.get("elevators_count"):
-                new_census.elevators_count = int(request.get("elevators_count"))
-            else:
-                new_census.elevators_count = 0
+        if self.request.get("elevators_count"):
+            self.new_census.elevators_count = int(self.request.get("elevators_count"))
 
-            m2m_save(
-                new_census.cars,
-                models.CarsList.objects.filter(pk__in=request.getlist("cars")),
-            )
-            m2m_save(
-                new_census.providers,
-                models.ProviderList.objects.filter(pk__in=request.getlist("providers")),
-            )
+        m2m_save(
+            self.new_census.cars,
+            models.CarsList.objects.filter(pk__in=self.request.getlist("cars")),
+        )
+        m2m_save(
+            self.new_census.providers,
+            models.ProviderList.objects.filter(pk__in=self.request.getlist("providers")),
+        )
 
-            if request.get("sto_type"):
-                new_census.sto_type = models.STOTypeList.objects.get(
-                    pk=request.get("sto_type")
-                )
-            else:
-                new_census.sto_type = None
-
-            if request.get("akb_specify"):
-                new_census.akb_specify = int(request.get("akb_specify"))
-
-            new_others = models.Others.objects.create(census=new_census)
-            new_others.vector = request.get("other_vector")
-            new_others.providers = request.get("other_providers")
-            new_others.save()
-
-            new_census.others = new_others
-
-            #  сохранение объема
-            oil = models.PointVectors.objects.get(name="Масло")
-            debit_items = models.Volume.objects.filter(is_active=True).filter(
-                department__name=_b2c
+        if self.request.get("sto_type"):
+            self.new_census.sto_type = models.STOTypeList.objects.get(
+                pk=self.request.get("sto_type")
             )
 
-            if str(oil.pk) in request.getlist("vectors"):
-                for volume in debit_items:
-                    new_volume_item = models.VolumeItem.objects.create(
-                        census=new_census,
-                        volume=models.Volume.objects.get(pk=volume.pk),
-                        value=request.get(f"volume_{volume.pk}"),
-                    )
-                    new_census.volume.add(new_volume_item)
+        if self.request.get("akb_specify"):
+            self.new_census.akb_specify = int(self.request.get("akb_specify"))
 
-            new_census.save()
+        new_others = models.Others.objects.create(census=self.new_census)
+        new_others.vector = self.request.get("other_vector")
+        new_others.providers = self.request.get("other_providers")
+        new_others.save()
 
-            del_ready_task(request, task)
+        self.new_census.others = new_others
 
-            return True
+        oil = models.PointVectors.objects.get(name="Масло")
+        debit_items = models.Volume.objects.filter(is_active=True).filter(
+            department__name=_b2c
+        )
 
-        elif (
-            request.get("depart") == _b2b or request.get("depart") == _industrial
-        ):  # B2B
-
-            new_census.tender = request.get("tender")
-
-            # Others
-            new_others = models.Others.objects.create(census=new_census)
-            try:
-                other_eq = models.EquipmentList.objects.get(name=_other_name)
-                new_others.equipment_name = request.get(
-                    f"equipment_other_name_{other_eq.pk}"
-                )
-
-            except models.EquipmentList.DoesNotExist:
-                new_others.equipment_name = None
-
-            try:
-                other_volume = models.Volume.objects.get(name=_other_name)
-                new_others.volume_name = request.get(
-                    f"other_volume_name_{other_volume.pk}"
-                )
-                new_others.volume_value = request.get(f"volume_{other_volume.pk}")
-
-            except models.Volume.DoesNotExist:
-                new_others.volume_name = None
-                new_others.volume_value = None
-
-            new_others.providers = request.get("other_providers")
-            new_others.vector = request.get("other_vector")
-            new_others.all_volume = request.get("all_volume")
-
-            new_census.others = new_others
-            new_others.save()
-
-            for equipment in request.getlist("equipment"):
-                new_equipment_item = models.EquipmentItem.objects.create(
-                    census=new_census,
-                    equipment=models.EquipmentList.objects.get(pk=equipment),
-                    value=request.get(f"equipment_{equipment}"),
-                )
-                new_census.equipment.add(new_equipment_item)
-
-            #  сохранение объема
-            for volume in request.getlist("volume"):
+        if str(oil.pk) in self.request.getlist("vectors"):
+            for volume in debit_items:
                 new_volume_item = models.VolumeItem.objects.create(
-                    census=new_census,
-                    volume=models.Volume.objects.get(pk=volume),
-                    value=request.get(f"volume_{volume}"),
+                    census=self.new_census,
+                    volume=models.Volume.objects.get(pk=volume.pk),
+                    value=self.request.get(f"volume_{volume.pk}"),
                 )
-                new_census.volume.add(new_volume_item)
+                self.new_census.volume.add(new_volume_item)
 
-        # m2m
+        self.new_census.save()
+
+        del_ready_task(self.request, self.task)
+
+    def b2b_point(self):
+        """Если точка B2B или Индустриальный отдел"""
+        self.new_census.tender = self.request.get("tender")
+
+        # Others
+        new_others = models.Others.objects.create(census=self.new_census)
+        try:
+            other_eq = models.EquipmentList.objects.get(name=self._other_name)
+            new_others.equipment_name = self.request.get(
+                f"equipment_other_name_{other_eq.pk}"
+            )
+
+        except models.EquipmentList.DoesNotExist:
+            new_others.equipment_name = None
+
+        try:
+            other_volume = models.Volume.objects.get(name=self._other_name)
+            new_others.volume_name = self.request.get(
+                f"other_volume_name_{other_volume.pk}"
+            )
+            new_others.volume_value = self.request.get(f"volume_{other_volume.pk}")
+
+        except models.Volume.DoesNotExist:
+            new_others.volume_name = None
+            new_others.volume_value = None
+
+        new_others.providers = self.request.get("other_providers")
+        new_others.vector = self.request.get("other_vector")
+        new_others.all_volume = self.request.get("all_volume")
+
+        self.new_census.others = new_others
+        new_others.save()
+
+        # Парк техники
+        for equipment in self.request.getlist("equipment"):
+            new_equipment_item = models.EquipmentItem.objects.create(
+                census=self.new_census,
+                equipment=models.EquipmentList.objects.get(pk=equipment),
+                value=self.request.get(f"equipment_{equipment}"),
+            )
+            self.new_census.equipment.add(new_equipment_item)
+
+        #  сохранение объема
+        for volume in self.request.getlist("volume"):
+            new_volume_item = models.VolumeItem.objects.create(
+                census=self.new_census,
+                volume=models.Volume.objects.get(pk=volume),
+                value=self.request.get(f"volume_{volume}"),
+            )
+            self.new_census.volume.add(new_volume_item)
+
         m2m_save(
-            new_census.providers,
-            models.ProviderList.objects.filter(pk__in=request.getlist("providers")),
+            self.new_census.providers,
+            models.ProviderList.objects.filter(pk__in=self.request.getlist("providers")),
         )
         m2m_save(
-            new_census.vectors,
-            models.PointVectorsItem.objects.filter(pk__in=request.getlist("vectors")),
+            self.new_census.vectors,
+            models.PointVectorsItem.objects.filter(pk__in=self.request.getlist("vectors")),
         )
 
-        new_census.save()
+        self.new_census.save()
 
-        Task.objects.filter(pk=task.pk).update(
-            status="Выполнено",
-            edited=True,
-            result=result,
-            worker_comment=worker_comment,
-        )
 
-        del_ready_task(request, task)
+def valid_data(request):
 
+    new_census = CensusSave(request=request)
+
+    if request.POST.get("closing") is not None:  # Если закрыто
+        new_census.point_closing()
+        new_census.closing_point(result_status="АДРЕС НЕ АКТУАЛЕН")
+        return True
+
+    elif request.POST.get("not_communicate"):  # Если нет коммуникации
+        new_census.not_communicate()
+        new_census.closing_point(result_status="НЕТ КОНТАКТА")
+        return True
+
+    elif request.POST.get("depart") == _b2c:
+        new_census.working_point()
+        new_census.b2c_point()
+        return True
+
+    elif request.POST.get("depart") == _b2b or request.POST.get("depart") == _industrial:
+        new_census.working_point()
+        new_census.b2b_point()
         return True
 
 
@@ -422,307 +406,6 @@ def clean_address(address):
         # return r.json()[0]['result']
     else:
         return None
-
-
-def valid_full_data(request):
-
-    _other_name = "Другое"
-    request_files = request.FILES
-    request = request.POST
-    new_census = models.Census()
-    new_census.address = request.get("full_address")
-    new_census.department = models.Department.objects.get(name=request.get("depart"))
-    new_census.name = request.get("name")
-    task = Task.objects.get(number=request.get('guid'))
-    new_census.task = task.number
-    new_census.position = request.get("position")  # Координаты
-    new_census.address_id = request.get('address_id')
-    new_census.basics = task.base.number
-    new_census.inn = request.get("inn")
-    new_census.task_author = "Имя автора"
-    worker = Worker.objects.get(chat_id=request.get("worker"))
-    new_census.worker = worker.name
-    new_census.edited = True
-
-    # new_census.save()
-
-    if request_files:
-        for file in request_files.getlist("file"):
-            census_files = models.CensusFiles()
-            # census_files.census = new_census
-            census_files.file = file
-            census_files.save()
-
-    try:
-        dadata = models.CompanyDatabase.objects.get(inn=request.get("inn"))
-        new_census.dadata = dadata
-    except models.CompanyDatabase.DoesNotExist:
-        new_census.dadata = None
-
-    if request.get("working"):
-        new_census.working = Partner.objects.get(inn=str(request.get("working")))
-
-    new_census.point_name = request.get("point_name")  # Вывеска
-    worker_comment = WorkerComments.objects.create(comment=request.get("result_comment"), worker=worker)
-
-    if request.get("closing") is not None:  # Если закрыто
-
-        result = Result.objects.create(
-            base_id=None,
-            type="meet",
-            result=ResultData.objects.get(name="АДРЕС НЕ АКТУАЛЕН"),
-            task_number=None,
-            contact_person="",
-            control_date=None,
-        )
-
-        new_census.result = result
-        new_census.closing = True
-        new_census.not_communicate = False
-        new_census.task_result = result.result.name
-        new_census.save()
-
-        Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
-                                               worker_comment=worker_comment)
-
-        del_ready_task(request, task)
-
-        return True
-
-    elif request.get("not_communicate"):  # Если нет коммуникации
-
-        result = Result.objects.create(
-            base_id=None,
-            type="meet",
-            result=ResultData.objects.get(code="000000067"),
-            task_number=None,
-            contact_person="",
-            control_date=None,
-        )
-
-        # new_census.result.objects.update(result=ResultData.objects.get(name="НЕТ КОНТАКТА"))
-
-        new_census.not_communicate = True
-        new_census.result = result
-        new_census.task_result = result.result.name
-        new_census.closing = False
-        new_census.save()
-
-        Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
-                                               worker_comment=worker_comment)
-
-        del_ready_task(request, task)
-
-        return True
-
-    else:
-
-        # control_date = None
-        #
-        # if len(request.get('control_date')) > 0:
-        #     control_date = datetime.strptime(request.get('control_date'), '%d-%m-%Y')  # Если есть контрольная дата
-
-        result = Result.objects.create(
-            base_id=None,
-            type="meet",
-            result=ResultData.objects.get(name="ДАННЫЕ АКТУАЛИЗИРОВАНЫ"),
-            task_number=None,
-            contact_person="",
-            control_date=None,
-        )
-
-        new_census.result = result
-        new_census.task_result = result.result.name
-        new_census.category = models.PointCategory.objects.get(
-            pk=request.get("category")
-        )
-
-        # new_census.save()
-
-
-        new_decisions = models.Decision.objects.create(
-            census=new_census,
-            firstname=request.get("firstname"),
-            lastname=request.get("lastname"),
-            surname=request.get("surname"),
-            email=request.get("decision_email"),
-            phone=request.get("decision_phone"),
-            function=request.get("decision_function"),
-        )
-
-        new_decisions.save()
-        new_census.decision = new_decisions
-
-
-        #  сохранение направления
-        for vector in models.PointVectors.objects.filter(
-            pk__in=request.getlist("vectors")
-        ):
-
-            if request.getlist(vector.slug):
-                new_vector_item = models.PointVectorsItem.objects.create(
-                    census=new_census,
-                    vectors=vector,
-                )
-                for vector_pk in request.getlist(vector.slug):
-                    new_value = models.PointVectorsSelectItem.objects.get(pk=vector_pk)
-                    new_vector_item.value.add(new_value)
-                for new_vector in models.PointVectorsItem.objects.filter(
-                    census__pk=new_census.pk
-                ):
-                    new_census.vectors.add(new_vector)
-
-            new_census.save()
-
-        if request.get("depart") == _b2c:  # B2C
-
-            new_census.nets = request.get("nets")
-
-            new_census.point_type = models.PointTypes.objects.get(
-                pk=request.get("point_type")
-            )
-            new_census.other_brand = request.get("other_brand")
-
-            if request.get("elevators_count"):
-                new_census.elevators_count = int(request.get("elevators_count"))
-            else:
-                new_census.elevators_count = 0
-
-            if request.get("sto_type"):
-                new_census.sto_type = models.STOTypeList.objects.get(
-                    pk=request.get("sto_type")
-                )
-            else:
-                new_census.sto_type = None
-
-            if request.get("akb_specify"):
-                new_census.akb_specify = int(request.get("akb_specify"))
-
-            new_others = models.Others.objects.create(census=new_census)
-            new_others.vector = request.get("other_vector")
-            new_others.providers = request.get("other_providers")
-
-            new_census.save()
-
-            m2m_save(
-                new_census.cars,
-                models.CarsList.objects.filter(pk__in=request.getlist("cars")),
-            )
-            m2m_save(
-                new_census.providers,
-                models.ProviderList.objects.filter(pk__in=request.getlist("providers")),
-            )
-
-            # if request.get("sto_type"):
-            #     new_census.sto_type = models.STOTypeList.objects.get(
-            #         pk=request.get("sto_type")
-            #     )
-            # else:
-            #     new_census.sto_type = None
-            #
-            # if request.get("akb_specify"):
-            #     new_census.akb_specify = int(request.get("akb_specify"))
-
-            new_others = models.Others.objects.create(census=new_census)
-            new_others.vector = request.get("other_vector")
-            new_others.providers = request.get("other_providers")
-            new_others.save()
-
-            new_census.others = new_others
-
-            #  сохранение объема
-            oil = models.PointVectors.objects.get(name="Масло")
-            debit_items = models.Volume.objects.filter(is_active=True).filter(
-                department__name=_b2c
-            )
-
-            if str(oil.pk) in request.getlist("vectors"):
-                for volume in debit_items:
-                    new_volume_item = models.VolumeItem.objects.create(
-                        census=new_census,
-                        volume=models.Volume.objects.get(pk=volume.pk),
-                        value=request.get(f"volume_{volume.pk}"),
-                    )
-                    new_census.volume.add(new_volume_item)
-
-            new_census.save()
-
-            Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
-                                                   worker_comment=worker_comment)
-            del_ready_task(request, task)
-
-            return True
-
-        elif (
-            request.get("depart") == _b2b or request.get("depart") == _industrial
-        ):  # B2B
-
-            new_census.tender = request.get("tender")
-
-            # Others
-            new_others = models.Others.objects.create(census=new_census)
-            try:
-                other_eq = models.EquipmentList.objects.get(name=_other_name)
-                new_others.equipment_name = request.get(
-                    f"equipment_other_name_{other_eq.pk}"
-                )
-
-            except models.EquipmentList.DoesNotExist:
-                new_others.equipment_name = None
-
-            try:
-                other_volume = models.Volume.objects.get(name=_other_name)
-                new_others.volume_name = request.get(
-                    f"other_volume_name_{other_volume.pk}"
-                )
-                new_others.volume_value = request.get(f"volume_{other_volume.pk}")
-
-            except models.Volume.DoesNotExist:
-                new_others.volume_name = None
-                new_others.volume_value = None
-
-            new_others.providers = request.get("other_providers")
-            new_others.vector = request.get("other_vector")
-            new_others.all_volume = request.get("all_volume")
-
-            new_census.others = new_others
-            new_others.save()
-
-            for equipment in request.getlist("equipment"):
-                new_equipment_item = models.EquipmentItem.objects.create(
-                    census=new_census,
-                    equipment=models.EquipmentList.objects.get(pk=equipment),
-                    value=request.get(f"equipment_{equipment}"),
-                )
-                new_census.equipment.add(new_equipment_item)
-
-            #  сохранение объема
-            for volume in request.getlist("volume"):
-                new_volume_item = models.VolumeItem.objects.create(
-                    census=new_census,
-                    volume=models.Volume.objects.get(pk=volume),
-                    value=request.get(f"volume_{volume}"),
-                )
-                new_census.volume.add(new_volume_item)
-
-        # m2m
-        m2m_save(
-            new_census.providers,
-            models.ProviderList.objects.filter(pk__in=request.getlist("providers")),
-        )
-        m2m_save(
-            new_census.vectors,
-            models.PointVectorsItem.objects.filter(pk__in=request.getlist("vectors")),
-        )
-
-        new_census.save()
-
-        Task.objects.filter(pk=task.pk).update(status='Выполнено', edited=True, result=result,
-                                               worker_comment=worker_comment)
-
-        del_ready_task(request, task)
-
-        return True
 
 
 ALGORITHM = "HS256"

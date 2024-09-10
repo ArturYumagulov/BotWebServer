@@ -131,7 +131,7 @@ class VolumeItem(models.Model):
 
 class EquipmentList(models.Model):
     is_active = models.BooleanField(default=False, verbose_name="Активность")
-    name = models.CharField(verbose_name="Название", max_length=500)
+    name = models.CharField(verbose_name="Название", max_length=500, null=True, default=None)
     department = models.ManyToManyField(Department, verbose_name="Подразделение", related_name='equipment_list')
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
@@ -317,7 +317,8 @@ class Census(models.Model):
     point_type = models.ForeignKey(PointTypes, on_delete=models.PROTECT, verbose_name="Тип", blank=True, null=True,
                                    default=None)
     nets = models.BooleanField(verbose_name="Сетевой", default=False)
-    sto_type = models.ForeignKey(STOTypeList, on_delete=models.PROTECT, verbose_name="Тип СТО", blank=True, null=True)
+    sto_type = models.ForeignKey(STOTypeList, on_delete=models.PROTECT, verbose_name="Тип СТО", blank=True, null=True,
+                                 default=None)
     category = models.ForeignKey(PointCategory, on_delete=models.PROTECT, verbose_name="Категория", blank=True,
                                  null=True)
     cars = models.ManyToManyField(CarsList, verbose_name="Автомобили обслуживают", blank=True, default=None)

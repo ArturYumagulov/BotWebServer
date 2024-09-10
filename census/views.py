@@ -11,7 +11,7 @@ from tasks.models import Partner, ResultData, PartnerWorker, Worker
 from tasks.services import create_worker_secret
 from . import models
 from .models import CompanyDatabase, LukoilBrands, OilPackages
-from .services import valid_data, DataInnOnRedis, clean_address, valid_full_data
+from .services import valid_data, DataInnOnRedis, clean_address
 
 # Create your views here.
 
@@ -148,7 +148,8 @@ def full_load_data(request):
     """Запись результатов Сенсуса"""
 
     if request.method == "POST":
-        form = valid_full_data(request)
+
+        form = valid_data(request)
 
         if form:
             return render(request, 'census/ready_census.html')
