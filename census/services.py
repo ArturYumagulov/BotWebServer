@@ -224,6 +224,7 @@ class CensusSave:
     def working_point(self):
 
         self.new_census.dadata = return_data_on_dadata(self.request.get("inn"))
+        self.new_census.point_name = self.request.get("point_name")
         self.new_census.category = models.PointCategory.objects.get(
             pk=self.request.get("category")
         )
@@ -264,6 +265,7 @@ class CensusSave:
                 pk=self.request.get("point_type")
             )
         self.new_census.other_brand = self.request.get("other_brand")
+        self.new_census.point_name = self.request.get("point_name")
 
         if self.request.get("elevators_count"):
             self.new_census.elevators_count = int(self.request.get("elevators_count"))
@@ -321,6 +323,7 @@ class CensusSave:
     def b2b_point(self):
         """Если точка B2B или Индустриальный отдел"""
         self.new_census.tender = self.request.get("tender")
+        self.new_census.point_name = self.request.get("point_name")
 
         # Others
         new_others = models.Others.objects.create(census=self.new_census)
