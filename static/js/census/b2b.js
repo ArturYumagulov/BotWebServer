@@ -412,6 +412,7 @@
 
     async function CreateApp(container) {
         loadValidPartners();
+        FilesFormValid('formFileMultiple')
         // checkHiddenSearchObjects('workCheckbox', 'searchClient', null, true);
         floatFormValid('signboardId', true)
         await createOption('shopCategoryId')
@@ -437,19 +438,6 @@
         floatFormValid('otherVolId', true, true, false)
 
 
-        // let control = document.getElementById('controlId')
-        // let date = document.getElementById('dateDiv')
-        // let date_input = document.getElementById('date')
-        // control.addEventListener('change', function () {
-        //     if (control.options[control.selectedIndex].dataset.control === 'true') {
-        //         date.style.display = 'block'
-        //         date_input.setAttribute('required', '')
-        //     } else {
-        //         date.style.display = 'none'
-        //         date_input.removeAttribute('required')
-        //     }
-        // })
-
         let other_multi_selects = document.querySelectorAll('.multi')
         other_multi_selects.forEach((item) => {
             item.style.display = 'none'
@@ -458,7 +446,6 @@
         vectorHideBlock();
         otherProviders();
         delAddReqCheckbox();
-        FilesFormValid('formFileMultiple')
 
         let form = document.getElementsByTagName('form')[0]
         form.addEventListener('submit', function (e) {
@@ -479,6 +466,9 @@
                 form.submit()
             }
         })
+        closeCheckbox.removeAttribute('disabled');
+        workCheckbox.removeAttribute('disabled');
+        communicateCheckbox.removeAttribute('disabled');
     }
     window.CreateApp = CreateApp;
 })();

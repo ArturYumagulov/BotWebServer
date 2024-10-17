@@ -436,9 +436,8 @@
     }
 
     async function CreateApp(container) {
-        loadValidPartners();
+        FilesFormValid('formFileMultiple')
         checkHiddenSearchObjects('workCheckbox', 'searchClient', null, true);
-        floatFormValid('signboardId', true)
         await createOption('pointTypeID')
         await createOption('shopCategoryId')
         await createOption('stoTypeId')
@@ -449,6 +448,7 @@
         await createSelectMulti('vectorMulti')
         await createSelectMulti('lukoilMulti')
         await createSelectMulti('packagesMulti')
+
         await validSelect('kpp')
         await validSelect('typeId')
         await validSelect('federal')
@@ -458,6 +458,7 @@
         // await validSelect('controlId')
         await validSelect('akbId')
 
+        floatFormValid('signboardId', true)
         floatFormValid('lastnameMakerId', false, false, true)
         floatFormValid('firstnameMakerId', false, false, true)
         floatFormValid('surnameMakerId', false, false, true)
@@ -475,16 +476,16 @@
         await hideChangeSelectElem('pointTypeID', 'stoTypeDiv', 'stoTypeId', 'Автосервис')
         await hideSelectMultiElement('pointTypeID', 'carsDiv', 'cars', 'Автосервис')
 
-        let access_items = document.querySelectorAll('.access')
-
-        for (let i = 1; i < access_items.length + 1; i++) {
-            let div = document.getElementById('category_' + i + '_div')
-            let item = document.getElementById('category_' + i)
-            let item_id = item.getAttribute('id').split('_')[1]
-            let data = await loadDataCategory(item, item_id)
-            await createMultiSelectOption(item, item_id, data)
-            div.style.display = 'none'
-        }
+        // let access_items = document.querySelectorAll('.access')
+        //
+        // for (let i = 1; i < access_items.length + 1; i++) {
+        //     let div = document.getElementById('category_' + i + '_div')
+        //     let item = document.getElementById('category_' + i)
+        //     let item_id = item.getAttribute('id').split('_')[1]
+        //     let data = await loadDataCategory(item, item_id)
+        //     await createMultiSelectOption(item, item_id, data)
+        //     div.style.display = 'none'
+        // }
 
         let other_multi_selects = document.querySelectorAll('.multi')
         other_multi_selects.forEach((item) => {
@@ -495,7 +496,10 @@
         otherProviders();
         delAddReqCheckbox();
         lukoil_brands()
-        FilesFormValid('formFileMultiple')
+        loadValidPartners();
+
+        closeCheckbox.removeAttribute('disabled');
+        workCheckbox.removeAttribute('disabled');
     }
     window.CreateApp = CreateApp;
 })();

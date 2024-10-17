@@ -4,6 +4,9 @@ let active_check = document.getElementById('workCheckbox')
 let searchBlock = document.getElementById('innSearchUl')
 let out = document.querySelector('.out')
 let orgNameDiv = document.getElementById('organizationsNameDivId')
+const closeCheckbox = document.getElementById('closeCheckbox')
+const workCheckbox = document.getElementById('workCheckbox')
+const communicateCheckbox = document.getElementById('communicateCheckbox')
 
 let partnersInn = inn.getAttribute('data-url')
 
@@ -77,9 +80,10 @@ function LoadInnSearchBlock(url, event) {
         method: "POST",
     }).then((res) => res.json()).then(
         (data) => {
-            if (window.location.pathname !== '/census/census-template/') {  // Выключил проверку ИНН
-                LengthValue(inn, event, data)
-            } else {
+            // if (window.location.pathname !== '/census/census-template/') {  // Выключил проверку ИНН
+            LengthValue(inn, event, data)
+            // } else
+            {
                 if (data.length > 0) {
                 data.forEach((item) => {
                     if (item.source === "out") {

@@ -198,6 +198,10 @@ class CensusSave:
         self.worker_comment = WorkerComments.objects.create(
             comment=self.request.get("result_comment"), worker_id=self.task.worker.pk
         )
+
+        self.new_census.chicago_code = self.request.get('chicago_code')
+        self.new_census.code = self.request.get('code')
+
         if self.request.get("working"):
             self.new_census.working = Partner.objects.get(inn=str(self.request.get("working")))
 
@@ -254,6 +258,8 @@ class CensusSave:
         """Если точка B2C"""
 
         self.new_census.nets = self.request.get("nets")
+        self.new_census.federal = self.request.get("federal")
+        self.new_census.kpp = self.request.get("kpp")
         self.new_census.point_type = models.PointTypes.objects.get(
                 pk=self.request.get("point_type")
             )
@@ -261,6 +267,13 @@ class CensusSave:
 
         if self.request.get("elevators_count"):
             self.new_census.elevators_count = int(self.request.get("elevators_count"))
+
+        m2m_save(self.new_census.package, models.OilPackages.objects.filter(pk__in=self.request.getlist("package")))
+
+        m2m_save(self.new_census.bonuses, models.ProviderList.objects.filter(pk__in=self.request.getlist("bonus")))
+
+        m2m_save(self.new_census.lukoil_brands, models.LukoilBrands.objects.filter(
+            pk__in=self.request.getlist("lukoil_brands")))
 
         m2m_save(
             self.new_census.cars,

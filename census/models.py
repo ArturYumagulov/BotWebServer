@@ -358,6 +358,8 @@ class Census(models.Model):
     federal = models.BooleanField(default=False, blank=True)
     bonuses = models.ManyToManyField(ProviderList, verbose_name="В бонусных программах каких брендов участвуют?",
                                      blank=True, default=None, related_name="census_bonuses")
+    chicago_code = models.CharField(verbose_name="Код Чикаго", max_length=2000, blank=True)
+    code = models.CharField(verbose_name="Код 1C", max_length=2000, blank=True)
 
     class Meta:
         verbose_name = "Сенсус"

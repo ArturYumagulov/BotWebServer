@@ -27,59 +27,63 @@ def template_test(request):
 
 def census(request, pk):
 
-    name = request.GET['name']
-    city = request.GET['city']
-    street = request.GET['street']
-    house = request.GET['house']
-    guid = request.GET['guid']
-    depart = request.GET['depart']
+    if len(request.GET) > 0:
+        name = request.GET['name']
+        city = request.GET['city']
+        street = request.GET['street']
+        house = request.GET['house']
+        guid = request.GET['guid']
+        depart = request.GET['depart']
+        code = request.GET['code']
+        chicago_code = request.GET['chicago_code']
 
-    try:
-        models.Census.objects.get(address_id=pk)
-        return render(request, 'census/exist_census.html')
+        try:
+            models.Census.objects.get(address_id=pk)
+            return render(request, 'census/exist_census.html')
 
-    except models.Census.DoesNotExist:
+        except models.Census.DoesNotExist:
 
-        if depart == _b2b or depart == _industrial:
+            if depart == _b2b or depart == _industrial:
 
-            products = models.PointVectors.objects\
-                .filter(is_active=True)\
-                .filter(department__name=_b2b)
+                products = models.PointVectors.objects\
+                    .filter(is_active=True)\
+                    .filter(department__name=_b2b)
 
-            context = {
-                'name': name,
-                'city': city,
-                'street': street,
-                'house': house,
-                'address_id': pk,
-                'guid': guid,
-                'products': products,
-                'depart': depart
-            }
-            return render(request, 'census/b2b.html', context)
+                context = {
+                    'name': name,
+                    'city': city,
+                    'street': street,
+                    'house': house,
+                    'address_id': pk,
+                    'guid': guid,
+                    'products': products,
+                    'depart': depart
+                }
+                return render(request, 'census/b2b.html', context)
 
-        elif depart == _b2c:
+            elif depart == _b2c:
 
-            products = models.PointVectors.objects\
-                .filter(is_active=True)\
-                .filter(department__name=_b2c)
+                products = models.PointVectors.objects\
+                    .filter(is_active=True)\
+                    .filter(department__name=_b2c)
 
-            volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
+                volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
 
-            context = {
-                'name': name,
-                'city': city,
-                'street': street,
-                'house': house,
-                'address_id': pk,
-                'guid': guid,
-                'products': products,
-                'volumes': volumes,
-                'depart': depart
-            }
-            return render(request, 'census/b2c.html', context)
-        else:
-            return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
+                context = {
+                    'name': name,
+                    'city': city,
+                    'street': street,
+                    'house': house,
+                    'address_id': pk,
+                    'guid': guid,
+                    'products': products,
+                    'volumes': volumes,
+                    'depart': depart
+                }
+                return render(request, 'census/b2c.html', context)
+
+        return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
+    return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
 
 
 def full_census(request):
