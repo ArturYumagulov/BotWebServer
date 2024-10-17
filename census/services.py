@@ -270,7 +270,8 @@ class CensusSave:
 
         m2m_save(self.new_census.package, models.OilPackages.objects.filter(pk__in=self.request.getlist("package")))
 
-        m2m_save(self.new_census.bonuses, models.ProviderList.objects.filter(pk__in=self.request.getlist("bonus")))
+        m2m_save(self.new_census.bonuses, models.PointVectorsSelectItem.objects.filter(
+            pk__in=self.request.getlist("bonus")))
 
         m2m_save(self.new_census.lukoil_brands, models.LukoilBrands.objects.filter(
             pk__in=self.request.getlist("lukoil_brands")))

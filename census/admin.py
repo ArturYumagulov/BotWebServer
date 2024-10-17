@@ -49,6 +49,13 @@ class CensusAdmin(admin.ModelAdmin):
         "basics",
         "tender",
         "position",
+        'chicago_code',
+        'code',
+        'bonuses',
+        'federal',
+        'lukoil_brands',
+        'package',
+        'kpp',
         # 'dadata',
         # 'volume',
     )

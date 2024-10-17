@@ -356,7 +356,7 @@ class Census(models.Model):
     package = models.ManyToManyField("OilPackages", related_name="census_packages", blank=True, default=None)
     lukoil_brands = models.ManyToManyField("LukoilBrands", related_name="lukoil_brands", blank=True, default=None)
     federal = models.BooleanField(default=False, blank=True)
-    bonuses = models.ManyToManyField(ProviderList, verbose_name="В бонусных программах каких брендов участвуют?",
+    bonuses = models.ManyToManyField(PointVectorsSelectItem, verbose_name="В бонусных программах каких брендов участвуют?",
                                      blank=True, default=None, related_name="census_bonuses")
     chicago_code = models.CharField(verbose_name="Код Чикаго", max_length=2000, blank=True)
     code = models.CharField(verbose_name="Код 1C", max_length=2000, blank=True)

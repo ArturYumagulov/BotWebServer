@@ -57,7 +57,9 @@ def census(request, pk):
                     'address_id': pk,
                     'guid': guid,
                     'products': products,
-                    'depart': depart
+                    'depart': depart,
+                    'code': code,
+                    'chicago_code': chicago_code
                 }
                 return render(request, 'census/b2b.html', context)
 
@@ -78,7 +80,9 @@ def census(request, pk):
                     'guid': guid,
                     'products': products,
                     'volumes': volumes,
-                    'depart': depart
+                    'depart': depart,
+                    'code': code,
+                    'chicago_code': chicago_code
                 }
                 return render(request, 'census/b2c.html', context)
 
