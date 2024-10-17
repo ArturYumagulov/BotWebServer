@@ -35,7 +35,7 @@ def census(request, pk):
         guid = request.GET['guid']
         depart = request.GET['depart']
         code = request.GET['code']
-        chicago_code = request.GET['chicago_code']
+        chicago_code = request.GET['chicago-code']
 
         try:
             models.Census.objects.get(address_id=pk)
