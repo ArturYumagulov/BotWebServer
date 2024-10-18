@@ -28,14 +28,14 @@ def template_test(request):
 def census(request, pk):
 
     if len(request.GET) > 0:
-        name = request.GET['name']
-        city = request.GET['city']
-        street = request.GET['street']
-        house = request.GET['house']
-        guid = request.GET['guid']
-        depart = request.GET['depart']
-        code = request.GET['code']
-        chicago_code = request.GET['chicago']
+        name = request.GET.get('name')
+        city = request.GET.get('city')
+        street = request.GET.get('street')
+        house = request.GET.get('house')
+        guid = request.GET.get('guid')
+        depart = request.GET.get('depart')
+        code = request.GET.get('code')
+        chicago_code = request.GET.get('chicago')
 
         try:
             models.Census.objects.get(address_id=pk)
