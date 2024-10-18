@@ -26,16 +26,23 @@ def template_test(request):
 
 
 def census(request, pk):
+    """Генерация страницы опросника"""
 
     if len(request.GET) > 0:
-        name = request.GET.get('name')
-        city = request.GET.get('city')
-        street = request.GET.get('street')
-        house = request.GET.get('house')
-        guid = request.GET.get('guid')
+
         depart = request.GET.get('depart')
-        code = request.GET.get('code')
-        chicago_code = request.GET.get('chicago')
+
+        context = {
+            'house': request.GET.get('house'),
+            'address_id': pk,
+            'depart': depart,
+            'name': request.GET.get('name'),
+            'city': request.GET.get('city'),
+            'street': request.GET.get('street'),
+            'guid': request.GET.get('guid'),
+            'code': request.GET.get('code'),
+            'chicago_code': request.GET.get('chicago')
+        }
 
         try:
             models.Census.objects.get(address_id=pk)
@@ -49,18 +56,8 @@ def census(request, pk):
                     .filter(is_active=True)\
                     .filter(department__name=_b2b)
 
-                context = {
-                    'name': name,
-                    'city': city,
-                    'street': street,
-                    'house': house,
-                    'address_id': pk,
-                    'guid': guid,
-                    'products': products,
-                    'depart': depart,
-                    'code': code,
-                    'chicago_code': chicago_code
-                }
+                context['products'] = products
+
                 return render(request, 'census/b2b.html', context)
 
             elif depart == _b2c:
@@ -71,19 +68,9 @@ def census(request, pk):
 
                 volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
 
-                context = {
-                    'name': name,
-                    'city': city,
-                    'street': street,
-                    'house': house,
-                    'address_id': pk,
-                    'guid': guid,
-                    'products': products,
-                    'volumes': volumes,
-                    'depart': depart,
-                    'code': code,
-                    'chicago_code': chicago_code
-                }
+                context['volumes'] = volumes
+                context['products'] = products
+
                 return render(request, 'census/b2c.html', context)
 
         return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
@@ -141,14 +128,10 @@ def load_data(request):
             return render(request, 'census/exist_census.html')
 
         except models.Census.DoesNotExist:
-
             form = valid_data(request)
-
             if form:
                 return render(request, 'census/ready_census.html')
-            else:
-                return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
-
+            return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
     return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
 
 
