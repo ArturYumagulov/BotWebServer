@@ -18,7 +18,7 @@ class ProductAdmin(ImportExportModelAdmin):
     resource_class = ProductResource
     list_display = ('name', 'article', 'access_category')
     list_filter = ('access_category',)
-    fields = ('code', 'name', 'brand', 'article', 'access_category', 'edit_date', 'created_date',)
+    fields = ('code', 'name', 'brand', 'article', 'access_category', 'tranzit_price', 'partkom_price', 'edit_date', 'created_date',)
     readonly_fields = ('edit_date', 'created_date',)
 
 
@@ -31,3 +31,13 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(models.OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     readonly_fields = ('total',)
+
+
+@admin.register(models.Brand)
+class BrandAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.AccessCategory)
+class AccessCategoryAdmin(admin.ModelAdmin):
+    pass

@@ -10,16 +10,10 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.84.0">
-    <title>Dashboard</title>
-
-{#    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">#}
-
-
-    <!-- Bootstrap core CSS -->
-{#    <link href="/docs/5.0/dist/css/bootstrap.min.css" rel="stylesheet"#}
-{#          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">#}
-    <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap.min.css' %}" />
     <meta name="theme-color" content="#7952b3">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap.min.css' %}" />
+    <link href="{% static 'css/analytics/dashboard.css'%}" rel="stylesheet">
     {% block styles %}
         <style>
             .bd-placeholder-img {
@@ -41,9 +35,6 @@
 
     {% block defer_js %}{% endblock %}
 
-
-    <!-- Custom styles for this template -->
-    <link href="{% static 'css/analytics/dashboard.css'%}" rel="stylesheet">
 </head>
 <body>
 
@@ -70,6 +61,13 @@
                             Общее выполнение сенсуса (Отчет 2)
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           href="{% url 'parse' %}">
+                            <span data-feather="file"></span>
+                            Проценка
+                        </a>
+                    </li>
                 </ul>
             {% if user_reports|length %}
                 <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
@@ -94,9 +92,9 @@
         </nav>
 
             <main class="col">
-
             {% block content %}{% endblock %}
-        </main>
+            </main>
+
     <div type="button" id="sidebarBut" class="btn btn-outline-secondary collapse-btn">>></div>
     </div>
 </div>

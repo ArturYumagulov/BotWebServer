@@ -6,6 +6,31 @@ from tasks.models import Partner
 # Create your models here.
 
 
+class AccessCategory(models.Model):
+    is_active = models.BooleanField(default=True)
+    name = models.CharField(max_length=2000, unique=True, verbose_name='Название')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Категории'
+        verbose_name_plural = 'Категория'
+
+
+class Brand(models.Model):
+    is_active = models.BooleanField(default=True)
+    name = models.CharField(max_length=2000, unique=True, verbose_name='Название')
+    partkom_code = models.CharField(max_length=50, unique=True, verbose_name='Партком', null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Бренды'
+        verbose_name_plural = 'Бренд'
+
+
 class Product(models.Model):
     """
     Хранит информацию о товаре. В этой модели укажите поля:
@@ -17,12 +42,15 @@ class Product(models.Model):
 
     code = models.CharField(max_length=50, primary_key=True, verbose_name="Код")
     name = models.CharField(max_length=2000, verbose_name="Наименование")
-    brand = models.CharField(max_length=2000, verbose_name="Бренд", blank=True, null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.PROTECT, verbose_name="Бренд", blank=True, null=True)
     article = models.CharField(max_length=100, verbose_name="Артикул", blank=True, null=True)
-    access_category = models.CharField(verbose_name="Категория товара", max_length=1000, blank=True, null=True)
-    edit_date = models.DateField(verbose_name="Дата изменения", auto_now=True)
+    access_category = models.ForeignKey(AccessCategory, verbose_name="Категория товара", max_length=1000, blank=True,
+                                        null=True, on_delete=models.PROTECT)
+    edit_date = models.DateTimeField(verbose_name="Дата изменения", auto_now=True)
     created_date = models.DateField(verbose_name="Дата создания", auto_now_add=True)
     is_active = models.BooleanField(verbose_name='Активность', default=False)
+    tranzit_price = models.DecimalField(null=True, max_digits=10, decimal_places=2)
+    partkom_price = models.DecimalField(null=True, max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
         return self.name

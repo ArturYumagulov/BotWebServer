@@ -131,10 +131,15 @@ class Worker(models.Model):
     controller = models.BooleanField(default=False)
     partner = models.CharField(max_length=11, blank=True, null=True)
     department = models.ForeignKey(Department, blank=True, null=True, on_delete=models.PROTECT)
-    secret = models.CharField(max_length=50, default=create_worker_secret)
+    secret = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}"
+
+    def save(self, *args, **kwargs):
+        if not self.secret:  # Генерируем секрет только если его еще нет
+            self.secret = create_worker_secret(25, "HS256")
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "05. Агент"

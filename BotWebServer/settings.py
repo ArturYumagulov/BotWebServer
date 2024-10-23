@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env.str("DJANGO_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
@@ -53,6 +53,9 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_filters',
     'corsheaders',
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    # 'dpd_static_support'
+    # ---------------------
     'tasks',
     'api',
     'census',
@@ -62,12 +65,14 @@ INSTALLED_APPS = [
     'sales',
     'send_message',
     'filegen',
+    'parse'
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    'django_plotly_dash.middleware.BaseMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -100,34 +105,35 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "test_db.sqlite3",
-#     }
-# }
-#
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env('database'),
-        'USER': env('user'),
-        'HOST': env('host'),
-        'PORT': env('port'),
-        'PASSWORD': env('password'),
+if not DEBUG:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env('database'),
+            'USER': env('user'),
+            'HOST': env('host'),
+            'PORT': env('port'),
+            'PASSWORD': env('password'),
+            }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
-}
+    }
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": 'census',
-#         'USER': 'postgres',
-#         'HOST': 'localhost',
-#         'PORT': '5433',
-#         'PASSWORD': 'postgres',
-#         }
-# }
+    # DATABASES = {
+    #     "default": {
+    #         "ENGINE": "django.db.backends.postgresql",
+    #         "NAME": 'postgres',
+    #         'USER': 'postgres',
+    #         'HOST': 'localhost',
+    #         'PORT': '5432',
+    #         'PASSWORD': 'postgres',
+    #         }
+    # }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -197,56 +203,57 @@ else:
     }
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'console': {
-            'format': '%(name)-12s %(levelname)-8s %(message)s'
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'console': {
+                'format': '%(name)-12s %(levelname)-8s %(message)s'
+            },
+            'file': {
+                'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+            },
+            'telegram': {
+                'format': 'BotWebServer - %(filename)s:%(lineno)d - <b>%(levelname)-8s</b> - '
+                          '<i> [%(asctime)s]</i> - %(message)s'
+            }
         },
-        'file': {
-            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'console'
+            },
+            'info_file': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'formatter': 'file',
+                'filename': 'logs/info.txt'
+            },
+            'error_file': {
+                'level': 'ERROR',
+                'class': 'logging.FileHandler',
+                'formatter': 'file',
+                'filename': 'logs/error.txt'
+            },
+            'telegram': {
+                'level': 'ERROR',
+                'class': 'BotWebServer.log_handler.TelegramLogsHandler',
+                'formatter': 'telegram'
+            }
         },
-        'telegram': {
-            'format': 'BotWebServer - %(filename)s:%(lineno)d - <b>%(levelname)-8s</b> - '
-                      '<i> [%(asctime)s]</i> - %(message)s'
-        }
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'console'
-        },
-        'info_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'formatter': 'file',
-            'filename': 'logs/info.txt'
-        },
-        'error_file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'formatter': 'file',
-            'filename': 'logs/error.txt'
-        },
-        'telegram': {
-            'level': 'ERROR',
-            'class': 'BotWebServer.log_handler.TelegramLogsHandler',
-            'formatter': 'telegram'
-        }
-    },
-    'loggers': {
-        '': {
-            'level': 'DEBUG',
-            'handlers': [
-                'console',
-                'info_file',
-                'error_file',
-                'telegram'
-            ]
+        'loggers': {
+            '': {
+                'level': 'DEBUG',
+                'handlers': [
+                    'console',
+                    'info_file',
+                    'error_file',
+                    'telegram'
+                ]
+            }
         }
     }
-}
 if DEBUG:
     CORS_ORIGIN_ALLOW_ALL = True
 else:
@@ -271,3 +278,13 @@ CELERY_RESULT_EXTENDED = True
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "analytics"
 LOGOUT_REDIRECT_URL = "analytics"
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}

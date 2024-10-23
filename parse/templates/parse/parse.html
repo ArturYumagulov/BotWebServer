@@ -1,0 +1,62 @@
+{% extends 'analytics/base.html' %}
+{% load static %}
+{% block title %}Проценка{% endblock %}
+{% load plotly_dash %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/datepicker/bootstrap-datepicker.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/datepicker/bootstrap-datepicker.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/icons/bootstrap-icons/font/bootstrap-icons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/parse/style.css' %}">
+
+    <style>
+        .dash-container {
+            width: 100%;
+            height: calc(100vh - 150px);
+            overflow: hidden;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="filter-block">
+        <div class="upload">
+            <div class="status">
+                Дата обновления {{ update.edit_date }}
+            </div>
+            <div class="load-excel">
+                <i class="bi bi-file-earmark-spreadsheet"></i>
+            </div>
+        </div>
+    </div>
+    <body>
+    <!-- Контейнер для приложения Dash -->
+    <div class="dash-container">
+        {% plotly_app name="DataTableExample" %}
+    </div>
+{% endblock%}
+
+{% block scripts %}
+    <script src="{% static 'js/jquery/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/datepicker/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/datepicker/bootstrap-datepicker.ru.min.js' %}"></script>
+
+    <script>
+        // Инициализация Datepicker
+        $(document).ready(function () {
+            $('#date').datepicker({
+                format: 'dd-mm-yyyy',
+                autoclose: true,
+                todayHighlight: true,
+                language: 'ru'
+            }).datepicker('setDate', new Date());
+        });
+
+        if (window.innerWidth < 768) {
+            let status = document.querySelector('.status')
+            status.innerHTML = status.innerHTML.replace('<br>', '')
+        }
+        document.querySelector('.dash-container div').style.height = '100%'
+    </script>
+{% endblock %}

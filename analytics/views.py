@@ -167,26 +167,29 @@ def get_report_3(requests):
 
 @login_required()
 def census_detail(requests, pk):
-    census = Census.objects.get(pk=pk)
     try:
-        task = Task.objects.get(number=census.task)
-        comment = WorkerComments.objects.get(pk=task.worker_comment.pk).comment
-    except Task.DoesNotExist:
-        comment = None
-    except WorkerComments.DoesNotExist:
-        comment = None
+        census = Census.objects.get(pk=pk)
+        try:
+            task = Task.objects.get(number=census.task)
+            comment = WorkerComments.objects.get(pk=task.worker_comment.pk).comment
+        except Task.DoesNotExist:
+            comment = None
+        except WorkerComments.DoesNotExist:
+            comment = None
 
-    mongo_census = services.ReportDataOnMongoDB().find_document(
-        elements={"_id": census.pk}
-    )
-    context = {
-        "census": census,
-        "category": mongo_census["category"],
-        "result": str(mongo_census["result"])[27:-4].split(">")[1],
-        "potential": mongo_census["potential"],
-        "comment": comment,
-    }
-    return render(requests, "analytics/census_detail.html", context=context)
+        mongo_census = services.ReportDataOnMongoDB().find_document(
+            elements={"_id": census.pk}
+        )
+        context = {
+            "census": census,
+            "category": mongo_census["category"],
+            "result": str(mongo_census["result"])[27:-4].split(">")[1],
+            "potential": mongo_census["potential"],
+            "comment": comment,
+        }
+        return render(requests, "analytics/census_detail.html", context=context)
+    except Census.DoesNotExist:
+        return HttpResponse("Not")
 
 
 def census_vector_data(request):

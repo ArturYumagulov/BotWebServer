@@ -25,6 +25,11 @@ app.conf.beat_schedule = {
     'create_worker_secret.': {
         'task': 'core.tasks.create_secret',
         'schedule': crontab(minute='*/30')
+    },
+    'parse-data': {
+        'task': 'core.tasks.update_price',
+        'schedule': crontab(minute='*/10')
+        # 'schedule': crontab(hour=3, minute=0)
     }
 
 }

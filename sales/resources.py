@@ -7,4 +7,5 @@ class ProductResource(resources.ModelResource):
 
     class Meta:
         model = Product
-        fields = ('code', 'name', 'brand', 'article', 'access_category',)
+        import_id_fields = ['code']
+        fields = ('code', 'name', 'brand', 'article', 'access_category', 'tranzit_price')
