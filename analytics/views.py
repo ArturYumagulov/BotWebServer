@@ -208,3 +208,7 @@ def census_vector_data(request):
             vec_dict.clear()
         return JsonResponse({"data": result}, safe=False)
     return JsonResponse({"data": False}, safe=False)
+
+
+def tasks(request):
+    return render(request, 'analytics/tasks.html')

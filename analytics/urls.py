@@ -15,9 +15,12 @@ urlpatterns = [
     path("detail/<int:pk>", views.census_detail, name="census_detail"),
     path("get_vectors/", views.census_vector_data, name="get_vectors"),
     # ---------------REPORT-2------------------------------------------
-    path("report-2/", views.report_2, name="report_2"),
-    path("get-report-2/", views.get_report_2, name="get_report_2"),
+    # path("report-2/", views.report_2, name="report_2"),
+    # path("get-report-2/", views.get_report_2, name="get_report_2"),
     # ---------------REPORT-3------------------------------------------
     path("get-report-3/", views.get_report_3, name="get_report_3"),
     path("report-3/", views.report_3, name="report_3"),
+
+    path("tasks/", views.tasks, name="tasks"),
+
 ]

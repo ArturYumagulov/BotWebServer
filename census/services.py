@@ -205,13 +205,15 @@ class CensusSave:
         if self.request.get("working"):
             self.new_census.working = Partner.objects.get(inn=str(self.request.get("working")))
 
+        save_files(self.request_files, self.new_census)
+
     def closing_point(self, result_status):
         result = save_tasks(self.task, self.worker_comment, result_status)
         self.new_census.result = result
         self.new_census.task_result = result.result.name
         self.new_census.save()
 
-        save_files(self.request_files, self.new_census)
+        # save_files(self.request_files, self.new_census)
 
         del_ready_task(self.request, self.task)
 

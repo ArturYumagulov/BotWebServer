@@ -41,7 +41,8 @@ def census(request, pk):
             'street': request.GET.get('street'),
             'guid': request.GET.get('guid'),
             'code': request.GET.get('code'),
-            'chicago_code': request.GET.get('chicago')
+            'chicago_code': request.GET.get('chicago'),
+            'inn': request.GET.get('inn')
         }
 
         try:

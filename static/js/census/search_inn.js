@@ -7,6 +7,7 @@ let orgNameDiv = document.getElementById('organizationsNameDivId')
 const closeCheckbox = document.getElementById('closeCheckbox')
 const workCheckbox = document.getElementById('workCheckbox')
 const communicateCheckbox = document.getElementById('communicateCheckbox')
+let orgNameInput = document.getElementById('organizationsNameId')
 
 let partnersInn = inn.getAttribute('data-url')
 
@@ -220,7 +221,7 @@ function checkHiddenSearchObjects(check_obj_id, hidden_id, input_id=null, org_hi
     let item = document.getElementById(check_obj_id)
     let hidden_item = document.getElementById(hidden_id)
     let search_place = document.getElementById('contragentsListOptions')
-    let orgNameInput = document.getElementById('organizationsNameId')
+    // let orgNameInput = document.getElementById('organizationsNameId')
     let communicate =document.getElementById('communicateCheckbox')
     let closing = document.getElementById('closeCheckbox')
 
@@ -316,3 +317,24 @@ async function loadData(url){
         alert("Ошибка: " + response.status);
     }
 }
+
+let super_inn = document.getElementById('hidden_inn')
+
+window.addEventListener('load', (e) => {
+    if (super_inn) {
+    inn.value = super_inn.value
+    fetch('/census/get-inn/', {
+        method: 'POST',
+        headers: {"X-CSRFToken": csrf},
+        body: JSON.stringify({searchInn: super_inn.value})
+    }).then(response=>response.json()).then(data=> {
+        LengthValue(inn, e, data)
+        if (data.length > 0) {
+            orgNameInput.value = data[0].name
+            inn.setAttribute('disabled', '')
+            orgNameInput.setAttribute('disabled', '')
+        }
+    })
+}
+})
+

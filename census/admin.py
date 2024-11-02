@@ -43,7 +43,7 @@ class CensusAdmin(admin.ModelAdmin):
         # 'cars',
         "elevators_count",
         "akb_specify",
-        # 'working',
+        'working',
         # 'result',
         "task",
         "basics",

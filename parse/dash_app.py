@@ -49,7 +49,7 @@ app.layout = html.Div(
         dcc.Dropdown(
             id='brand-filter',
             options=get_brands(),
-            placeholder="Выберите артикул",
+            placeholder="Выберите бренд",
             multi=True,  # Позволяет выбрать несколько значений
             style={'width': '50%', 'margin-bottom': '20px'}
         ),

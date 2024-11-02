@@ -147,7 +147,6 @@ class Worker(models.Model):
         ordering = ['name']
 
 
-
 class Head(models.Model):
     name = models.CharField(verbose_name="Имя", max_length=1000)
     code = models.CharField(verbose_name="Код 1С", primary_key=True, max_length=11)

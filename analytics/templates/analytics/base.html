@@ -1,6 +1,7 @@
 {% url 'analytics' as main %}
-{% url 'report_2' as report_2 %}
+{% url 'tasks' as tasks %}
 {% url 'report_3' as report_3 %}
+{% url 'parse' as parse %}
 <!doctype html>
 {% load static %}
 <html lang="en">
@@ -13,7 +14,21 @@
     <meta name="theme-color" content="#7952b3">
     <title>{% block title %}Dashboard{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/icons/bootstrap-icons/font/bootstrap-icons.css' %}">
     <link href="{% static 'css/analytics/dashboard.css'%}" rel="stylesheet">
+    <style>
+        .close {
+            text-decoration: none;
+        }
+        .close i::before {
+            display: flex;
+            justify-content: end;
+            margin: 0 15px;
+            text-decoration: none;
+            color: #0f0f0f;
+            cursor: pointer;
+        }
+    </style>
     {% block styles %}
         <style>
             .bd-placeholder-img {
@@ -48,6 +63,7 @@
     <div class="row">
         <nav id="sidebarMenu" class="col-md-2 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="position-sticky pt-3">
+                <a class="close"><i class="bi bi-x"></i></a>
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == main %}active{% else %}{% endif %}" aria-current="page" href="{{ main }}">
@@ -56,14 +72,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == report_2 %}active{% else %}{% endif %}" href="{{ report_2 }}">
+                        <a class="nav-link {% if request.path == tasks %}active{% else %}{% endif %}" href="{{ tasks }}">
                             <span data-feather="file"></span>
                             Общее выполнение сенсуса (Отчет 2)
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active"
-                           href="{% url 'parse' %}">
+                        <a class="nav-link {% if request.path == parse %}active{% else %}{% endif %}" href="{{ parse }}">
                             <span data-feather="file"></span>
                             Проценка
                         </a>
@@ -95,22 +110,30 @@
             {% block content %}{% endblock %}
             </main>
 
-    <div type="button" id="sidebarBut" class="btn btn-outline-secondary collapse-btn">>></div>
+{#    <div type="button" id="sidebarBut" class="btn btn-outline-secondary collapse-btn">>></div>#}
     </div>
 </div>
 
 <script>
     let collapse_btn = document.querySelector('.collapse-btn')
     let collapse_menu = document.querySelector('.collapse')
-    collapse_btn.addEventListener('click', () => {
-        collapse_menu.classList.add('show')
+    let close = document.querySelector('.close i')
 
-        window.addEventListener('click', (event)=> {
-            if (event.target.id !== 'sidebarMenu' && event.target.id !== 'sidebarBut') {
-                collapse_menu.classList.remove('show')
-            }
-        })
+
+    document.addEventListener('mousemove', function (event) {
+        const threshold = 10; // Расстояние в пикселях от левого края, считаем "прижатием"
+        const mouseX = event.clientX; // Позиция курсора по оси X
+        // Проверяем, находится ли курсор в пределах `threshold` пикселей от левого края окна
+        if (mouseX <= threshold) {
+            console.log('Курсор прижат к левой стороне окна');
+            collapse_menu.classList.add('show')
+        }
+    });
+
+    close.addEventListener('click', () => {
+        collapse_menu.classList.remove('show')
     })
+
 </script>
 
 <script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>

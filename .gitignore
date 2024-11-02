@@ -451,8 +451,10 @@ static/import_export
 static/rest_framework
 static/js/analytics/Chart.min.js
 static/js/analytics/dashboard.js
+static/assets/icons/bootstrap-icons
 celerybeat-schedule.dat
 celerybeat-schedule.bak
 celerybeat-schedule.dir
 *.sqlite3
+data.json
 # End of https://www.toptal.com/developers/gitignore/api/pycharm,windows,macos,python,django
