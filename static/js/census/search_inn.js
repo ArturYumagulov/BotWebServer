@@ -185,6 +185,7 @@ function loadValidPartners() {
                             ii.addEventListener('click', function (){
                                 ii.classList.add('bg-secondary')
                                 search.value = ii.dataset.inn
+                                inn.value = ii.dataset.inn
                                 if (search.value.length > 0) {
                                     search.classList.remove('is-invalid')
                                     search.classList.add('is-valid')
