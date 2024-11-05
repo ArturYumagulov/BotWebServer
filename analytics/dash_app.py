@@ -94,6 +94,7 @@ app.layout = html.Div(
                 {"name": "Подразделение", "id": "department"},
                 {"name": "Автор", "id": "author"},
                 {"name": "Количество", "id": "tasks"},
+                {"name": "Выполнено задач", "id": "ready"},
                 {"name": "Действующие торговые точки", "id": "active"},
                 {"name": "Потенциальные торговые точки", "id": "potential", "presentation": "markdown"},
                 {"name": "Договор", "id": "contract"},
