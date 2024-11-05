@@ -13,11 +13,13 @@ class CensusAdmin(admin.ModelAdmin):
 
     actions = ["make_load", "make_unload"]
     search_fields = ("address_id",)
-    list_filter = ("department",)
+    list_filter = ("department", "worker")
     list_display = (
+        "pk",
         "address_id",
         "address",
         "name",
+        "worker",
         "created_date",
         "edit_date",
         "department",
