@@ -205,6 +205,8 @@ class CensusSave:
         if self.request.get("working"):
             self.new_census.working = Partner.objects.get(inn=str(self.request.get("working")))
 
+        self.new_census.save()
+
         save_files(self.request_files, self.new_census)
 
     def closing_point(self, result_status):

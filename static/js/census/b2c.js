@@ -176,6 +176,9 @@
         const package_div = document.getElementById('packagesMultiDiv')
         const package_input = document.getElementById('packagesMulti')
 
+        const lukoil_multi_div = document.getElementById('lukoilMultiDiv')
+        const lukoil_multi_input = document.getElementById('lukoilMulti')
+
 
         $('#vectorMulti').on('select2:select', function (e) {
 
@@ -215,6 +218,7 @@
                 // Фасовка
                 package_div.style.display = 'block'
                 package_input.setAttribute('required', '')
+
                 // Коробка
                 kpp.parentNode.style.display = "block";
                 kpp.setAttribute('required', '')
@@ -270,7 +274,7 @@
             let category = e.params.data.element.dataset.slug
             console.log(e.params.data.text)
             if(e.params.data.text === 'Масло') {
-                let element = document.getElementById(`maslo_load`)
+                let element = document.getElementById(`maslo`)
                 element.style.display = 'none'
                 element.removeAttribute('required')
 
@@ -361,14 +365,17 @@
 
         function lukoil_brands(){
             const lukoil_div = document.getElementById('lukoilMultiDiv')
+            const lukoil_input = document.getElementById('lukoilMulti')
             $('#maslo').on('select2:select', function (e) {
                 let txt = e.params.data.text
                 if (txt === "ЛУКОЙЛ") {
                     lukoil_div.style.display = 'block'
+                    lukoil_input.setAttribute('required', '')
                 }
             })
             $('#maslo').on('select2:unselect', function (e) {
-                console.log(e.params.data.text)
+                lukoil_div.style.display = 'none'
+                lukoil_input.removeAttribute('required')
             })
         }
 
