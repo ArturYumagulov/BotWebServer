@@ -352,7 +352,7 @@ class Census(models.Model):
     basics = models.CharField(verbose_name='Номер основания', null=True, blank=True, max_length=1000)
     loaded = models.BooleanField('Загружено', default=False)
     load_to_1c = models.BooleanField('Загружено', default=False)
-    kpp = models.BooleanField(default=False, blank=True)
+    kpp = models.BooleanField(default=False, blank=True, null=True)
     package = models.ManyToManyField("OilPackages", related_name="census_packages", blank=True, default=None)
     lukoil_brands = models.ManyToManyField("LukoilBrands", related_name="lukoil_brands", blank=True, default=None)
     federal = models.BooleanField(default=False, blank=True)

@@ -264,7 +264,7 @@ class CensusSave:
 
         self.new_census.nets = self.request.get("nets")
         self.new_census.federal = self.request.get("federal")
-        self.new_census.kpp = self.request.get("kpp")
+        self.new_census.kpp = False
         self.new_census.point_type = models.PointTypes.objects.get(
                 pk=self.request.get("point_type")
             )
