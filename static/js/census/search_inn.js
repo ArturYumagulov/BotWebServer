@@ -322,7 +322,7 @@ async function loadData(url){
 let super_inn = document.getElementById('hidden_inn')
 
 window.addEventListener('load', (e) => {
-    if (super_inn) {
+    if (super_inn.value !== 'None') {
     inn.value = super_inn.value
     fetch('/census/get-inn/', {
         method: 'POST',
