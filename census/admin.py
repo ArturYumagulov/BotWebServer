@@ -12,7 +12,7 @@ from .models import Census
 class CensusAdmin(admin.ModelAdmin):
 
     actions = ["make_load", "make_unload"]
-    search_fields = ("address_id",)
+    search_fields = ("address_id", 'basics')
     list_filter = ("department", "worker")
     list_display = (
         "pk",
