@@ -891,7 +891,7 @@ class TasksFilterViews(generics.ListAPIView):
     queryset = models.Task.objects.all()
     serializer_class = serializers.TaskListSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["worker", "edited", "status"]
+    filterset_fields = ["worker", "edited", "status", "base__group"]
 
 
 class WorkerFilterViews(generics.ListAPIView):
