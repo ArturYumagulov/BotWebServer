@@ -1,10 +1,6 @@
 (function (qualifiedName) {
     function isInteger(num) {
-        if (num < '0' || num > '9') {
-            return false;
-        } else {
-            return true;
-        }
+        return /^\d+$/.test(num);
     }
     function floatFormValid(input_id, hidden=true, is_integer=false, is_string=true) {
         let input = document.getElementById(input_id)
