@@ -1,37 +1,4 @@
 (function (qualifiedName) {
-    function isInteger(num) {
-            return /^\d+$/.test(num);
-        }
-
-    function floatFormValid(input_id, hidden=true, is_integer=false, is_string=true) {
-            let input = document.getElementById(input_id)
-
-            input.addEventListener('keyup', function (e) {
-                if (e.target.value === '' ) {
-                    input.classList.add('is-invalid')
-                } else if (e.target.value.length > 0){
-                    input.classList.remove('is-invalid')
-                    input.classList.add('is-valid')
-                    if (is_integer === true){
-                        if(isInteger(e.target.value)) {
-                            input.classList.remove('is-invalid')
-                            input.classList.add('is-valid')
-                        } else {
-                            input.classList.remove('is-valid')
-                            input.classList.add('is-invalid')
-                        }
-                    } else if (is_string) {
-                        if(isInteger(e.target.value)) {
-                            input.classList.remove('is-valid')
-                            input.classList.add('is-invalid')
-                        } else if (typeof e.target.value === 'string') {
-                            input.classList.remove('is-invalid')
-                            input.classList.add('is-valid')
-                        }
-                    }
-                }
-            })
-        }
 
     function checkHiddenSearchObjects(check_obj_id, hidden_id, input_id=null, org_hidden=false) {
         let item = document.getElementById(check_obj_id)
