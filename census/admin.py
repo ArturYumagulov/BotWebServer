@@ -1,15 +1,16 @@
 from django.contrib import admin
-
-from tasks.models import Task
 from . import models
-from .models import Census
 
+from import_export.admin import ImportExportModelAdmin
+from .resources import CensusResource
 
 # Register your models here.
 
 
 @admin.register(models.Census)
-class CensusAdmin(admin.ModelAdmin):
+# class CensusAdmin(admin.ModelAdmin):
+class CensusAdmin(ImportExportModelAdmin):
+    resource_class = CensusResource
 
     actions = ["make_load", "make_unload"]
     search_fields = ("address_id", 'basics')

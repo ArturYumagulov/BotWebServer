@@ -195,6 +195,7 @@ class CensusSave:
         self.new_census.task_author = self.task.author.name
         self.new_census.worker = self.task.worker.name
         self.new_census.edited = True
+
         self.worker_comment = WorkerComments.objects.create(
             comment=self.request.get("result_comment"), worker_id=self.task.worker.pk
         )
@@ -203,7 +204,7 @@ class CensusSave:
         self.new_census.code = self.request.get('code')
 
         if self.request.get("working"):
-            self.new_census.working = Partner.objects.get(inn=str(self.request.get("working")))
+            self.new_census.working = Partner.objects.filter(inn__in=self.request.getlist("working"))[0]
 
         self.new_census.save()
 
