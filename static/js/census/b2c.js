@@ -1,17 +1,49 @@
 (function (qualifiedName) {
+    function isInteger(num) {
+            return /^\d+$/.test(num);
+        }
 
-    async function createOption(item_id) {
-        let item = document.getElementById(item_id)
-        let url = item.dataset.url
-        let data = await loadData(url)
+    function floatFormValid(input_id, hidden=true, is_integer=false, is_string=true) {
+            let input = document.getElementById(input_id)
 
-        data.forEach((i) => {
-            let option = document.createElement("option")
-            option.setAttribute('value', i.id)
-            option.innerHTML = i.name
-            item.append(option)
-        })
-    }
+            input.addEventListener('keyup', function (e) {
+                if (e.target.value === '' ) {
+                    input.classList.add('is-invalid')
+                } else if (e.target.value.length > 0){
+                    input.classList.remove('is-invalid')
+                    input.classList.add('is-valid')
+                    if (is_integer === true){
+                        if(isInteger(e.target.value)) {
+                            input.classList.remove('is-invalid')
+                            input.classList.add('is-valid')
+                        } else {
+                            input.classList.remove('is-valid')
+                            input.classList.add('is-invalid')
+                        }
+                    } else if (is_string) {
+                        if(isInteger(e.target.value)) {
+                            input.classList.remove('is-valid')
+                            input.classList.add('is-invalid')
+                        } else if (typeof e.target.value === 'string') {
+                            input.classList.remove('is-invalid')
+                            input.classList.add('is-valid')
+                        }
+                    }
+                }
+            })
+        }
+        async function createOption(item_id) {
+            let item = document.getElementById(item_id)
+            let url = item.dataset.url
+            let data = await loadData(url)
+
+            data.forEach((i) => {
+                let option = document.createElement("option")
+                option.setAttribute('value', i.id)
+                option.innerHTML = i.name
+                item.append(option)
+            })
+        }
 
     async function loadData(url){
 
