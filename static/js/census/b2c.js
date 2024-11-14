@@ -267,6 +267,7 @@
                 });
                 select.parentNode.style.display = 'block'
                 select.setAttribute('required', '')
+                select.setAttribute('required', '')
             }
         })
 
@@ -418,6 +419,7 @@
                 elements.slice(1)
                 elements.forEach((item) => {
                     item.setAttribute('disabled', '')
+                    item.classList.remove('is-invalid')
                 })
                 function removeReq(iterElem) {
                     iterElem.forEach((elem) => {
