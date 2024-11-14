@@ -118,6 +118,7 @@ function LoadInnSearchBlock(url, event) {
                                 innDiv.style.display = 'none'
                                 orgNameDiv.style.display = 'none'
                                 orgNameDiv.children[0].removeAttribute('required')
+
                             })
                         })
 
@@ -166,7 +167,7 @@ function loadValidPartners() {
                     if (data.length === 0) {
                         dataList.style.display = 'block'
                         search.classList.remove('mb-3')
-                        dataList.innerHTML = '<li class="list-group-item">Ничего не найдено</li>'
+                        dataList.innerHTML = '<li class="list-group-item">Ничего не найдено. Возможно вы не указали название организации</li>'
                     } else {
                         dataList.style.display = 'block'
                         dataList.innerHTML = ''
@@ -237,6 +238,7 @@ function checkHiddenSearchObjects(check_obj_id, hidden_id, input_id=null, org_hi
             closing.setAttribute('disabled', '')
             hidden_item.style.display = 'block'
             hidden_item.setAttribute('required', '')
+
             if (org_hidden === true) {
                 innDiv.style.display = 'none'
                 orgNameDiv.style.display = 'none'
@@ -245,12 +247,12 @@ function checkHiddenSearchObjects(check_obj_id, hidden_id, input_id=null, org_hi
                 orgNameInput.removeAttribute('required')
             }
             inn.classList.remove('is-valid')
+
             if (input_id !== null) {
                 let input = document.getElementById(input_id)
                 input.setAttribute('required', '')
             }
             hidden_item.classList.add('mb-3')
-
             hidden_item.addEventListener('keyup', (e) => {
                 if (e.target.value.length === 0) {
                     hidden_item.classList.add('is-invalid')
@@ -262,11 +264,14 @@ function checkHiddenSearchObjects(check_obj_id, hidden_id, input_id=null, org_hi
             } catch (TypeError) {}
             closing.removeAttribute('disabled')
             hidden_item.style.display = 'none'
+            // document.querySelector('.search .invalid-feedback').style.display = 'none'
             search_place.style.display = 'none'
             hidden_item.removeAttribute('required')
             hidden_item.value = ''
             hidden_item.classList.remove('is-valid')
+            hidden_item.classList.remove('is-invalid')
             inn.classList.remove('is-valid', 'is-invalid')
+            inn.value = ''
             if (org_hidden === true) {
                 innDiv.style.display = 'block'
                 orgNameDiv.style.display = 'block'
@@ -339,3 +344,39 @@ window.addEventListener('load', (e) => {
 }
 })
 
+
+function isInteger(num) {
+        return /^\d+$/.test(num);
+    }
+
+function floatFormValid(input_id, hidden=true, is_integer=false, is_string=true) {
+        let input = document.getElementById(input_id)
+
+        input.addEventListener('keyup', function (e) {
+            if (e.target.value === '' ) {
+                input.classList.add('is-invalid')
+            } else if (e.target.value.length > 0){
+                input.classList.remove('is-invalid')
+                input.classList.add('is-valid')
+                if (is_integer === true){
+                    if(isInteger(e.target.value)) {
+                        input.classList.remove('is-invalid')
+                        input.classList.add('is-valid')
+                    } else {
+                        input.classList.remove('is-valid')
+                        input.classList.add('is-invalid')
+                    }
+                } else if (is_string) {
+                    if(isInteger(e.target.value)) {
+                        input.classList.remove('is-valid')
+                        input.classList.add('is-invalid')
+                    } else if (typeof e.target.value === 'string') {
+                        input.classList.remove('is-invalid')
+                        input.classList.add('is-valid')
+                    }
+                }
+            }
+        })
+    }
+
+floatFormValid('searchClient', true, false, true)
