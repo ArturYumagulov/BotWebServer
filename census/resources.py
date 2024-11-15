@@ -18,7 +18,7 @@ class CensusResource(resources.ModelResource):
     )
     packages = fields.Field(
         column_name='packages',  # Название столбца в файле
-        attribute='packages',  # Название поля ManyToMany в модели
+        attribute='package',  # Название поля ManyToMany в модели
         widget=ManyToManyWidget(OilPackages, separator=',', field='name')  # Указываем модель Genre и разделитель
     )
     cars = fields.Field(
