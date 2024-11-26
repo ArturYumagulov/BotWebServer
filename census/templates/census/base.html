@@ -1,4 +1,4 @@
-{% url 'census_template' as full_census %}
+    {% url 'census_template' as full_census %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,6 +74,22 @@
             width: 100%;
             z-index: 99999;
         }
+        .inn-search {
+            position: relative;
+        }
+        .inn-search .res-list {
+            position: absolute;
+            z-index: 999;
+            border: solid 1px gray;
+            width: 100%;
+            border-radius: 5px;
+            background-color: #efe8e8;
+            padding: 10px;
+        }
+        .inn-search .res-list li {
+            padding: 1px;
+            list-style: none;
+        }
 
     </style>
 
@@ -130,10 +146,16 @@
             }
         });
     }
-    {#let divs = document.getElementsByTagName('input')#}
-    {#for (let i = 0; i < divs.length; i++) {#}
-    {#    if (divs[i].hasAttribute('required')) {#}
-    {#        divs[i].classList.add('is-invalid')}}#}
+
+    const form = document.querySelector('form')
+    form.addEventListener('submit', (event) => {
+        {#event.preventDefault()#}
+        const inputs = form.querySelectorAll('input')
+        inputs.forEach(input => {
+            console.log(input)
+        })
+    })
+
 </script>
 </body>
 </html>

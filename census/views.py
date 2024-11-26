@@ -5,6 +5,7 @@ from django.db.models.functions import Lower
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
 
 from core.tasks import save_organizations
 from tasks.models import Partner, ResultData, PartnerWorker, Worker
@@ -141,7 +142,7 @@ def full_load_data(request):
 
     if request.method == "POST":
 
-        form = valid_data(request)
+        form = valid_data(request, full=True)
 
         if form:
             return render(request, 'census/ready_census.html')
@@ -153,7 +154,8 @@ def full_load_data(request):
 
 def get_partners(request):
     search_str = json.loads(request.body).get('searchText')
-    partners = Partner.objects.filter(name__iregex=search_str).distinct()
+    partners = Partner.objects.filter(Q(name__icontains=search_str)|
+                                      Q(inn__icontains=search_str)).distinct()
     return JsonResponse(list(partners.values()), safe=False)
 
 

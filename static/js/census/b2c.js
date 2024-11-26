@@ -1,17 +1,17 @@
 (function (qualifiedName) {
 
-        async function createOption(item_id) {
-            let item = document.getElementById(item_id)
-            let url = item.dataset.url
-            let data = await loadData(url)
+    async function createOption(item_id) {
+        let item = document.getElementById(item_id)
+        let url = item.dataset.url
+        let data = await loadData(url)
 
-            data.forEach((i) => {
-                let option = document.createElement("option")
-                option.setAttribute('value', i.id)
-                option.innerHTML = i.name
-                item.append(option)
-            })
-        }
+        data.forEach((i) => {
+            let option = document.createElement("option")
+            option.setAttribute('value', i.id)
+            option.innerHTML = i.name
+            item.append(option)
+        })
+    }
 
     async function loadData(url){
 
@@ -431,6 +431,7 @@
         await validSelect('akbId')
 
         floatFormValid('signboardId', true)
+        floatFormValid('organizationsNameId', true)
         floatFormValid('lastnameMakerId', false, false, true)
         floatFormValid('firstnameMakerId', false, false, true)
         floatFormValid('surnameMakerId', false, false, true)
@@ -470,8 +471,10 @@
         lukoil_brands()
         loadValidPartners();
 
-        closeCheckbox.removeAttribute('disabled');
-        workCheckbox.removeAttribute('disabled');
+        if (document.location.pathname !== '/census/census-template/') {
+            closeCheckbox.removeAttribute('disabled');
+            workCheckbox.removeAttribute('disabled');
+        }
     }
     window.CreateApp = CreateApp;
 })();

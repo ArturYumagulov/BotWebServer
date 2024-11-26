@@ -176,29 +176,44 @@ def create_decisions(request, census_model):
 
 class CensusSave:
     """Класс работы с моделью Сенсуса"""
-    def __init__(self, request):
+    def __init__(self, request, full):
 
         self._other_name = "Другое"
         self.request = request.POST
         self.request_files = request.FILES
-
         self.new_census = Census()
-        self.task = Task.objects.get(number=self.request.get("guid"))
         self.new_census.address = self.request.get("address")
         self.new_census.department = models.Department.objects.get(name=self.request.get("depart"))
         self.new_census.name = self.request.get("name")
-        self.new_census.task = self.task.number
         self.new_census.position = self.request.get("position")
-        self.new_census.address_id = self.request.get("address_id")
-        self.new_census.basics = self.task.base.number
         self.new_census.inn = self.request.get("inn")
-        self.new_census.task_author = self.task.author.name
-        self.new_census.worker = self.task.worker.name
+        self.new_census.chicago_code = self.request.get('chicago_code')
+        self.new_census.code = self.request.get('code')
         self.new_census.edited = True
 
-        self.worker_comment = WorkerComments.objects.create(
-            comment=self.request.get("result_comment"), worker_id=self.task.worker.pk
-        )
+
+        if full:
+            self.new_census.task = None
+            self.new_census.address_id = None
+            self.new_census.basics = None
+            self.new_census.task_author = None
+            self.worker = Worker.objects.get(chat_id=self.request.get("worker"))
+            self.new_census.worker = self.worker.name
+            self.worker_comment = WorkerComments.objects.create(
+                comment=self.request.get("result_comment"), worker_id=self.worker.pk
+            )
+        else:
+            self.task = Task.objects.get(number=self.request.get("guid"))
+            self.new_census.task = self.task.number
+            self.new_census.address_id = self.request.get("address_id")
+            self.new_census.basics = self.task.base.number
+            self.new_census.task_author = self.task.author.name
+            self.new_census.worker = self.task.worker.name
+
+
+            self.worker_comment = WorkerComments.objects.create(
+                comment=self.request.get("result_comment"), worker_id=self.task.worker.pk
+            )
 
         self.new_census.chicago_code = self.request.get('chicago_code')
         self.new_census.code = self.request.get('code')
@@ -389,9 +404,9 @@ class CensusSave:
         self.new_census.save()
 
 
-def valid_data(request):
+def valid_data(request, full=False):
 
-    new_census = CensusSave(request=request)
+    new_census = CensusSave(request=request, full=full)
 
     if request.POST.get("closing") is not None:  # Если закрыто
         new_census.point_closing()

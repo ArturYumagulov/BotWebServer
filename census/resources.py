@@ -45,6 +45,7 @@ class CensusResource(resources.ModelResource):
     class Meta:
         model = Census
         fields = (
+            'id',
             'address_id',
             'address',
             'name',

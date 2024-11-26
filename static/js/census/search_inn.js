@@ -65,7 +65,7 @@ function HideSearchBlock(hide=false) {
 
 function createSearchElem(searchBlock, item, source) {
     let li = document.createElement('li')
-    li.classList.add('list-group-item', 'result-inn')
+    li.classList.add('result-inn')
     li.style.cursor = 'pointer'
     li.innerHTML = `${item.name}`
     li.setAttribute('data-inn', item.inn)
@@ -93,9 +93,10 @@ function LoadInnSearchBlock(url, event) {
                         innDiv.classList.remove('mb-3')
                         createSearchElem(searchBlock, item)
 
-                        let results_list = document.querySelectorAll('.list-group-item.result-inn')
+                        let results_list = document.querySelectorAll('.result-inn')
                         let contragent = document.getElementById('searchClient')
                         // let orgDiv = document.getElementById('organizationsNameDivId')
+
                         results_list.forEach((item) => {
                             item.addEventListener('click', () => {
                                 active_check.checked = true
@@ -104,7 +105,7 @@ function LoadInnSearchBlock(url, event) {
                                 } catch (TypeError) {}
                                 document.getElementById('closeCheckbox').setAttribute('disabled', '')
                                 HideSearchBlock(true)
-                                let items = document.querySelectorAll('.list-group-item.result-inn')
+                                let items = document.querySelectorAll('.result-inn')
                                 items.forEach((item) => {
                                     item.remove()
                                 })
@@ -118,7 +119,7 @@ function LoadInnSearchBlock(url, event) {
                                 innDiv.style.display = 'none'
                                 orgNameDiv.style.display = 'none'
                                 orgNameDiv.children[0].removeAttribute('required')
-
+                                orgNameDiv.children[0].classList.remove('is-invalid')
                             })
                         })
 
@@ -128,12 +129,13 @@ function LoadInnSearchBlock(url, event) {
                         innDiv.classList.remove('mb-3')
                         createSearchElem(searchBlock, item)
 
-                        let results_list = document.querySelectorAll('.list-group-item.result-inn')
+                        let results_list = document.querySelectorAll('.result-inn')
                         results_list.forEach((item) => {
                             item.addEventListener('click', () => {
                                 // HideSearchBlock(true)
                                 let orgName = document.getElementById('organizationsNameId')
                                 orgName.value = item.getAttribute('data-name')
+                                orgName.classList.remove('is-invalid')
                                 orgName.classList.add('is-valid')
                                 inn.value = item.getAttribute('data-inn')
                                 HideSearchBlock(searchBlock)
@@ -167,7 +169,7 @@ function loadValidPartners() {
                     if (data.length === 0) {
                         dataList.style.display = 'block'
                         search.classList.remove('mb-3')
-                        dataList.innerHTML = '<li class="list-group-item">Ничего не найдено. Возможно вы не указали название организации</li>'
+                        dataList.innerHTML = '<li class="list-group-item">Ничего не найдено</li>'
                     } else {
                         dataList.style.display = 'block'
                         dataList.innerHTML = ''
@@ -355,7 +357,7 @@ function floatFormValid(input_id, hidden=true, is_integer=false, is_string=true)
         input.addEventListener('keyup', function (e) {
             if (e.target.value === '' ) {
                 input.classList.add('is-invalid')
-            } else if (e.target.value.length > 0){
+            } else if (e.target.value.length > 0) {
                 input.classList.remove('is-invalid')
                 input.classList.add('is-valid')
                 if (is_integer === true){

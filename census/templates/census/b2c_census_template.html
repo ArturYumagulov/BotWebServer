@@ -1,8 +1,5 @@
 {% extends 'census/base.html' %}
 {% load static %}
-{% block css %}
-    <link rel="stylesheet" href="{% static 'css/census/style.css' %}">
-{% endblock %}
 {% block js %}
     <script defer src="{% static 'js/census/clean_address.js' %}"></script>
 {% endblock %}
@@ -17,6 +14,10 @@
     {% include 'census/utils/board.html' %}
 
     <p class="text-center" style="margin-top: 41px ">Сведения о торговой точке</p>
+
+    {% include 'census/utils/bonuses.html' %}
+
+    {% include 'census/utils/federal.html' %}
 
     {#        Точка является сетью? -----------------------#}
     {% include 'census/b2c/nets.html' %}
