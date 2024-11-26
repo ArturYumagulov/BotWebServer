@@ -11,7 +11,7 @@ from analytics import services
 from analytics.models import ReportUpdateModel
 from analytics.services import create_report_1
 from census.services import DataInnOnRedis, unix_to_date
-from parse.services import Parsers
+# from parse.services import Parsers
 from sales.models import Product
 from tasks.models import Task, WorkerComments, AuthorComments, Department, Worker
 from census.models import CensusFiles, CompanyDatabase
@@ -178,12 +178,12 @@ def create_secret():
     return True
 
 
-@shared_task
-def update_price():
-    queryset = Product.objects.all()
-    products = queryset.filter(brand__partkom_code__isnull=False)
-    for product in products:
-        partkom_price = Parsers().partkom(article=product.article, maker_id=product.brand.partkom_code)
-        product.partkom_price = partkom_price
-        product.save()
-    return True
+# @shared_task
+# def update_price():
+#     queryset = Product.objects.all()
+#     products = queryset.filter(brand__partkom_code__isnull=False)
+#     for product in products:
+#         partkom_price = Parsers().partkom(article=product.article, maker_id=product.brand.partkom_code)
+#         product.partkom_price = partkom_price
+#         product.save()
+#     return True

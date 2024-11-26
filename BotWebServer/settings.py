@@ -65,7 +65,7 @@ INSTALLED_APPS = [
     'sales',
     'send_message',
     'filegen',
-    'parse'
+    # 'parse'
 ]
 
 MIDDLEWARE = [
@@ -106,23 +106,23 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # if not DEBUG:
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": env('database'),
-#         'USER': env('user'),
-#         'HOST': env('host'),
-#         'PORT': env('port'),
-#         'PASSWORD': env('password'),
-#     }
-# }
-# else:
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env('database'),
+        'USER': env('user'),
+        'HOST': env('host'),
+        'PORT': env('port'),
+        'PASSWORD': env('password'),
     }
 }
+# else:
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 # DATABASES = {
 #     "default": {
