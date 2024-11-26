@@ -24,7 +24,7 @@ urlpatterns = [
     path('django_plotly_dash/', include('django_plotly_dash.urls')),
     path('census/', include('census.urls')),
     path('analytics/', include('analytics.urls')),
-    path('parse/', include('parse.urls')),
+    # path('parse/', include('parse.urls')),
     path('load-to-excel/', include('filegen.urls')),
     path('api/v1/', include('api.urls')),
     path('send-message/', include('send_message.urls')),

@@ -119,18 +119,23 @@ class ReportDataOnMongoDB:
         skip=100,
     ) -> list:
         if all_item:
-            results = self.series_collection.find({}, {"_id": 0})
+            results = self.series_collection.find({})
+            # results = self.series_collection.find({}, {"_id": 0})
+
             return [r for r in results]
         elif multiple:
             results = (
-                self.series_collection.find(elements, {"_id": 0})
+                # self.series_collection.find(elements, {"_id": 0})
+                self.series_collection.find(elements)
+
                 .limit(limit)
                 .skip(skip)
             )
             res = [r for r in results]
             return res
         elif summary:
-            results = self.series_collection.find(elements, {"_id": 0})
+            # results = self.series_collection.find(elements, {"_id": 0})
+            results = self.series_collection.find(elements)
             res = [r for r in results]
             return res
         else:

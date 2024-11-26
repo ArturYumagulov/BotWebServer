@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 import environ
+
 # from celery.schedules import crontab
 # from tasks.services import del_task
 
@@ -20,7 +21,6 @@ environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -105,35 +105,35 @@ WSGI_APPLICATION = "BotWebServer.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-if not DEBUG:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": env('database'),
-            'USER': env('user'),
-            'HOST': env('host'),
-            'PORT': env('port'),
-            'PASSWORD': env('password'),
-            }
+# if not DEBUG:
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": env('database'),
+#         'USER': env('user'),
+#         'HOST': env('host'),
+#         'PORT': env('port'),
+#         'PASSWORD': env('password'),
+#     }
+# }
+# else:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
+}
 
-    # DATABASES = {
-    #     "default": {
-    #         "ENGINE": "django.db.backends.postgresql",
-    #         "NAME": 'postgres',
-    #         'USER': 'postgres',
-    #         'HOST': 'localhost',
-    #         'PORT': '5432',
-    #         'PASSWORD': 'postgres',
-    #         }
-    # }
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": 'postgres',
+#         'USER': 'postgres',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#         'PASSWORD': 'postgres',
+#         }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -153,7 +153,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -165,20 +164,17 @@ USE_I18N = True
 
 USE_TZ = False
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-   os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "static"),
 ]
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -201,7 +197,6 @@ else:
         'TEST_REQUEST_DEFAULT_FORMAT': 'json',
         'UNICODE_JSON': True
     }
-
 
 if not DEBUG:
     LOGGING = {
@@ -265,7 +260,6 @@ else:
         'https://service.tranzit-oil.com',
     ]
 
-
 REDIS_PORT = "6379"
 REDIS_HOST = "localhost"
 CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
@@ -274,13 +268,11 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_RESULT_EXTENDED = True
 
-
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "analytics"
 LOGOUT_REDIRECT_URL = "analytics"
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
-
 
 CACHES = {
     'default': {
