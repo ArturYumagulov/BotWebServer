@@ -190,9 +190,10 @@ class CensusSave:
         self.new_census.chicago_code = self.request.get('chicago_code')
         self.new_census.code = self.request.get('code')
         self.new_census.edited = True
+        self.full = full
 
 
-        if full:
+        if self.full:
             self.new_census.task = None
             self.new_census.address_id = None
             self.new_census.basics = None
@@ -248,10 +249,17 @@ class CensusSave:
         self.new_census.category = models.PointCategory.objects.get(
             pk=self.request.get("category")
         )
-        result = save_tasks(self.task, self.worker_comment, "ДАННЫЕ АКТУАЛИЗИРОВАНЫ")
-        self.new_census.result = result
-        self.new_census.task_result = result.result.name
-        self.new_census.save()
+
+        if self.full:
+            self.new_census.result = None
+            self.new_census.task_result = "Заполнен с шаблона"
+            self.new_census.save()
+
+        else:
+            result = save_tasks(self.task, self.worker_comment, "ДАННЫЕ АКТУАЛИЗИРОВАНЫ")
+            self.new_census.result = result
+            self.new_census.task_result = result.result.name
+            self.new_census.save()
 
         # Сохранение контактного лица
         self.new_census.decision = create_decisions(self.request, self.new_census)
