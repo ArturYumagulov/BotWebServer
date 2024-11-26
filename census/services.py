@@ -346,7 +346,8 @@ class CensusSave:
 
         self.new_census.save()
 
-        del_ready_task(self.request, self.task)
+        if not self.full:
+            del_ready_task(self.request, self.task)
 
     def b2b_point(self):
         """Если точка B2B или Индустриальный отдел"""
