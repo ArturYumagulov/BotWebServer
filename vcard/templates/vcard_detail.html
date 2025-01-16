@@ -102,6 +102,7 @@
         }
         .shares {
             display: flex;
+            width: 100%;
         }
         .socials {
             display: flex;
@@ -119,12 +120,16 @@
             margin-bottom: 0;
         }
         .contact span {
-            margin: 11px 15px;
+            margin: 11px 0 0 15px;
             color: black;
+            text-align: left;
         }
-        button a {
+        .shares a {
             color: white;
-
+            width: 100%;
+        }
+        button i {
+            padding-left: 8px;
         }
         .main-title {
             color: #2F343A;
@@ -241,8 +246,9 @@
             <div class="image">
                 <img src="{{ vcard.photo.url }}" class="img-fluid rounded-start" alt="...">
                 <div class="shares">
-                    <button type="button" class="download"><a
-                            href="{% url 'download_vcard' vcard.pk %}">Сохранить контакт</a></button>
+                    <a href="{% url 'download_vcard' vcard.pk %}">
+                        <button type="button" class="download">Сохранить контакт <i class="bi bi-download"></i></button>
+                    </a>
                 </div>
             </div>
             <div class="main-contacts-body">
@@ -270,7 +276,7 @@
                             </a>
                         </p>
                         <p class="contact"><i class="bi bi-geo-alt"></i>
-                            <span>{{ vcard.address }}</span>
+                            <span>{{ vcard.address.full_address }}</span>
                         </p>
                     </div>
                 </div>
