@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Контакт {{ vcard.full_name }} - компания - {{ vcard.company }}, {{ vcard.job_title }}"/>
     <meta property="og:title" content="{{ vcard.full_name }}"/>
-    <meta property="og:image" content="{{ vcard.photo.path }}"/>
+    <meta property="og:image" content="{{ vcard.photo.url }}"/>
     <meta property="og:description" content="Контакт {{ vcard.full_name }} - компания - {{ vcard.company }}, {{ vcard.job_title }}"/>
     <title>{{ vcard.full_name }} - {{ vcard.company | safe }}</title>
     {% load static %}
