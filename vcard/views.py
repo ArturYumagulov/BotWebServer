@@ -39,7 +39,7 @@ N;CHARSET=utf-8:{vcard.full_name}
 FN;CHARSET=utf-8:{vcard.full_name}
 TEL;TYPE=CELL:{vcard.phone_number}
 EMAIL;TYPE=INTERNET:{vcard.email}
-ADR:{vcard.address}
+ADR:{ vcard.address.full_address }
 PHOTO;ENCODING=BASE64;TYPE=JPEG:{image_base64}
     """
     if vcard.company:
