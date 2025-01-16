@@ -43,9 +43,9 @@ ADR:{vcard.address}
 PHOTO;ENCODING=BASE64;TYPE=JPEG:{image_base64}
     """
     if vcard.company:
-        vcard_data += f"ORG:{vcard.company}\n"
+        vcard_data += f"ORG;CHARSET=utf-8:{vcard.company}\n"
     if vcard.job_title:
-        vcard_data += f"TITLE:{vcard.job_title}\n"
+        vcard_data += f"TITLE;CHARSET=utf-8:{vcard.job_title} {vcard.company}\n"
     if vcard.website:
         vcard_data += f"URL:{vcard.website}\n"
 
