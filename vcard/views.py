@@ -9,8 +9,8 @@ from .models import VCard
 
 def whatsapp_share_link(vcard):
     # Формируем ссылку на WhatsApp с сообщением и ссылкой на vCard
-    vcard_url = "https://service.tranzit-oil.com/vcard/{}/download/".format(vcard.pk)  # URL для скачивания vCard
-    message = f"Check out this contact: {vcard.full_name} - {vcard.phone_number} - {vcard.email}\nDownload vCard: {vcard_url}"
+    vcard_url = "https://service.tranzit-oil.com/contacts/vcard/{}/download/".format(vcard.pk)  # URL для скачивания vCard
+    message = f"Сохраните этот контакт: {vcard.full_name} - {vcard.phone_number} - {vcard.email}\nDownload vCard: {vcard_url}"
     return f"https://wa.me/?text={quote_plus(message)}"
 
 
@@ -18,7 +18,7 @@ def whatsapp_share_link(vcard):
 # Функция для создания ссылки Telegram
 def telegram_share_link(vcard):
     # Формируем ссылку для Telegram с сообщением и ссылкой на vCard
-    vcard_url = f"https://service.tranzit-oil.com/vcard/{vcard.pk}/download/" # URL для скачивания vCard
+    vcard_url = f"https://service.tranzit-oil.com/contacts/vcard/{vcard.pk}/download/" # URL для скачивания vCard
     message = f"Сохраните этот контакт: {vcard.full_name} - {vcard.phone_number} - {vcard.email}\nDownload vCard: {vcard_url}"
     return f"https://t.me/share/url?url={quote_plus(vcard_url)}&text={quote_plus(message)}"
 
@@ -59,8 +59,8 @@ PHOTO;ENCODING=BASE64;TYPE=JPEG:{image_base64}
     return response
 
 
-def index(request, pk):
-    vcard = get_object_or_404(VCard, pk=pk)
+def index(request, email):
+    vcard = get_object_or_404(VCard, email=email)
     whatsapp_link = whatsapp_share_link(vcard)
     telegram_link = telegram_share_link(vcard)
     return render(request, 'vcard_detail.html', {

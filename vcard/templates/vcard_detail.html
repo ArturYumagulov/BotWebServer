@@ -33,50 +33,253 @@
     <!---Datepicker-->
 {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>#}
 
+    <style>
+        {#body {#}
+        {#    background: #2F343A;}#}
+        a {
+            text-decoration: none;
+        }
+        .logo img {
+            width: 257px;
+            height: 100%;
+            padding: 10px;
+        }
+        .wrapper {
+            border: solid #8080805e 1px;
+            border-radius: 3px;
+            margin: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+        }
 
+        .image {
+            max-width: 30%;
+            min-width: 200px;
+            height: 100%;
+            display: block;
+        }
 
+        .image img {
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+        }
+        .image .shares {
+            padding: 10px;
+            width: 100%;
+        }
+        .download {
+            width: 100%;
+            border: none;
+            border-radius: 3px;
+            padding: 10px;
+            background-color: #E60D2E;
+            color: white;
+        }
+        .download a:hover {
+            color: #2F343A;
+        }
+        .main-contacts-body {
+            display: flex;
+            width: 70%;
+            justify-content: space-between;
+            padding-left: 15px;
+        }
+        .card-title {
+            font-size: 26px;
+        }
+        .item {
+            display: flex;
+            flex-direction: column;
+            margin: 10px;
+        }
+        .item .logo img{
+            width: 100px;
+        }
+        .shares {
+            display: flex;
+        }
+        .socials {
+            display: flex;
+        }
+
+        .contact {
+            display: flex;
+            align-items: center;
+        }
+        .contact i {
+            font-size: 25px;
+            color: #E60D2E;
+        }
+        .contact {
+            margin-bottom: 0;
+        }
+        .contact span {
+            margin: 11px 15px;
+            color: black;
+        }
+        button a {
+            color: white;
+
+        }
+        .main-title {
+            color: #2F343A;
+            margin: 45px 10px;
+        }
+        .socials {
+            display: block;
+            padding-right: 20px;
+        }
+        .socials a {
+            font-size: 40px;
+            color: black;
+        }
+        
+        @media (max-width: 992px) {
+            .wrapper {
+                justify-content: center;
+            }
+            .logo img {
+                width: 285px;
+            }
+            .navbar .container-fluid {
+                justify-content: center;
+            }
+            .image {
+                max-width: 100%;
+            }
+            .image img {
+                width: 500px;
+                height: 100%;
+            }
+            .main-contacts-body {
+                max-width: 100%;
+                flex-direction: column;
+                justify-content: center;
+            }
+            .item {
+                justify-content: center;
+                text-align: center;
+                margin-bottom: 17px;
+            }
+            .socials {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+            .socials a {
+                margin: 5px;
+            }
+            
+        }
+        @media (max-width: 480px) {
+            .main-contacts-body {
+                margin: 0;
+                padding: 0;
+            }
+            .item {
+                margin: 0;
+                padding: 0;
+            }
+            .main-title {
+                margin: 30px 0;
+            }
+        }
+        @media (max-width: 480px) {
+            .wrapper {
+                justify-content: center;
+                margin: auto;
+            }
+        }
+        @media (max-width: 420px) {
+            .wrapper {
+                margin: 0;
+            }
+            .main-contacts-body {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+            }
+            .main-contacts {
+                margin-left: 15px;
+            }
+        }
+        @media (max-width: 320px) {
+            .logo img {
+                width: 250px;
+            }
+            .main-contacts {
+                margin-left: 5px;
+            }
+            .contact i {
+                font-size: 20px;
+            }
+            .socials a {
+                font-size: 30px;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
     <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Tranzit-Oil</a>
+            <a class="navbar-brand" href="#">
+                <div class="logo">
+                    <img src="{% static 'images/logo.png' %}" alt="">
+                </div>
+            </a>
         </div>
     </nav>
-    <div class="card m-3 justify-content-center" style="max-width: 100%;">
-        <div class="row g-0">
-            <div class="col-md-4">
+    <div class="contact-card">
+        <div class="wrapper">
+            <div class="image">
                 <img src="{{ vcard.photo.url }}" class="img-fluid rounded-start" alt="...">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h5 class="card-title">{{ vcard.full_name }}</h5>
-                    <p class="card-text">{{ vcard.job_title }}</p>
-                    <p class="contact"><i class="bi bi-phone-fill"></i>
-                        <a href="tel:{{ vcard.phone_number }}">{{ vcard.phone_number }}</a>
-                    </p>
-                    <p class="contact"><i class="bi bi-envelope-at-fill"></i>
-                        <a href="mailto:{{ vcard.email }}">{{ vcard.email }}</a>
-                    </p>
-                    <p class="contact"><i class="bi bi-suitcase-lg-fill"></i>
-                        <a href="{{ vcard.website }}">{{ vcard.company }}</a>
-                    </p>
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                <div class="shares">
+                    <button type="button" class="download"><a
+                            href="{% url 'download_vcard' vcard.pk %}">Сохранить контакт</a></button>
                 </div>
             </div>
-        </div>
-        <div class="shares">
-            <button type="button" class="btn btn-secondary m-1 download"><a href="{% url 'download_vcard' vcard.pk %}">Download vCard</a></button>
+            <div class="main-contacts-body">
+                <div class="item">
+                    <div class="main-title">
+                        <h5 class="card-title">{{ vcard.full_name }}</h5>
+                        <p class="card-text">{{ vcard.job_title }}</p>
+                    </div>
+                    <div class="main-contacts">
+                        <p class="contact"><i class="bi bi-phone"></i>
+                            <a href="tel:{{ vcard.phone_number }}"><span>{{ vcard.phone_number }}</span></a>
+                        </p>
+                        <p class="contact"><i class="bi bi-envelope-at"></i>
+                            <a href="mailto:{{ vcard.email }}">
+                                <span>{{ vcard.email }}</span>
+                            </a>
+                        </p>
+{#                        <p class="contact"><i class="bi bi-suitcase-lg"></i>#}
+{#                            <a href="{{ vcard.website }}">#}
+{#                                <span>{{ vcard.company }}</span></a>#}
+{#                        </p>#}
+                        <p class="contact"><i class="bi bi-globe"></i>
+                            <a href="{{ vcard.website }}">
+                                <span>{{ vcard.website }}</span>
+                            </a>
+                        </p>
+                        <p class="contact"><i class="bi bi-geo-alt"></i>
+                            <span>{{ vcard.address }}</span>
+                        </p>
+                    </div>
+                </div>
             <div class="socials">
-                <a href="{{ whatsapp_link }}" target="_blank">Share via WhatsApp</a><br>
-                <a href="{{ telegram_link }}" target="_blank">Share via Telegram</a>
+                        <a href="{{ whatsapp_link }}" class="whatsapp" target="_blank"><i
+                                class="bi bi-whatsapp"></i></a><br>
+                        <a href="{{ telegram_link }}" class="telegram" target="_blank"><i
+                                class="bi bi-telegram"></i></a>
+                    </div>
             </div>
         </div>
-
     </div>
 
 </div>
-
 </body>
 </html>
