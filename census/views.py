@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 
 from core.tasks import save_organizations
-from tasks.models import Partner, ResultData, PartnerWorker, Worker
+from tasks.models import Partner, ResultData, PartnerWorker, Worker, Task
 from tasks.services import create_worker_secret
 from . import models
 from .models import CompanyDatabase, LukoilBrands, OilPackages
@@ -46,34 +46,34 @@ def census(request, pk):
             'inn': request.GET.get('inn')
         }
 
-        try:
-            models.Census.objects.get(address_id=pk)
+        census_exists = models.Census.objects.filter(address_id=pk).exists()
+        task_exist = Task.objects.filter(number=request.GET.get('guid')).exists()
+
+        if census_exists or not task_exist:
             return render(request, 'census/exist_census.html')
 
-        except models.Census.DoesNotExist:
+        if depart == _b2b or depart == _industrial:
 
-            if depart == _b2b or depart == _industrial:
+            products = models.PointVectors.objects \
+                .filter(is_active=True) \
+                .filter(department__name=_b2b)
 
-                products = models.PointVectors.objects\
-                    .filter(is_active=True)\
-                    .filter(department__name=_b2b)
+            context['products'] = products
 
-                context['products'] = products
+            return render(request, 'census/b2b.html', context)
 
-                return render(request, 'census/b2b.html', context)
+        elif depart == _b2c:
 
-            elif depart == _b2c:
+            products = models.PointVectors.objects \
+                .filter(is_active=True) \
+                .filter(department__name=_b2c)
 
-                products = models.PointVectors.objects\
-                    .filter(is_active=True)\
-                    .filter(department__name=_b2c)
+            volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
 
-                volumes = models.Volume.objects.filter(is_active=True).filter(department__name='b2c')
+            context['volumes'] = volumes
+            context['products'] = products
 
-                context['volumes'] = volumes
-                context['products'] = products
-
-                return render(request, 'census/b2c.html', context)
+            return render(request, 'census/b2c.html', context)
 
         return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')
     return HttpResponse('<h1 style="text-align: center; margin: 20px;">Ошибка<h1>')

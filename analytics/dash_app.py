@@ -6,7 +6,7 @@
 # from urllib.parse import urlencode, quote
 #
 # from census.models import Census
-# from parse.services import Parsers
+# # from parse.services import Parsers
 # from sales.models import Product, Brand, OrderItem
 # from collections import UserDict
 # from tasks.models import Task

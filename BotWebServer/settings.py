@@ -65,7 +65,7 @@ INSTALLED_APPS = [
     'sales',
     'send_message',
     'filegen',
-    # 'parse'
+    'vcard'
 ]
 
 MIDDLEWARE = [
